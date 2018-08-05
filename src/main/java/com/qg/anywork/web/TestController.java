@@ -14,13 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Created by logan on 2017/7/12.
+ * @author logan
+ * @date 2017/7/12
  */
 @RestController
 @RequestMapping("/test")
@@ -41,7 +40,9 @@ public class TestController {
     @RequestMapping(value = "/testList", method = RequestMethod.POST)
     public RequestResult<List<Testpaper>> search(@RequestBody Map map, HttpServletRequest request) {
         String organizationId = (String) map.get("organizationId");
-        if (organizationId == null || organizationId.equals("")) return new RequestResult(StatEnum.REQUEST_ERROR);
+        if (organizationId == null || "".equals(organizationId)) {
+            return new RequestResult<>(StatEnum.REQUEST_ERROR);
+        }
 
         try {
             User user = (User) request.getSession().getAttribute("user");
@@ -49,10 +50,10 @@ public class TestController {
             return testService.getTestList(Integer.parseInt(organizationId), user.getUserId());
         } catch (TestException e) {
             logger.warn(e.getMessage());
-            return new RequestResult(0, e.getMessage());
+            return new RequestResult<>(0, e.getMessage());
         } catch (Exception e) {
             logger.warn(e.getMessage());
-            return new RequestResult(StatEnum.GET_TEST_FAIL);
+            return new RequestResult<>(StatEnum.GET_TEST_FAIL);
         }
     }
 

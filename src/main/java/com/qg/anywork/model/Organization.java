@@ -1,101 +1,58 @@
 package com.qg.anywork.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * 组织实体
- * Created by FunriLy on 2017/7/10.
+ *
+ * @author FunriLy
+ * @date 2017/7/10
  * From small beginnings comes great things.
  */
+@Data
+@NoArgsConstructor
 public class Organization {
 
-    private int organizationId;            //ID
-    private int teacherId;               //教师ID
-    private String teacherName;          //教师名称
-    private String organizationName;       //组织名
-    private String description;     //描述
-    private long token;             //口令
-    private int count;              //组织人数
-    private int isJoin;             //判断字段，标志学生是否是该组织成员
+    /**
+     * ID
+     */
+    private int organizationId;
+
+    /**
+     * 教师ID
+     */
+    private int teacherId;
+
+    /**
+     * 教师名称
+     */
+    private String teacherName;
+
+    /**
+     * 组织名
+     */
+    private String organizationName;
+
+    /**
+     * 描述
+     */
+    private String description;
+
+    /**
+     * 口令
+     */
+    private long token;
+
+    /**
+     * 组织人数
+     */
+    private int count;
+
+    /**
+     * 判断字段，标志学生是否是该组织成员
+     */
+    private int isJoin;
 
     //TODO:考虑老师登录后是否要带上学生列表或者试卷列表
-
-    public Organization() {
-    }
-
-    @Override
-    public String toString() {
-        return "Organization{" +
-                "organizationId=" + organizationId +
-                ", teacherId=" + teacherId +
-                ", teacherName='" + teacherName + '\'' +
-                ", organName='" + organizationName + '\'' +
-                ", description='" + description + '\'' +
-                ", token=" + token +
-                ", count=" + count +
-                ", isJoin=" + isJoin +
-                '}';
-    }
-
-    public int getOrganizationId() {
-        return organizationId;
-    }
-
-    public void setOrganizationId(int organizationId) {
-        this.organizationId = organizationId;
-    }
-
-    public int getTeacherId() {
-        return teacherId;
-    }
-
-    public void setTeacherId(int teacherId) {
-        this.teacherId = teacherId;
-    }
-
-    public String getTeacherName() {
-        return teacherName;
-    }
-
-    public void setTeacherName(String teacherName) {
-        this.teacherName = teacherName;
-    }
-
-    public String getOrganizationName() {
-        return organizationName;
-    }
-
-    public void setOrganizationName(String organizationName) {
-        this.organizationName = organizationName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public long getToken() {
-        return token;
-    }
-
-    public void setToken(long token) {
-        this.token = token;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
-
-    public int getIsJoin() {
-        return isJoin;
-    }
-
-    public void setIsJoin(int isJoin) {
-        this.isJoin = isJoin;
-    }
 }

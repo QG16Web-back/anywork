@@ -1,27 +1,22 @@
 package com.qg.anywork.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * @author ming
+ */
+@Data
+@NoArgsConstructor
 public class TeacherJudge {
 
-    int questionId;     //问题id
-    double socre;       //老师所给分数
+    /**
+     * 问题id
+     */
+    private int questionId;
 
-    public TeacherJudge() {
-    }
-
-
-    public int getQuestionId() {
-        return questionId;
-    }
-
-    public void setQuestionId(int questionId) {
-        this.questionId = questionId;
-    }
-
-    public double getSocre() {
-        return socre;
-    }
-
-    public void setSocre(double socre) {
-        this.socre = socre;
-    }
+    /**
+     * 老师所给分数
+     */
+    private double socre;
 }

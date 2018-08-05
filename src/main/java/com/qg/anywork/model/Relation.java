@@ -1,48 +1,34 @@
 package com.qg.anywork.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
- * Created by FunriLy on 2017/7/10.
+ * @author FunriLy
+ * @date 2017/7/10
  * From small beginnings comes great things.
  */
+@Data
+@NoArgsConstructor
 public class Relation {
 
-    private int relationId;     //ID
-    private int organizationId; //组织ID
-    private int userId;         //用户ID
-    private int role;           //角色，预留字段
+    /**
+     * ID
+     */
+    private int relationId;
 
-    public Relation() {
-    }
+    /**
+     * 组织ID
+     */
+    private int organizationId;
 
-    public int getRelationId() {
-        return relationId;
-    }
+    /**
+     * 用户ID
+     */
+    private int userId;
 
-    public void setRelationId(int relationId) {
-        this.relationId = relationId;
-    }
-
-    public int getOrganizationId() {
-        return organizationId;
-    }
-
-    public void setOrganizationId(int organizationId) {
-        this.organizationId = organizationId;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public int getRole() {
-        return role;
-    }
-
-    public void setRole(int role) {
-        this.role = role;
-    }
+    /**
+     * 角色，预留字段
+     */
+    private int role;
 }

@@ -15,7 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
- * Created by logan on 2017/8/18.
+ * @author logan
+ * @date 2017/8/18
  */
 @RestController
 @RequestMapping("/suggest")

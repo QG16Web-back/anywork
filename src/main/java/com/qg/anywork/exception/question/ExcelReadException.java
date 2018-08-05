@@ -1,7 +1,8 @@
 package com.qg.anywork.exception.question;
 
 /**
- * Created by FunriLy on 2017/7/13.
+ * @author FunriLy
+ * @date 2017/7/13
  * From small beginnings comes great things.
  */
 public class ExcelReadException extends RuntimeException {

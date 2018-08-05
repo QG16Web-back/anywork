@@ -1,37 +1,30 @@
 package com.qg.anywork.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 /**
- * Created by logan on 2017/8/1.
+ * @author logan
+ * @date 2017/8/1
  */
+@Data
+@NoArgsConstructor
 public class TeacherSubmit {
 
-    private int studentId;            //答题者Id
-    private int testpaperId;            //试卷id
-    private List<TeacherJudge> teacherJudge;  //老师评分
+    /**
+     * 答题者Id
+     */
+    private int studentId;
 
-    public int getStudentId() {
-        return studentId;
-    }
+    /**
+     * 试卷id
+     */
+    private int testpaperId;
 
-    public void setStudentId(int studentId) {
-        this.studentId = studentId;
-    }
-
-    public int getTestpaperId() {
-        return testpaperId;
-    }
-
-    public void setTestpaperId(int testpaperId) {
-        this.testpaperId = testpaperId;
-    }
-
-    public List<TeacherJudge> getTeacherJudge() {
-        return teacherJudge;
-    }
-
-    public void setTeacherJudge(List<TeacherJudge> teacherJudge) {
-        this.teacherJudge = teacherJudge;
-    }
+    /**
+     * 老师评分
+     */
+    private List<TeacherJudge> teacherJudge;
 }

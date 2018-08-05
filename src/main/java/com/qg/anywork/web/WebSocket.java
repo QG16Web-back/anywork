@@ -1,6 +1,5 @@
 package com.qg.anywork.web;
 
-import com.qg.anywork.config.GetHttpSessionConfigurator;
 import com.qg.anywork.exception.user.UserNotLoginException;
 import com.qg.anywork.model.User;
 import org.slf4j.Logger;

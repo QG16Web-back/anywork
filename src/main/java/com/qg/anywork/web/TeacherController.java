@@ -17,7 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by logan on 2017/7/31.
+ * @author logan
+ * @date 2017/7/31
  */
 @RestController
 @RequestMapping("/teacher")

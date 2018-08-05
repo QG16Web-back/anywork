@@ -11,7 +11,9 @@ import java.util.List;
 
 /**
  * Redis 数据库缓存操作
- * Created by FunriLy on 2017/7/12.
+ *
+ * @author FunriLy
+ * @date 2017/7/12
  * From small beginnings comes great things.
  */
 @Repository
@@ -46,7 +48,8 @@ public class RedisDao {
 
     public void addUserMessage(String email, User user) {
         synchronized (user) {
-            removeUserMessage(email);   // 清除已经有的缓存信息
+            // 清除已经有的缓存信息
+            removeUserMessage(email);
             redisTemplate.opsForList().leftPush(email, user);
         }
     }
@@ -66,7 +69,8 @@ public class RedisDao {
             e.printStackTrace();
         }
         if (user != null) {
-            removeUserMessage(email);   // 清除
+            // 清除
+            removeUserMessage(email);
         }
         return user;
     }

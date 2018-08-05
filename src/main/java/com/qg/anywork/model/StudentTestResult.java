@@ -1,71 +1,43 @@
 package com.qg.anywork.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 /**
  * 学生成绩实体
- * Created by FunriLy on 2017/7/10.
+ *
+ * @author FunriLy
+ * @date 2017/7/10
  * From small beginnings comes great things.
  */
+@Data
+@NoArgsConstructor
 public class StudentTestResult {
 
-    private int studentTestResultId;        // 考试结果ID
-    private int studentId;                  // 学生ID
-    private int testpaperId;                // 考试ID
-    private double socre;                   //分数
-    private List<StudentAnswerAnalysis> studentAnswerAnalysis;  //具体题目分析
+    /**
+     * 考试结果ID
+     */
+    private int studentTestResultId;
 
-    public StudentTestResult() {
-    }
+    /**
+     * 学生ID
+     */
+    private int studentId;
 
-    @Override
-    public String toString() {
-        return "StudentTestResult{" +
-                "studentTestResultId=" + studentTestResultId +
-                ", studentId=" + studentId +
-                ", testpaperId=" + testpaperId +
-                ", socre=" + socre +
-                ", studentAnswerAnalysis=" + studentAnswerAnalysis +
-                '}';
-    }
+    /**
+     * 考试ID
+     */
+    private int testpaperId;
 
-    public int getStudentTestResultId() {
-        return studentTestResultId;
-    }
+    /**
+     * 分数
+     */
+    private double socre;
 
-    public void setStudentTestResultId(int studentTestResultId) {
-        this.studentTestResultId = studentTestResultId;
-    }
-
-    public int getStudentId() {
-        return studentId;
-    }
-
-    public void setStudentId(int studentId) {
-        this.studentId = studentId;
-    }
-
-    public int getTestpaperId() {
-        return testpaperId;
-    }
-
-    public void setTestpaperId(int testpaperId) {
-        this.testpaperId = testpaperId;
-    }
-
-    public double getSocre() {
-        return socre;
-    }
-
-    public void setSocre(double socre) {
-        this.socre = socre;
-    }
-
-    public List<StudentAnswerAnalysis> getStudentAnswerAnalysis() {
-        return studentAnswerAnalysis;
-    }
-
-    public void setStudentAnswerAnalysis(List<StudentAnswerAnalysis> studentAnswerAnalysis) {
-        this.studentAnswerAnalysis = studentAnswerAnalysis;
-    }
+    /**
+     * 具体题目分析
+     */
+    private List<StudentAnswerAnalysis> studentAnswerAnalysis;
 }

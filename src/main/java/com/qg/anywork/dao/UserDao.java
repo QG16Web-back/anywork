@@ -8,7 +8,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * Created by FunriLy on 2017/7/10.
+ * @author FunriLy
+ * @date 2017/7/10
  * From small beginnings comes great things.
  */
 @Mapper
@@ -18,32 +19,31 @@ public interface UserDao {
     /**
      * 插入用户
      *
-     * @param user
-     * @return
+     * @param user 用户
      */
     void insertUser(@Param("user") User user);
 
     /**
      * 更新用户消息
      *
-     * @param user
-     * @return
+     * @param user 用户
+     * @return int
      */
     int updateUser(@Param("user") User user);
 
     /**
      * 根据用户id来获得用户消息
      *
-     * @param userId
-     * @return
+     * @param userId 用户ID
+     * @return user
      */
     User selectById(@Param("userId") int userId);
 
     /**
      * 根据邮箱查找用户
      *
-     * @param email
-     * @return
+     * @param email email
+     * @return User
      */
     User selectByEmail(@Param("email") String email);
 

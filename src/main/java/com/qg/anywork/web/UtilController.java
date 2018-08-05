@@ -4,12 +4,10 @@ import com.qg.anywork.dto.RequestResult;
 import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.MailSendException;
 import com.qg.anywork.exception.user.UserNotExitException;
-import com.qg.anywork.model.User;
 import com.qg.anywork.service.MailService;
 import com.qg.anywork.service.UserService;
 import com.qg.anywork.utils.Encryption;
-import com.qg.anywork.utils.MailUtil;
-import org.apache.poi.ss.formula.functions.Today;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +29,14 @@ import java.util.Random;
 
 /**
  * 工具类访问接口
- * Created by FunriLy on 2017/8/18.
+ *
+ * @author FunriLy
+ * @date 2017/8/18
  * From small beginnings comes great things.
  */
 @Controller
 @RequestMapping("/utils")
+@Slf4j
 public class UtilController {
     private static final Logger logger = LoggerFactory.getLogger(UtilController.class);
 
@@ -55,17 +56,16 @@ public class UtilController {
     @ResponseBody
     public RequestResult<?> sendMail(@RequestBody Map<String, String> map) {
         try {
-            RequestResult<?> result = mailService.sendPsaawordMail(map.get("email"));
-            return result;
+            return mailService.sendPasswordMail(map.get("email"));
         } catch (UserNotExitException e) {
             logger.warn("不存在的用户！", e);
-            return new RequestResult<Object>(StatEnum.LOGIN_NOT_EXIT_USER);
+            return new RequestResult<>(StatEnum.LOGIN_NOT_EXIT_USER);
         } catch (MailSendException e) {
             logger.warn("发送邮件失败！", e);
-            return new RequestResult<Object>(StatEnum.MAIL_SEND_FAIL);
+            return new RequestResult<>(StatEnum.MAIL_SEND_FAIL);
         } catch (Exception e) {
             logger.warn("未知异常: ", e);
-            return new RequestResult<Object>(StatEnum.DEFAULT_WRONG);
+            return new RequestResult<>(StatEnum.DEFAULT_WRONG);
         }
     }
 
@@ -82,7 +82,7 @@ public class UtilController {
         String ciphertext = request.getParameter("ciphertext");
 //        String email = map.get("email");
 //        String ciphertext = map.get("ciphertext");
-        if (email == null || email.equals("") || ciphertext == null || ciphertext.equals("")) {
+        if (email == null || "".equals(email) || ciphertext == null || "".equals(ciphertext)) {
             return "redirect:../html/failure.html";  // 跳转到错误页面 参数为空
         }
         if (ciphertext.equals(Encryption.getMD5(email))) {
@@ -110,34 +110,35 @@ public class UtilController {
         try {
             String email = map.get("email");
             String ciphertext = map.get("ciphertext");
-            if (email == null || email.equals("") || ciphertext == null || ciphertext.equals("")) {
-                return new RequestResult<String>(StatEnum.ERROR_PARAM);
+            if (email == null || "".equals(email) || ciphertext == null || "".equals(ciphertext)) {
+                return new RequestResult<>(StatEnum.ERROR_PARAM);
             }
             if (ciphertext.equals(Encryption.getMD5(email))) {
                 String password = mailService.resetPassword(email);
-                return new RequestResult<String>(StatEnum.PASSWORD_RESET, password);
+                return new RequestResult<>(StatEnum.PASSWORD_RESET, password);
             }
-            return new RequestResult<String>(StatEnum.ERROR_PARAM);
+            return new RequestResult<>(StatEnum.ERROR_PARAM);
         } catch (UserNotExitException e) {
             logger.warn("不存在的用户！", e);
-            return new RequestResult<String>(StatEnum.LOGIN_NOT_EXIT_USER);
+            return new RequestResult<>(StatEnum.LOGIN_NOT_EXIT_USER);
         } catch (Exception e) {
             logger.warn("未知异常: ", e);
-            return new RequestResult<String>(StatEnum.DEFAULT_WRONG);
+            return new RequestResult<>(StatEnum.DEFAULT_WRONG);
         }
     }
 
     /**
      * 生成图片验证码
      *
-     * @param request
-     * @param response
-     * @return
+     * @param request  request
+     * @param response response
+     * @return 验证码
      */
     @RequestMapping(value = "/valcode", produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public String Verification(HttpServletRequest request, HttpServletResponse response) {
+    public String verification(HttpServletRequest request, HttpServletResponse response) {
 
+        log.info("验证码");
         // 告知浏览当作图片处理
         response.setContentType("image/jpeg");
         // 告诉浏览器不缓存
@@ -146,13 +147,14 @@ public class UtilController {
         response.setHeader("expires", "0");
         // 产生由4位数字构成的验证码
         int length = 4;
-        String valcode = "";
+        StringBuilder valcode = new StringBuilder();
         Random rd = new Random();
-        for (int i = 0; i < length; i++)
-            valcode += rd.nextInt(10);
+        for (int i = 0; i < length; i++) {
+            valcode.append(rd.nextInt(10));
+        }
         // 把产生的验证码存入到Session中
         HttpSession session = request.getSession();
-        session.setAttribute("valcode", valcode);
+        session.setAttribute("valcode", valcode.toString());
 
         // 产生图片
         int width = 120;
@@ -171,7 +173,8 @@ public class UtilController {
         }
         // 绘制边框
         g.setColor(Color.GRAY);
-        g.drawRect(0, 0, width - 1, height - 1);//边框
+        //边框
+        g.drawRect(0, 0, width - 1, height - 1);
         // 绘制验证码
         for (int i = 0; i < length; i++) {
             g.setColor(new Color(rd.nextInt(150), rd.nextInt(150), rd.nextInt(150)));
@@ -183,8 +186,9 @@ public class UtilController {
             ImageIO.write(img, "jpeg", response.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
-            return "false";
+            return "html/failure.html";
         }
-        return "success";
+        log.info("验证码");
+        return "html/success.html";
     }
 }

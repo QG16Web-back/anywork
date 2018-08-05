@@ -1,89 +1,51 @@
 package com.qg.anywork.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.Date;
 import java.util.List;
 
 /**
- * Created by logan on 2017/7/10.
+ * @author logan
+ * @date 2017/7/10
  */
+@Data
+@NoArgsConstructor
 public class StudentPaper {
-    private int studentPaperId;               //学生答卷id
-    private List<StudentAnswer> studentAnswer; //学生做的答案
-    private String userName;            //答题者名字
-    private int studentId;            //答题者Id
-    private int testpaperId;            //试卷id
-    private Date startTime;             //开始答题的时间
-    private Date endTime;               //答题结束的时间
 
-    public StudentPaper() {
-    }
+    /**
+     * 学生答卷id
+     */
+    private int studentPaperId;
 
-    @Override
-    public String toString() {
-        return "StudentPaper{" +
-                "studentPaperId=" + studentPaperId +
-                ", studentAnswer=" + studentAnswer +
-                ", userName='" + userName + '\'' +
-                ", studentId=" + studentId +
-                ", testpaperId=" + testpaperId +
-                ", startTime=" + startTime +
-                ", endTime=" + endTime +
-                '}';
-    }
+    /**
+     * 学生做的答案
+     */
+    private List<StudentAnswer> studentAnswer;
 
-    public int getStudentPaperId() {
-        return studentPaperId;
-    }
+    /**
+     * 答题者名字
+     */
+    private String userName;
 
-    public void setStudentPaperId(int studentPaperId) {
-        this.studentPaperId = studentPaperId;
-    }
+    /**
+     * 答题者Id
+     */
+    private int studentId;
 
-    public List<StudentAnswer> getStudentAnswer() {
-        return studentAnswer;
-    }
+    /**
+     * 试卷id
+     */
+    private int testpaperId;
 
-    public void setStudentAnswer(List<StudentAnswer> studentAnswer) {
-        this.studentAnswer = studentAnswer;
-    }
+    /**
+     * 开始答题的时间
+     */
+    private Date startTime;
 
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public int getStudentId() {
-        return studentId;
-    }
-
-    public void setStudentId(int studentId) {
-        this.studentId = studentId;
-    }
-
-    public int getTestpaperId() {
-        return testpaperId;
-    }
-
-    public void setTestpaperId(int testpaperId) {
-        this.testpaperId = testpaperId;
-    }
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-    public Date getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
+    /**
+     * 答题结束的时间
+     */
+    private Date endTime;
 }

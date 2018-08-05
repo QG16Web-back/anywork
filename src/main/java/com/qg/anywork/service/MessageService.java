@@ -20,13 +20,17 @@ import java.util.List;
 
 /**
  * 消息实体 Service 层
- * Created by FunriLy on 2017/9/25.
+ *
+ * @author FunriLy
+ * @date 2017/9/25
  * From small beginnings comes great things.
  */
 @Service
 public class MessageService {
 
-    // 每页数据条数
+    /**
+     * 每页数据条数
+     */
     private static final int MESSAGE_NUMBER = 10;
     private static final Logger logger = LoggerFactory.getLogger(MessageService.class);
 
@@ -75,8 +79,9 @@ public class MessageService {
      * @return
      */
     public RequestResult<List<Message>> getSendMessage(int userId, int organId, int page, String userName) {
-        Organization oragn = organizationDao.getById(organId);
-        if (oragn.getTeacherId() != userId) {    // 用户不是组织的创建者
+        Organization organization = organizationDao.getById(organId);
+        if (organization.getTeacherId() != userId) {
+            // 用户不是组织的创建者
             throw new NotPowerException("用户没有相应的权限来查看消息！");
         }
         if (page < 0) {
@@ -93,21 +98,22 @@ public class MessageService {
                 logger.warn("用户发送消息获取未知异常：" + e.getMessage());
             }
         }
-        return new RequestResult<List<Message>>(StatEnum.MESSAGE_LIST, list);
+        return new RequestResult<>(StatEnum.MESSAGE_LIST, list);
     }
 
     /**
      * 将用户消息做用户名与用户id转换处理
      *
-     * @param userId
-     * @param username
-     * @param message
-     * @return
+     * @param userId   用户ID
+     * @param username 用户名
+     * @param message  消息
+     * @return 消息
      */
     private Message replaceMessageName(int userId, String username, Message message) {
         String sendName, receiveName;
         try {
-            if (userId != message.getSendId()) { // user 不是 发送者
+            if (userId != message.getSendId()) {
+                // user 不是 发送者
                 sendName = userDao.selectById(message.getSendId()).getUserName();
                 receiveName = username;
             } else {

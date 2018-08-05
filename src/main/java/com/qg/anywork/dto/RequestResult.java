@@ -1,15 +1,29 @@
 package com.qg.anywork.dto;
 
 import com.qg.anywork.enums.StatEnum;
+import lombok.Data;
 
 /**
- * Created by FunriLy on 2017/7/10.
+ * @author FunriLy
+ * @date 2017/7/10
  * From small beginnings comes great things.
  */
+@Data
 public class RequestResult<T> {
 
+    /**
+     * 状态码
+     */
     private int state;
+
+    /**
+     * 状态信息
+     */
     private String stateInfo;
+
+    /**
+     * 数据
+     */
     private T data;
 
     public RequestResult(StatEnum statEnum, T data) {
@@ -32,38 +46,5 @@ public class RequestResult<T> {
         this.state = state;
         this.stateInfo = stateInfo;
         this.data = data;
-    }
-
-    public int getState() {
-        return state;
-    }
-
-    public void setState(int state) {
-        this.state = state;
-    }
-
-    public String getStateInfo() {
-        return stateInfo;
-    }
-
-    public void setStateInfo(String stateInfo) {
-        this.stateInfo = stateInfo;
-    }
-
-    public T getData() {
-        return data;
-    }
-
-    public void setData(T data) {
-        this.data = data;
-    }
-
-    @Override
-    public String toString() {
-        return "RequestResult{" +
-                "state=" + state +
-                ", \nstateInfo='" + stateInfo + '\'' +
-                ",\n data=" + data +
-                '}';
     }
 }
