@@ -23,14 +23,14 @@ public class MailUtil {
     /**
      * 登录URL
      */
-    private final static String LOGIN_URL = "http://127.0.0.1:8080/html/login.html";
+    private final static String LOGIN_URL = "http://10.21.48.11:8080/html/login.html";
 
     /**
      * 校验邮箱URL
      */
-    private final static String CHECK_EMAIL_URL = "http://127.0.0.1:8080/utils/check";
+    private final static String CHECK_EMAIL_URL = "http://10.21.48.11:8080/utils/check";
 
-    private final static String PASSWORD_URL = "http://127.0.0.1:8080/html/newPassword.html";
+    private final static String PASSWORD_URL = "http://10.21.48.11:8080/html/newPassword.html";
 
     @Autowired
     private JavaMailSender javaMailSender;
