@@ -69,56 +69,42 @@ public class OrganizationServiceImpl implements OrganizationService {
         return new RequestResult<>(StatEnum.ORGAN_JOIN_SUCCESS, organization);
     }
 
-    /***
-     * 获取我的组织列表
-     * @param userId
-     * @return
-     */
     @Override
     public RequestResult<List<Organization>> searchByUserId(int userId) {
         List<Organization> organizations = organizationDao.getByUserId(userId);
-        for (Organization o :
-                organizations) {
+        for (Organization o : organizations) {
             o.setIsJoin(1);
             o.setCount(organizationDao.getOrganizationCount(o.getOrganizationId()));
         }
         return new RequestResult<>(StatEnum.ORGAN_SEARCH_SUCCESS, organizations);
     }
 
-    /***
-     * 退出组织
-     * @param organizationId
-     * @param userId
-     * @return
-     */
     @Override
     public RequestResult exitOrganization(int organizationId, int userId) {
-        if (organizationDao.isJoin(organizationId, userId) == 0) throw new OrganizationException("用户未加入该组织");
+        if (organizationDao.isJoin(organizationId, userId) == 0) {
+            throw new OrganizationException("用户未加入该组织");
+        }
         int flag = organizationDao.exitOrganization(organizationId, userId);
-        if (flag == 0)
+        if (flag == 0) {
             return new RequestResult(0, "退出失败");
+        }
         return new RequestResult(1, "退出成功");
     }
 
-    /***
-     * 创建组织
-     * @return
-     */
     @Override
     public RequestResult addOrganization(Organization organization) {
-        int radomInt = new Random().nextInt(99999);
-        organization.setToken(radomInt);
+        int randomInt = new Random().nextInt(99999);
+        organization.setToken(randomInt);
         int flag = organizationDao.addOrganization(organization);
         organizationDao.joinOrganization(organization.getOrganizationId(), organization.getTeacherId());
-        if (flag == 1)
+        if (flag == 1) {
             return new RequestResult(1, "创建组织成功");
-        else return new RequestResult(0, "创建组织失败");
+        } else {
+            return new RequestResult(0, "创建组织失败");
+        }
     }
 
-    /***
-     * 修改组织
-     * @return
-     */
+
     @Override
     public RequestResult alterOrganization(Organization organization) {
         organizationDao.updateOrganization(organization);

@@ -2,15 +2,10 @@ package com.qg.anywork.utils;
 
 import com.qg.anywork.exception.question.ExcelReadException;
 import com.qg.anywork.model.Question;
-import com.qg.anywork.model.Testpaper;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.formula.functions.Count;
-import org.apache.poi.ss.formula.functions.T;
-import org.apache.poi.ss.formula.ptg.EqualPtg;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.DateUtil;
-import org.omg.CORBA.StringHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,6 +78,7 @@ public class ExcelUtil {
      * @return
      * @throws Exception
      */
+    @SuppressWarnings("unchecked")
     private <T> List<Question> readQuest(InputStream input, Class<T> clazz,
                                          Map<Integer, String> map1,                      //选择题
                                          Map<Integer, String> map2,                      //判断题
@@ -155,8 +151,9 @@ public class ExcelUtil {
                     field.setAccessible(true);
                     //获得单元格对象
                     Cell realCell = row.getCell(j);
-                    if (null == realCell || "".equals(realCell.toString()))
+                    if (null == realCell || "".equals(realCell.toString())) {
                         continue;
+                    }
                     t = addingT(field, t1, realCell);
                 }
 
@@ -218,7 +215,7 @@ public class ExcelUtil {
 
                     if (Double.parseDouble(longVal + ".0") == doubleVal) {
                         String type = field.getType().toString();
-                        if (type.equals("class java.lang.String")) {
+                        if ("class java.lang.String".equals(type)) {
                             field.set(t, longVal + "");
                         } else {
                             field.set(t, longVal);
@@ -237,6 +234,8 @@ public class ExcelUtil {
                 break;
 
             case HSSFCell.CELL_TYPE_ERROR:  //故障
+                break;
+            default:
                 break;
         }
 
@@ -405,6 +404,8 @@ public class ExcelUtil {
                                 String[] headers6 = {"综合题", "题目内容", "正确答案", "分数"};
                                 util.addCell(headers6, pre_row, style);
                                 index += 2;
+                                break;
+                            default:
                                 break;
                         }
                     }

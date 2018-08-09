@@ -47,8 +47,6 @@ public class OrganizationController {
     public RequestResult<List<Organization>> search(HttpServletRequest request, @RequestBody Map map) {
         try {
             User user = (User) request.getSession().getAttribute("user");
-//            User user = new User();
-//            user.setUserId(41);
             String organizationName = (String) map.get("organizationName");
             return organizationService.search(organizationName, user.getUserId());
         } catch (Exception e) {
@@ -70,7 +68,6 @@ public class OrganizationController {
     public RequestResult<?> join(HttpServletRequest request, @RequestBody Map map) {
         try {
             User user = (User) request.getSession().getAttribute("user");
-//            User user = new User(); user.setUserId(1);
             String organizationId = (String) map.get("organizationId");
             String token = (String) map.get("token");
             return organizationService.join(Integer.parseInt(organizationId), Long.parseLong(token), user.getUserId());
@@ -85,30 +82,35 @@ public class OrganizationController {
 
     /***
      * 获取我的组织列表
-     * @param request
-     * @return
+     *
+     * @param request request
+     * @return request result
      */
     @RequestMapping(value = "/me", method = RequestMethod.POST)
     public RequestResult<List<Organization>> myOrganization(HttpServletRequest request) {
         User user = (User) request.getSession().getAttribute("user");
-//        User user = new User(); user.setUserId(1);
-        if (user == null) return new RequestResult<>(StatEnum.ORGAN_SEARCH_FAIL);
+        if (user == null) {
+            return new RequestResult<>(StatEnum.ORGAN_SEARCH_FAIL);
+        }
         return organizationService.searchByUserId(user.getUserId());
     }
 
     /***
      * 退出组织接口
-     * @param request
-     * @param map
-     * @return
+     *
+     * @param request request
+     * @param map map
+     *            organizationId 组织ID
+     * @return request resu
      */
     @RequestMapping(value = "/leave", method = RequestMethod.POST)
     public RequestResult leave(HttpServletRequest request, @RequestBody Map map) {
 
         try {
             User user = (User) request.getSession().getAttribute("user");
-//            User user = new User(); user.setUserId(1);
-            if (user == null) return new RequestResult(StatEnum.ORGAN_SEARCH_FAIL);
+            if (user == null) {
+                return new RequestResult(StatEnum.ORGAN_SEARCH_FAIL);
+            }
             int organizationId = (int) map.get("organizationId");
             return organizationService.exitOrganization(organizationId, user.getUserId());
         } catch (Exception e) {
@@ -119,18 +121,18 @@ public class OrganizationController {
 
     /***
      * 创建组织
-     * @param file
-     * @param organizationName
-     * @param description
-     * @param request
-     * @return
-     * @throws IOException
+     * @param file file 组织头像
+     * @param organizationName 组织名称
+     * @param description 描述
+     * @param request request
+     * @return request result
+     * @throws IOException ioException
      */
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public RequestResult addOrganization(@RequestParam(value = "file", required = false) MultipartFile file,
-                                                     @RequestParam(value = "organizationName", required = false) String organizationName,
-                                                     @RequestParam(value = "description", required = false) String description,
-                                                     HttpServletRequest request) throws IOException {
+                                         @RequestParam(value = "organizationName", required = false) String organizationName,
+                                         @RequestParam(value = "description", required = false) String description,
+                                         HttpServletRequest request) throws IOException {
         if (description == null || "".equals(description)) {
             return new RequestResult<>(0, "描述为空");
         }
@@ -141,8 +143,6 @@ public class OrganizationController {
         if (user.getMark() == 0) {
             return new RequestResult<>(0, "没有权限");
         }
-//        User user = new User(); user.setUserId(0); user.setMark(1);
-//        if (user.getMark()==0) return new RequestResult(0,"无此权限");
 
         Organization o = new Organization();
         o.setTeacherName(user.getUserName());
@@ -154,8 +154,9 @@ public class OrganizationController {
         if (file != null && !file.isEmpty()) {
             String filename = file.getOriginalFilename();
             assert filename != null;
-            if (!(filename.endsWith(".jpg") || filename.endsWith(".JPG") || filename.endsWith(".png") || filename.endsWith(".PNG")))
+            if (!(filename.endsWith(".jpg") || filename.endsWith(".JPG") || filename.endsWith(".png") || filename.endsWith(".PNG"))) {
                 return new RequestResult<>(0, "上传的头像不合法");
+            }
 
             String photoName = o.getOrganizationId() + ".jpg";
             FileUtils.copyInputStreamToFile(file.getInputStream(),
@@ -167,13 +168,13 @@ public class OrganizationController {
 
     /***
      * 修改组织信息
-     * @param file
-     * @param organizationId
-     * @param organizationName
-     * @param description
-     * @param request
-     * @return
-     * @throws IOException
+     * @param file file 组织头像
+     * @param organizationId 组织ID
+     * @param organizationName 组织名称
+     * @param description 描述
+     * @param request request
+     * @return request result
+     * @throws IOException ioException
      */
     @RequestMapping(value = "/alter", method = RequestMethod.POST)
     public RequestResult alter(@RequestParam(value = "file", required = false) MultipartFile file,
@@ -182,12 +183,14 @@ public class OrganizationController {
                                @RequestParam(value = "description", required = false) String description,
                                HttpServletRequest request) throws IOException {
         User user = (User) request.getSession().getAttribute("user");
-        if (user.getMark() == 0) return new RequestResult<>(0, "没有权限");
-//        User user = new User(); user.setUserId(0); user.setMark(1);
-//        if (user.getMark()==0) return new RequestResult(0,"无此权限");
+        if (user.getMark() == 0) {
+            return new RequestResult<>(0, "没有权限");
+        }
 
         Organization o = organizationService.getById(organizationId);
-        if (o.getTeacherId() != user.getUserId()) return new RequestResult<>(0, "您不是此组织的创建人");
+        if (o.getTeacherId() != user.getUserId()) {
+            return new RequestResult<>(0, "您不是此组织的创建人");
+        }
 
         if ((organizationName != null && !"".equals(organizationName)) || (description != null && !"".equals(description))) {
             if ((description != null && !"".equals(description))) {
@@ -217,16 +220,18 @@ public class OrganizationController {
 
     /***
      * 删除组织
-     * @param request
-     * @param map
-     * @return
+     * @param request request
+     * @param map map
+     *            organizationId 组织ID
+     * @return request result
      */
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     public RequestResult delete(HttpServletRequest request, @RequestBody Map map) {
         int organizationId = (int) map.get("organizationId");
         User user = (User) request.getSession().getAttribute("user");
-//        User user = new User(); user.setUserId(0); user.setMark(1);
-        if (user.getMark() == 0) return new RequestResult(0, "无此权限");
+        if (user.getMark() == 0) {
+            return new RequestResult(0, "无此权限");
+        }
         try {
             return organizationService.deleteOrganization(organizationId, user.getUserId());
         } catch (Exception e) {
@@ -237,22 +242,24 @@ public class OrganizationController {
 
     /***
      * 查看我创建过的组织
-     * @param request
-     * @return
+     * @param request request
+     * @return request result
      */
     @RequestMapping(value = "/myOrganization", method = RequestMethod.POST)
-    public RequestResult<List<Organization>> Organization(HttpServletRequest request) {
+    public RequestResult<List<Organization>> listMyOrganization(HttpServletRequest request) {
         User user = (User) request.getSession().getAttribute("user");
-//        User user = new User(); user.setUserId(0);  user.setMark(1);
-        if (user.getMark() == 0) return new RequestResult<>(0, "无此权限");
+        if (user.getMark() == 0) {
+            return new RequestResult<>(0, "无此权限");
+        }
         return organizationService.getMyOrganization(user.getUserId());
     }
 
 
     /***
      * 获得该组织下的成员
-     * @param map
-     * @return
+     * @param map map
+     *            organizationId 组织ID
+     * @return 组织成员
      */
     @RequestMapping(value = "/student", method = RequestMethod.POST)
     public RequestResult<List<User>> getStudentOfOrganization(@RequestBody Map map) {

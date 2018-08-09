@@ -26,6 +26,7 @@ public interface OrganizationDao {
 
     /***
      * 查看用户加入的组织
+     *
      * @param userId 用户
      * @return List<Organization> 用户加入的组织列表
      */
@@ -58,49 +59,49 @@ public interface OrganizationDao {
      * 退出组织接口
      * @param organizationId  组织id
      * @param userId 用户id
-     * @return
+     * @return int
      */
     int exitOrganization(@Param("organizationId") int organizationId, @Param("userId") int userId);
 
     /***
      * 获取当前组织下的人数
-     * @param organizationId
-     * @return
+     * @param organizationId 组织ＩＤ
+     * @return 组织人数
      */
     int getOrganizationCount(@Param("organizationId") int organizationId);
 
     /***
      * 添加组织借口
-     * @param organization
-     * @return
+     * @param organization 组织
+     * @return int
      */
     int addOrganization(@Param("organization") Organization organization);
 
     /***
      * 更新组织信息
-     * @param organization
-     * @return
+     * @param organization 组织
+     * @return int
      */
     int updateOrganization(@Param("organization") Organization organization);
 
     /***
      * 删除组织
-     * @param organizationId
-     * @return
+     * @param organizationId 组织ID
+     * @return int
      */
     int deleteOrganization(@Param("organizationId") int organizationId);
 
     /***
      * 查看我创建过的组织
-     * @param userId
-     * @return
+     * @param userId userId
+     * @return Organization List
      */
     List<Organization> getMyOrganization(@Param("userId") int userId);
 
     /***
      * 获得该组织下的成员列表
-     * @param organizationId
-     * @return
+     * @param organizationId 组织ID
+     * @return User　List
      */
     List<User> getOrganizationPeople(@Param("organizationId") int organizationId);
 

@@ -12,7 +12,7 @@ import java.sql.SQLException;
 /**
  * Created by zggdczfr on 2017/1/22.
  */
-//@Configuration
+@Configuration
 public class DruidDBConfig {
 
     @Value("${spring.datasource.url}")

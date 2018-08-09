@@ -8,8 +8,7 @@ import com.qg.anywork.exception.TestException;
 import com.qg.anywork.model.*;
 import com.qg.anywork.service.ChapterService;
 import com.qg.anywork.service.TestService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +22,8 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/test")
+@Slf4j
 public class TestController {
-    private static final Logger logger = LoggerFactory.getLogger(TestController.class);
 
     @Autowired
     private TestService testService;
@@ -34,8 +33,9 @@ public class TestController {
 
     /***
      * 获取试题集合
-     * @param map
-     * @return
+     * @param map map
+     *            organizationId 组织ID
+     * @return 试题列表
      */
     @RequestMapping(value = "/testList", method = RequestMethod.POST)
     public RequestResult<List<Testpaper>> search(@RequestBody Map map, HttpServletRequest request) {
@@ -46,13 +46,12 @@ public class TestController {
 
         try {
             User user = (User) request.getSession().getAttribute("user");
-//            User user = new User(); user.setUserId(1);
             return testService.getTestList(Integer.parseInt(organizationId), user.getUserId());
         } catch (TestException e) {
-            logger.warn(e.getMessage());
+            log.warn(e.getMessage());
             return new RequestResult<>(0, e.getMessage());
         } catch (Exception e) {
-            logger.warn(e.getMessage());
+            log.warn(e.getMessage());
             return new RequestResult<>(StatEnum.GET_TEST_FAIL);
         }
     }
@@ -67,16 +66,15 @@ public class TestController {
     public RequestResult<List<Testpaper>> getPracticeByOCId(@RequestBody Map map, HttpServletRequest request) {
         try {
             User user = (User) request.getSession().getAttribute("user");
-//            User user = new User(); user.setUserId(1);
             int organizationId = (int) map.get("organizationId");
             int chapterId = (int) map.get("chapterId");
             return testService.getPracticeByOCId(organizationId, chapterId, user.getUserId());
         } catch (TestException e) {
-            logger.warn(e.getMessage());
-            return new RequestResult(0, e.getMessage());
+            log.warn(e.getMessage());
+            return new RequestResult<>(0, e.getMessage());
         } catch (Exception e) {
-            logger.warn(e.getMessage());
-            return new RequestResult(StatEnum.GET_TEST_FAIL);
+            log.warn(e.getMessage());
+            return new RequestResult<>(StatEnum.GET_TEST_FAIL);
         }
     }
 
@@ -89,18 +87,20 @@ public class TestController {
     @RequestMapping(value = "/practiceList", method = RequestMethod.POST)
     public RequestResult<List<Testpaper>> searchPractice(@RequestBody Map map, HttpServletRequest request) {
         String organizationId = (String) map.get("organizationId");
-        if (organizationId == null || organizationId.equals("")) return new RequestResult(StatEnum.REQUEST_ERROR);
+        if (organizationId == null || "".equals(organizationId)) {
+            return new RequestResult<>(StatEnum.REQUEST_ERROR);
+        }
 
         try {
+
             User user = (User) request.getSession().getAttribute("user");
-//            User user = new User(); user.setUserId(1);
             return testService.getPracticeList(Integer.parseInt(organizationId), user.getUserId());
         } catch (TestException e) {
-            logger.warn(e.getMessage());
-            return new RequestResult(0, e.getMessage());
+            log.warn(e.getMessage());
+            return new RequestResult<>(0, e.getMessage());
         } catch (Exception e) {
-            logger.warn(e.getMessage());
-            return new RequestResult(StatEnum.GET_TEST_FAIL);
+            log.warn(e.getMessage());
+            return new RequestResult<>(StatEnum.GET_TEST_FAIL);
         }
     }
 
@@ -139,10 +139,10 @@ public class TestController {
             String testpaperId = (String) map.get("testpaperId");
             return testService.getQuestion(Integer.parseInt(testpaperId));
         } catch (TestException e) {
-            logger.warn(e.getMessage());
+            log.warn(e.getMessage());
             return new RequestResult(0, e.getMessage());
         } catch (Exception e) {
-            logger.warn(e.getMessage());
+            log.warn(e.getMessage());
             return new RequestResult(StatEnum.GET_TEST_FAIL);
         }
     }
@@ -163,11 +163,11 @@ public class TestController {
             request.getSession().setAttribute("studentTestResult", studentTestResult.getData());
             return studentTestResult;
         } catch (TestException e) {
-            logger.warn(e.getMessage());
+            log.warn(e.getMessage());
             return new RequestResult(0, e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            logger.warn(e.getMessage());
+            log.warn(e.getMessage());
             return new RequestResult(StatEnum.SUBMIT_TEST_FAIL);
         }
 
@@ -205,7 +205,7 @@ public class TestController {
         try {
             return chapterService.getByOrganizationId(organizationId);
         } catch (OrganizationException e) {
-            logger.warn(e.getMessage());
+            log.warn(e.getMessage());
             return new RequestResult(0, e.getMessage());
         }
     }
@@ -223,10 +223,10 @@ public class TestController {
         try {
             return chapterService.addChapter(chapter);
         } catch (ChapterException e) {
-            logger.warn(e.getMessage());
+            log.warn(e.getMessage());
             return new RequestResult(0, e.getMessage());
         } catch (Exception e) {
-            logger.warn(e.getMessage());
+            log.warn(e.getMessage());
             return new RequestResult(0, e.getMessage());
         }
     }

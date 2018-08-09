@@ -36,43 +36,47 @@ public interface OrganizationService {
 
     /***
      * 获取我的组织列表
-     * @param userId
-     * @return
+     *
+     * @param userId 用户ID
+     * @return Organization List
      */
     RequestResult<List<Organization>> searchByUserId(int userId);
 
     /***
      * 退出组织
-     * @param organizationId
-     * @param userId
-     * @return
+     * @param organizationId 组织ID
+     * @param userId 用户ID
+     * @return request result
      */
     RequestResult exitOrganization(int organizationId, int userId);
 
     /***
      * 创建组织
-     * @return
+     * @param organization 组织
+     * @return request result
      */
     RequestResult addOrganization(Organization organization);
 
     /***
      * 修改组织
-     * @return
+     * @param organization 组织
+     * @return request result
      */
     RequestResult alterOrganization(Organization organization);
 
     /***
      * 删除组织
-     * @param organizationId
-     * @param userId
-     * @return
+     * @param organizationId 组织ID
+     * @param userId 用户ID
+     * @return request result
      */
     RequestResult deleteOrganization(int organizationId, int userId);
 
     /***
      * 获取我创建过的组织列表
-     * @param userId
-     * @return
+     *
+     * @param userId 用户ID
+     * @return request result
      */
     RequestResult<List<Organization>> getMyOrganization(int userId);
 

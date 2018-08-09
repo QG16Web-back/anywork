@@ -8,7 +8,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * Created by logan on 2017/7/11.
+ * @author logan
+ * @date 2017/7/11
  * 操作学生的答卷
  */
 @Mapper
