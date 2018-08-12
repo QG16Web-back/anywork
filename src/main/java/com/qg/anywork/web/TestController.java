@@ -1,16 +1,20 @@
 package com.qg.anywork.web;
 
-import com.qg.anywork.dto.RequestResult;
 import com.qg.anywork.enums.StatEnum;
-import com.qg.anywork.exception.ChapterException;
 import com.qg.anywork.exception.OrganizationException;
 import com.qg.anywork.exception.TestException;
-import com.qg.anywork.model.*;
+import com.qg.anywork.model.bo.StudentPaper;
+import com.qg.anywork.model.bo.StudentTestResult;
+import com.qg.anywork.model.dto.RequestResult;
+import com.qg.anywork.model.po.*;
 import com.qg.anywork.service.ChapterService;
 import com.qg.anywork.service.TestService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -59,8 +63,10 @@ public class TestController {
 
     /***
      * 根据组织id和章节id获取练习集合
-     * @param map
-     * @return
+     * @param map map
+     *            organizationId 组织ID
+     *            chapterId      章节ID
+     * @return 试卷列表
      */
     @RequestMapping(value = "/practiceListByChapter", method = RequestMethod.POST)
     public RequestResult<List<Testpaper>> getPracticeByOCId(@RequestBody Map map, HttpServletRequest request) {
@@ -81,8 +87,9 @@ public class TestController {
 
     /***
      * 获取练习集合
-     * @param map
-     * @return
+     * @param map map
+     *            organizationId 组织ID
+     * @return 练习
      */
     @RequestMapping(value = "/practiceList", method = RequestMethod.POST)
     public RequestResult<List<Testpaper>> searchPractice(@RequestBody Map map, HttpServletRequest request) {
@@ -106,32 +113,31 @@ public class TestController {
 
     /***
      * 获取我做过的练习列表
-     * @param request
-     * @return
+     * @param request request
+     * @return 练习卷
      */
     @RequestMapping(value = "/getMyPractice", method = RequestMethod.POST)
     public RequestResult<List<Testpaper>> getMyPractice(HttpServletRequest request) {
         User user = (User) request.getSession().getAttribute("user");
-//        User user = new User(); user.setUserId(1);
         return testService.getMyPracticeList(user.getUserId());
     }
 
     /***
      * 获取我做过的试卷列表
-     * @param request
-     * @return
+     * @param request request
+     * @return 试卷
      */
     @RequestMapping(value = "/getMyTest", method = RequestMethod.POST)
     public RequestResult<List<Testpaper>> getMyTest(HttpServletRequest request) {
         User user = (User) request.getSession().getAttribute("user");
-//        User user = new User(); user.setUserId(1);
         return testService.getMyTestList(user.getUserId());
     }
 
     /***
      * 获取问题集合
-     * @param
-     * @return
+     * @param map map
+     *            testpaperId 试卷ID
+     * @return 试题
      */
     @RequestMapping(method = RequestMethod.POST)
     public RequestResult<List<Question>> getQuestion(@RequestBody Map map) {
@@ -140,23 +146,25 @@ public class TestController {
             return testService.getQuestion(Integer.parseInt(testpaperId));
         } catch (TestException e) {
             log.warn(e.getMessage());
-            return new RequestResult(0, e.getMessage());
+            return new RequestResult<>(0, e.getMessage());
         } catch (Exception e) {
             log.warn(e.getMessage());
-            return new RequestResult(StatEnum.GET_TEST_FAIL);
+            return new RequestResult<>(StatEnum.GET_TEST_FAIL);
         }
     }
 
     /***
      * 提交试卷
-     * @param studentPaper
-     * @return
+     * @param studentPaper 学生答卷
+     * @return 测试结果
      */
     @RequestMapping(value = "/submit", method = RequestMethod.POST)
     public RequestResult<StudentTestResult> submit(@RequestBody StudentPaper studentPaper, HttpServletRequest request) {
-        if (studentPaper == null) return new RequestResult(StatEnum.REQUEST_ERROR);
+        if (studentPaper == null) {
+            return new RequestResult<>(StatEnum.REQUEST_ERROR);
+        }
 
-        RequestResult<StudentTestResult> studentTestResult = null;
+        RequestResult<StudentTestResult> studentTestResult;
 
         try {
             studentTestResult = testService.submit(studentPaper);
@@ -164,40 +172,45 @@ public class TestController {
             return studentTestResult;
         } catch (TestException e) {
             log.warn(e.getMessage());
-            return new RequestResult(0, e.getMessage());
+            return new RequestResult<>(0, e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             log.warn(e.getMessage());
-            return new RequestResult(StatEnum.SUBMIT_TEST_FAIL);
+            return new RequestResult<>(StatEnum.SUBMIT_TEST_FAIL);
         }
 
 
     }
 
     /***
-     * 获取做题的详情信息
-     * @param map
-     * @return
+     * 具体查看学生某道题的答题情况
+     * @param map map
+     *            questionId 问题ID
+     * @return 详细的答题情况
      */
     @RequestMapping(value = "/detail", method = RequestMethod.POST)
     public RequestResult<StudentAnswerAnalysis> detail(@RequestBody Map map, HttpServletRequest request) {
         String questionId = (String) map.get("questionId");
-        if (questionId == null || questionId.equals("")) return new RequestResult(StatEnum.REQUEST_ERROR);
+        if (questionId == null || "".equals(questionId)) {
+            return new RequestResult<>(StatEnum.REQUEST_ERROR);
+        }
 
         StudentTestResult studentTestResult = (StudentTestResult) request.getSession().getAttribute("studentTestResult");
-        List<StudentAnswerAnalysis> studentAnswerAnalysises = studentTestResult.getStudentAnswerAnalysis();
+        List<StudentAnswerAnalysis> studentAnswerAnalysis = studentTestResult.getStudentAnswerAnalysis();
 
-        for (StudentAnswerAnalysis s : studentAnswerAnalysises) {
-            if (Integer.parseInt(questionId) == s.getQuestion().getQuestionId())
-                return new RequestResult<StudentAnswerAnalysis>(StatEnum.GET_TEST_SUCCESS, s);
+        for (StudentAnswerAnalysis s : studentAnswerAnalysis) {
+            if (Integer.parseInt(questionId) == s.getQuestion().getQuestionId()) {
+                return new RequestResult<>(StatEnum.GET_TEST_SUCCESS, s);
+            }
         }
-        return new RequestResult(StatEnum.GET_TEST_FAIL);
+        return new RequestResult<>(StatEnum.GET_TEST_FAIL);
     }
 
     /***
-     * 获取章节
-     * @param map
-     * @return
+     * 获取组织下的章节列表
+     * @param map map
+     *            organizationId 组织ID
+     * @return 章节列表
      */
     @RequestMapping(value = "/chapter", method = RequestMethod.POST)
     public RequestResult<List<Chapter>> getChapter(@RequestBody Map map) {
@@ -206,44 +219,42 @@ public class TestController {
             return chapterService.getByOrganizationId(organizationId);
         } catch (OrganizationException e) {
             log.warn(e.getMessage());
-            return new RequestResult(0, e.getMessage());
+            return new RequestResult<>(0, e.getMessage());
         }
     }
 
     /***
      * 添加章节
-     * @param chapter
-     * @return
+     * @param chapter 章节
+     * @return 章节信息
      */
     @RequestMapping(value = "/addChapter", method = RequestMethod.POST)
-    public RequestResult<Chapter> addChapter(@RequestBody Chapter chapter, HttpServletRequest request) {
+    public RequestResult addChapter(@RequestBody Chapter chapter, HttpServletRequest request) {
         User user = (User) request.getSession().getAttribute("user");
-//        User user = new User(); user.setUserId(0);  user.setMark(1);
-        if (user.getMark() == 0) return new RequestResult(0, "无此权限");
+        if (user.getMark() == 0) {
+            return new RequestResult<>(0, "无此权限");
+        }
         try {
             return chapterService.addChapter(chapter);
-        } catch (ChapterException e) {
-            log.warn(e.getMessage());
-            return new RequestResult(0, e.getMessage());
         } catch (Exception e) {
             log.warn(e.getMessage());
-            return new RequestResult(0, e.getMessage());
+            return new RequestResult<>(0, e.getMessage());
         }
     }
 
     /***
      * 删除章节
-     * @param map
-     * @return
+     * @param map map
+     *            chapterId 章节ID
+     * @return 返回信息
      */
     @RequestMapping(value = "/deleteChapter", method = RequestMethod.POST)
-    public RequestResult<Chapter> deleteChapter(@RequestBody Map map, HttpServletRequest request) {
+    public RequestResult deleteChapter(@RequestBody Map map, HttpServletRequest request) {
         int chapterId = (int) map.get("chapterId");
         User user = (User) request.getSession().getAttribute("user");
-//        User user = new User(); user.setUserId(0);  user.setMark(1);
-        if (user.getMark() == 0) return new RequestResult(0, "无此权限");
+        if (user.getMark() == 0) {
+            return new RequestResult(0, "无此权限");
+        }
         return chapterService.deleteChapter(chapterId);
     }
-
-
 }

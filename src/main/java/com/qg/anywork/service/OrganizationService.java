@@ -1,8 +1,8 @@
 package com.qg.anywork.service;
 
-import com.qg.anywork.dto.RequestResult;
-import com.qg.anywork.model.Organization;
-import com.qg.anywork.model.User;
+import com.qg.anywork.model.dto.RequestResult;
+import com.qg.anywork.model.po.Organization;
+import com.qg.anywork.model.po.User;
 
 import java.util.List;
 
@@ -22,7 +22,21 @@ public interface OrganizationService {
     RequestResult<List<Organization>> search(String organizationName, int userId);
 
 
+    /**
+     * 根据组织ID获得组织
+     *
+     * @param organizationId 组织ID
+     * @return 组织
+     */
     Organization getById(int organizationId);
+
+    /**
+     * 根据组织名称获得组织
+     *
+     * @param organizationName 组织名称
+     * @return 组织
+     */
+    Organization getByName(String organizationName);
 
     /***
      * 加入组织
@@ -83,8 +97,8 @@ public interface OrganizationService {
     /**
      * 获取组织下的成员列表
      *
-     * @param organizationId
-     * @return
+     * @param organizationId 组织ID
+     * @return 学生列表
      */
     RequestResult<List<User>> getOrganizationPeople(int organizationId);
 }

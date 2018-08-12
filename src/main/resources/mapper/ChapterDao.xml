@@ -5,13 +5,13 @@
 <mapper namespace="com.qg.anywork.dao.ChapterDao">
     <!--目的：为Dao接口方法提供SQL语句-->
 
-    <select id="getByOrganizationId" resultType="com.qg.anywork.model.Chapter">
+    <select id="getByOrganizationId" resultType="com.qg.anywork.model.po.Chapter">
         SELECT *
         FROM chapter
         WHERE organization_id = #{organizationId}
     </select>
 
-    <insert id="addChapter" parameterType="com.qg.anywork.model.Chapter" useGeneratedKeys="true"
+    <insert id="addChapter" parameterType="com.qg.anywork.model.po.Chapter" useGeneratedKeys="true"
             keyProperty="chapter.chapterId">
         INSERT ignore INTO chapter (organization_id, chapter_name)
         VALUE (#{chapter.organizationId}, #{chapter.chapterName})
@@ -23,7 +23,7 @@
         WHERE chapter_id = #{chapterId}
     </delete>
 
-    <update id="updateChapter" parameterType="com.qg.anywork.model.Chapter">
+    <update id="updateChapter" parameterType="com.qg.anywork.model.po.Chapter">
         UPDATE chapter
         SET chapter_name = #{chapter.chapterName}
         WHERE chapter_id = #{chapter.chapterId}

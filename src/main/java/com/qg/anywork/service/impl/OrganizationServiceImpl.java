@@ -1,11 +1,11 @@
 package com.qg.anywork.service.impl;
 
 import com.qg.anywork.dao.OrganizationDao;
-import com.qg.anywork.dto.RequestResult;
 import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.OrganizationException;
-import com.qg.anywork.model.Organization;
-import com.qg.anywork.model.User;
+import com.qg.anywork.model.dto.RequestResult;
+import com.qg.anywork.model.po.Organization;
+import com.qg.anywork.model.po.User;
 import com.qg.anywork.service.OrganizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,6 +54,11 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
+    public Organization getByName(String organizationName) {
+        return organizationDao.findByOrganizationName(organizationName);
+    }
+
+    @Override
     public synchronized RequestResult<Organization> join(int organizationId, long token, int userId) {
         if (organizationDao.isJoin(organizationId, userId) > 0) {
             throw new OrganizationException("用户已加入该组织");
@@ -96,9 +101,9 @@ public class OrganizationServiceImpl implements OrganizationService {
         int randomInt = new Random().nextInt(99999);
         organization.setToken(randomInt);
         int flag = organizationDao.addOrganization(organization);
-        organizationDao.joinOrganization(organization.getOrganizationId(), organization.getTeacherId());
         if (flag == 1) {
-            return new RequestResult(1, "创建组织成功");
+            organizationDao.joinOrganization(organization.getOrganizationId(), organization.getTeacherId());
+            return new RequestResult<>(1, "创建组织成功", organization);
         } else {
             return new RequestResult(0, "创建组织失败");
         }
@@ -111,28 +116,25 @@ public class OrganizationServiceImpl implements OrganizationService {
         return new RequestResult(1, "修改组织成功");
     }
 
-    /***
-     * 删除组织
-     * @param organizationId
-     * @param userId
-     * @return
-     */
     @Override
     public RequestResult deleteOrganization(int organizationId, int userId) {
         Organization o = organizationDao.getById(organizationId);
-        if (o == null) throw new OrganizationException("组织不存在");
-        if (o.getTeacherId() != userId) throw new OrganizationException("没有删除权限");
+        if (o == null) {
+            throw new OrganizationException("组织不存在");
+        }
+        if (o.getTeacherId() != userId) {
+            throw new OrganizationException("没有删除权限");
+        }
         int flag = organizationDao.deleteOrganization(organizationId);
 
-        if (flag == 1) return new RequestResult(1, "删除组织成功");
-        else return new RequestResult(0, "删除组织失败");
+        if (flag == 1) {
+            return new RequestResult(1, "删除组织成功");
+        } else {
+            return new RequestResult(0, "删除组织失败");
+        }
     }
 
-    /***
-     * 获取我创建过的组织列表
-     * @param userId
-     * @return
-     */
+
     @Override
     public RequestResult<List<Organization>> getMyOrganization(int userId) {
         List<Organization> organizations = organizationDao.getMyOrganization(userId);
@@ -142,16 +144,16 @@ public class OrganizationServiceImpl implements OrganizationService {
         return new RequestResult<>(1, "获取成功", organizations);
     }
 
-    /**
-     * 获取组织下的成员列表
-     *
-     * @param organizationId
-     * @return
-     */
     @Override
     public RequestResult<List<User>> getOrganizationPeople(int organizationId) {
-        if (organizationDao.getById(organizationId) == null) throw new OrganizationException("该组织不存在");
-        return new RequestResult<>(1, "获取成功", organizationDao.getOrganizationPeople(organizationId));
+        if (organizationDao.getById(organizationId) == null) {
+            throw new OrganizationException("该组织不存在");
+        }
+        List<User> users = organizationDao.getOrganizationPeople(organizationId);
+        if (users.isEmpty()) {
+            return new RequestResult<>(1, "该组织还没有学生");
+        }
+        return new RequestResult<>(1, "获取成功", users);
     }
 
 }

@@ -1,11 +1,12 @@
 package com.qg.anywork.web;
 
-import com.qg.anywork.dto.RequestResult;
-import com.qg.anywork.exception.TestException;
-import com.qg.anywork.model.*;
+import com.qg.anywork.model.bo.TeacherSubmit;
+import com.qg.anywork.model.bo.StudentTestResult;
+import com.qg.anywork.model.dto.RequestResult;
+import com.qg.anywork.model.po.CheckResult;
+import com.qg.anywork.model.po.User;
 import com.qg.anywork.service.TestService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,16 +23,18 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/teacher")
+@Slf4j
 public class TeacherController {
-    private static final Logger logger = LoggerFactory.getLogger(TeacherController.class);
 
     @Autowired
     private TestService testService;
 
     /***
      * 获取某套题组织内成员的完成情况
-     * @param map
-     * @return
+     * @param map map
+     *            testpaperId 试卷ID
+     *            organizationId 组织ID
+     * @return 试卷完成情况
      */
     @RequestMapping(value = "/lookTest", method = RequestMethod.POST)
     public RequestResult<List<CheckResult>> studentTest(@RequestBody Map map) {
@@ -43,23 +46,19 @@ public class TeacherController {
 
     /***
      * 老师改卷
-     * @param teacherSubmit
-     * @param request
-     * @return
      */
     @RequestMapping(value = "/judge", method = RequestMethod.POST)
     public RequestResult<StudentTestResult> submit(@RequestBody TeacherSubmit teacherSubmit, HttpServletRequest request) {
         User user = (User) request.getSession().getAttribute("user");
-        if (user.getMark() == 0) return new RequestResult(0, "权限不足");
+        if (user.getMark() == 0) {
+            return new RequestResult<>(0, "权限不足");
+        }
         try {
             testService.updateStudentTest(teacherSubmit);
             return testService.getDetail(teacherSubmit.getTestpaperId(), teacherSubmit.getStudentId());
-        } catch (TestException e) {
-            logger.warn(e.getMessage());
-            return new RequestResult(0, e.getMessage());
         } catch (Exception e) {
-            logger.warn(e.getMessage());
-            return new RequestResult(0, e.getMessage());
+            log.warn(e.getMessage());
+            return new RequestResult<>(0, e.getMessage());
         }
     }
 }

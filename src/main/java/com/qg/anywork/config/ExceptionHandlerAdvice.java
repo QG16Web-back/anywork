@@ -1,6 +1,6 @@
 package com.qg.anywork.config;
 
-import com.qg.anywork.dto.RequestResult;
+import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.exception.AnyWorkException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

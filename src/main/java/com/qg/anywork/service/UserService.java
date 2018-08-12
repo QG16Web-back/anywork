@@ -1,7 +1,7 @@
 package com.qg.anywork.service;
 
-import com.qg.anywork.dto.RequestResult;
-import com.qg.anywork.model.User;
+import com.qg.anywork.model.dto.RequestResult;
+import com.qg.anywork.model.po.User;
 import org.springframework.stereotype.Service;
 
 /**
@@ -29,11 +29,11 @@ public interface UserService {
     /**
      * 用户登录
      *
-     * @param email    邮箱
-     * @param password 密码
+     * @param studentId 学号
+     * @param password  密码
      * @return request result
      */
-    RequestResult<User> login(String email, String password);
+    RequestResult<User> login(String studentId, String password);
 
     /**
      * 更新用户信息
@@ -54,8 +54,17 @@ public interface UserService {
     /**
      * 更新密码
      *
-     * @param user 用户
-     * @return request result
+     * @param userId      用户ID
+     * @param newPassword 新密码
+     * @param oldPassword 旧密码
+     * @return 修改成功返回true，修改失败返回false
      */
-    RequestResult<User> passwordChange(User user);
+    boolean modifyPassword(int userId, String oldPassword, String newPassword);
+
+    /**
+     * 添加学生
+     *
+     * @return Request result
+     */
+    RequestResult addStudent();
 }

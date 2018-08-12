@@ -2,14 +2,14 @@ package com.qg.anywork.service.impl;
 
 import com.qg.anywork.dao.RedisDao;
 import com.qg.anywork.dao.UserDao;
-import com.qg.anywork.dto.RequestResult;
+import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.MailSendException;
 import com.qg.anywork.exception.user.UserNotExitException;
-import com.qg.anywork.model.User;
+import com.qg.anywork.model.po.User;
 import com.qg.anywork.service.MailService;
-import com.qg.anywork.utils.Encryption;
-import com.qg.anywork.utils.MailUtil;
+import com.qg.anywork.util.Encryption;
+import com.qg.anywork.util.MailUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,12 +1,12 @@
 package com.qg.anywork.web;
 
-import com.qg.anywork.dto.RequestResult;
+import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.MailSendException;
 import com.qg.anywork.exception.user.UserNotExitException;
 import com.qg.anywork.service.MailService;
 import com.qg.anywork.service.UserService;
-import com.qg.anywork.utils.Encryption;
+import com.qg.anywork.util.Encryption;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,55 +46,28 @@ public class UtilController {
     @Autowired
     private UserService userService;
 
-    /**
-     * 忘了密码邮箱找回
-     *
-     * @param map
-     * @return
-     */
-    @RequestMapping(value = "/forget", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    @ResponseBody
-    public RequestResult<?> sendMail(@RequestBody Map<String, String> map) {
-        try {
-            return mailService.sendPasswordMail(map.get("email"));
-        } catch (UserNotExitException e) {
-            logger.warn("不存在的用户！", e);
-            return new RequestResult<>(StatEnum.LOGIN_NOT_EXIT_USER);
-        } catch (MailSendException e) {
-            logger.warn("发送邮件失败！", e);
-            return new RequestResult<>(StatEnum.MAIL_SEND_FAIL);
-        } catch (Exception e) {
-            logger.warn("未知异常: ", e);
-            return new RequestResult<>(StatEnum.DEFAULT_WRONG);
-        }
-    }
-
     // TODO 各种重定向页面
 
     /**
      * 验证邮箱秘钥，注册用户
-     *
-     * @return
      */
     @RequestMapping(value = "/check", method = RequestMethod.GET)
     public String checkRegister(HttpServletRequest request) {
         String email = request.getParameter("email");
         String ciphertext = request.getParameter("ciphertext");
-//        String email = map.get("email");
-//        String ciphertext = map.get("ciphertext");
         if (email == null || "".equals(email) || ciphertext == null || "".equals(ciphertext)) {
-            return "redirect:../html/failure.html";  // 跳转到错误页面 参数为空
+            return "redirect:../html/failure.html";
         }
         if (ciphertext.equals(Encryption.getMD5(email))) {
             // 验证正确
             try {
                 userService.register(email);
             } catch (Exception e) {
-                return "redirect:../html/failure.html";  // 跳转到错误页面
+                return "redirect:../html/failure.html";
             }
-            return "redirect:../html/success.html";  // 跳转到登录页面
+            return "redirect:../html/success.html";
         } else {
-            return "redirect:../html/failure.html";  // 跳转到错误页面 验证失败
+            return "redirect:../html/failure.html";
         }
     }
 
@@ -138,7 +111,6 @@ public class UtilController {
     @ResponseBody
     public String verification(HttpServletRequest request, HttpServletResponse response) {
 
-        log.info("验证码");
         // 告知浏览当作图片处理
         response.setContentType("image/jpeg");
         // 告诉浏览器不缓存
@@ -188,7 +160,6 @@ public class UtilController {
             e.printStackTrace();
             return "html/failure.html";
         }
-        log.info("验证码");
         return "html/success.html";
     }
 }

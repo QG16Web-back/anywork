@@ -3,15 +3,15 @@ package com.qg.anywork.service.impl;
 import com.qg.anywork.dao.QuestionDao;
 import com.qg.anywork.dao.RedisDao;
 import com.qg.anywork.dao.TestDao;
-import com.qg.anywork.dto.RequestResult;
+import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.question.ExcelReadException;
 import com.qg.anywork.exception.question.RedisNotExitException;
 import com.qg.anywork.exception.testpaper.TestpaperIsNoExit;
-import com.qg.anywork.model.Question;
-import com.qg.anywork.model.Testpaper;
+import com.qg.anywork.model.po.Question;
+import com.qg.anywork.model.po.Testpaper;
 import com.qg.anywork.service.QuestionService;
-import com.qg.anywork.utils.ExcelUtil;
+import com.qg.anywork.util.ExcelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -129,7 +129,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public Testpaper findTestpaperById(int testpaperId) {
-        Testpaper testpaper = testDao.getTestpaperByTestpaperId(testpaperId);
+        Testpaper testpaper = testDao.getTestPaperByTestpaperId(testpaperId);
         if (testpaper == null) {
             throw new TestpaperIsNoExit("试卷并不存在！");
         }

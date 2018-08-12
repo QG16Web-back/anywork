@@ -1,6 +1,10 @@
 package com.qg.anywork.dao;
 
-import com.qg.anywork.model.*;
+import com.qg.anywork.model.bo.StudentTestResult;
+import com.qg.anywork.model.po.CheckResult;
+import com.qg.anywork.model.po.Question;
+import com.qg.anywork.model.po.StudentAnswerAnalysis;
+import com.qg.anywork.model.po.Testpaper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -41,8 +45,20 @@ public interface TestDao {
 
     List<CheckResult> getUserPracticeByOrganizationId(@Param("userId") int userId, @Param("organizationId") int organizaitonId);
 
+    /**
+     * 获得我的练习卷集合
+     *
+     * @param userId 用户ID
+     * @return 练习卷集合
+     */
     List<Testpaper> getMyPractice(@Param("userId") int userId);
 
+    /**
+     * 获得我的考试集合
+     *
+     * @param userId 用户ID
+     * @return 考试卷集合
+     */
     List<Testpaper> getMyTest(@Param("userId") int userId);
 
     /***
@@ -50,7 +66,7 @@ public interface TestDao {
      * @param testpaperId 试卷id
      * @return Testpaper 返回问卷对象
      */
-    Testpaper getTestpaperByTestpaperId(@Param("testpaperId") int testpaperId);
+    Testpaper getTestPaperByTestpaperId(@Param("testpaperId") int testpaperId);
 
 
     /***
@@ -84,8 +100,8 @@ public interface TestDao {
 
     /***
      * 更新 考试结果
-     * @param testResult
-     * @return
+     * @param testResult 考试结果
+     * @return int
      */
     int updateTestResult(@Param("testResult") StudentTestResult testResult);
 
@@ -164,22 +180,25 @@ public interface TestDao {
 
     /***
      * 添加教师查阅及评卷信息
-     * @param checkResult
-     * @return
+     * @param checkResult checkResult
+     * @return 1为成功，0为失败
      */
     int addCheckResult(@Param("checkResult") CheckResult checkResult);
 
 
     /***
      * 更新学生完成的每道题的分数
-     * @param socre
-     * @return
+     * @param socre 分数
+     * @param studentId 学生ID
+     * @param questionId 问题ID
+     * @return int
      */
     int updateStudentAnswerSocre(@Param("socre") double socre, @Param("studentId") int studentId, @Param("questionId") int questionId);
 
     /***
      * 更新批改详情
      * @param subject
+     * @param object
      * @param testpaperId
      * @param studentId
      * @return

@@ -4,14 +4,14 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.qg.anywork.dao.TestDao">
 
-    <resultMap type="com.qg.anywork.model.StudentAnswerAnalysis" id="studentAnswerAnalysis">
-        <id property="studentAnswerAnalysisId" column="student_answer_id"/>
+    <resultMap type="com.qg.anywork.model.po.StudentAnswerAnalysis" id="studentAnswerAnalysis">
+        <id property="studentAnswerId" column="student_answer_id"/>
         <result property="studentId" column="student_id"/>
         <result property="studentAnswer" column="student_answer"/>
         <result property="isTrue" column="is_true"/>
         <result property="socre" column="getsocre"/>
 
-        <association property="question" javaType="com.qg.anywork.model.Question">
+        <association property="question" javaType="com.qg.anywork.model.po.Question">
             <id property="questionId" column="question_id"/>
             <result property="content" column="content"/>
             <result property="type" column="type"/>
@@ -26,14 +26,14 @@
         </association>
     </resultMap>
 
-    <resultMap type="com.qg.anywork.model.CheckResult" id="checkResult">
+    <resultMap type="com.qg.anywork.model.po.CheckResult" id="checkResult">
         <result property="studentId" column="student_id"/>
         <result property="studentName" column="user_name"/>
         <result property="ifCheck" column="if_check"/>
         <result property="object" column="object"/>
         <result property="subject" column="subject"/>
 
-        <association property="testpaper" javaType="com.qg.anywork.model.Testpaper">
+        <association property="testpaper" javaType="com.qg.anywork.model.po.Testpaper">
             <id property="testpaperId" column="testpaper_id"/>
             <result property="testpaperTitle" column="testpaper_title"/>
             <result property="createTime" column="create_time"/>
@@ -42,14 +42,14 @@
         </association>
     </resultMap>
 
-    <resultMap type="com.qg.anywork.model.CheckResult" id="PracticeCheckResult">
+    <resultMap type="com.qg.anywork.model.po.CheckResult" id="PracticeCheckResult">
         <result property="studentId" column="student_id"/>
         <result property="studentName" column="user_name"/>
         <result property="ifCheck" column="if_check"/>
         <result property="object" column="socre"/>
         <result property="subject" column="subject"/>
 
-        <association property="testpaper" javaType="com.qg.anywork.model.Testpaper">
+        <association property="testpaper" javaType="com.qg.anywork.model.po.Testpaper">
             <id property="testpaperId" column="testpaper_id"/>
             <result property="testpaperTitle" column="testpaper_title"/>
             <result property="createTime" column="create_time"/>
@@ -59,7 +59,7 @@
     </resultMap>
 
     <!--目的：为Dao接口方法提供SQL语句-->
-    <select id="getTestByOrganizationId" resultType="com.qg.anywork.model.Testpaper">
+    <select id="getTestByOrganizationId" resultType="com.qg.anywork.model.po.Testpaper">
         SELECT *
         FROM testpaper
         WHERE organization_id = #{organizationId}
@@ -88,7 +88,7 @@
     </select>
 
 
-    <select id="getPracticeByOrganizationId" resultType="com.qg.anywork.model.Testpaper">
+    <select id="getPracticeByOrganizationId" resultType="com.qg.anywork.model.po.Testpaper">
         SELECT t.testpaper_id,
                t.testpaper_title,
                t.author_id,
@@ -113,7 +113,7 @@
           AND student_id = #{userId};
     </select>
 
-    <select id="getPracticeByOCId" resultType="com.qg.anywork.model.Testpaper">
+    <select id="getPracticeByOCId" resultType="com.qg.anywork.model.po.Testpaper">
         SELECT *
         FROM testpaper
         WHERE organization_id = #{organizationId}
@@ -121,7 +121,7 @@
           AND testpaper_type = 0;
     </select>
 
-    <select id="getMyPractice" resultType="com.qg.anywork.model.Testpaper">
+    <select id="getMyPractice" resultType="com.qg.anywork.model.po.Testpaper">
         SELECT t.testpaper_id,
                t.testpaper_title,
                t.author_id,
@@ -141,7 +141,7 @@
           AND c.chapter_id = t.chapter_id;
     </select>
 
-    <select id="getMyTest" resultType="com.qg.anywork.model.Testpaper">
+    <select id="getMyTest" resultType="com.qg.anywork.model.po.Testpaper">
         SELECT t.testpaper_id,
                t.testpaper_title,
                t.author_id,
@@ -161,30 +161,30 @@
           AND c.chapter_id = t.chapter_id;
     </select>
 
-    <select id="getTestpaperByTestpaperId" resultType="com.qg.anywork.model.Testpaper">
+    <select id="getTestPaperByTestpaperId" resultType="com.qg.anywork.model.po.Testpaper">
         SELECT *
         FROM testpaper
         WHERE testpaper_id = #{testpaperId};
     </select>
 
-    <select id="getQuestionByTestpaperId" resultType="com.qg.anywork.model.Question">
+    <select id="getQuestionByTestpaperId" resultType="com.qg.anywork.model.po.Question">
         SELECT *
         FROM question
         WHERE testpaper_id = #{testpaperId}
     </select>
 
-    <select id="getQuestionById" resultType="com.qg.anywork.model.Question">
+    <select id="getQuestionById" resultType="com.qg.anywork.model.po.Question">
         SELECT *
         FROM question
         WHERE question_id = #{questionId}
     </select>
 
-    <insert id="addTestResult" parameterType="com.qg.anywork.model.StudentTestResult" keyProperty="studentTestResultId">
+    <insert id="addTestResult" parameterType="com.qg.anywork.model.bo.StudentTestResult" keyProperty="studentTestResultId">
         INSERT ignore INTO test_result (student_id, test_paper_id, socre)
         VALUE (#{testResult.studentId}, #{testResult.testpaperId}, #{testResult.socre})
     </insert>
 
-    <update id="updateTestResult" parameterType="com.qg.anywork.model.StudentTestResult">
+    <update id="updateTestResult" parameterType="com.qg.anywork.model.bo.StudentTestResult">
         UPDATE test_result
         <set>
             <if test="testResult.socre != null">
@@ -194,7 +194,7 @@
         WHERE student_id = #{testResult.studentId} AND test_paper_id = #{testResult.testpaperId}
     </update>
 
-    <insert id="addStudentAnswer" parameterType="com.qg.anywork.model.StudentAnswerAnalysis"
+    <insert id="addStudentAnswer" parameterType="com.qg.anywork.model.po.StudentAnswerAnalysis"
             keyProperty="studentAnswerAnalysisId">
         INSERT ignore INTO student_answer (student_id, question_id, student_answer, is_true, socre)
         VALUE (#{studentAnswerAnalysis.studentId},
@@ -204,7 +204,7 @@
                #{studentAnswerAnalysis.socre})
     </insert>
 
-    <update id="updateStudentAnswer" parameterType="com.qg.anywork.model.StudentAnswerAnalysis">
+    <update id="updateStudentAnswer" parameterType="com.qg.anywork.model.po.StudentAnswerAnalysis">
         UPDATE student_answer
         <set>
             <if test="studentAnswerAnalysis.studentAnswer != null">
@@ -221,7 +221,7 @@
         #{studentAnswerAnalysis.question.questionId}
     </update>
 
-    <insert id="addTestpaper" parameterType="com.qg.anywork.model.Testpaper" useGeneratedKeys="true"
+    <insert id="addTestpaper" parameterType="com.qg.anywork.model.po.Testpaper" useGeneratedKeys="true"
             keyProperty="testpaper.testpaperId">
         INSERT INTO testpaper (testpaper_title,
                                author_id,
@@ -245,7 +245,7 @@
         WHERE testpaper_id = #{testpaperId}
     </update>
 
-    <select id="getTestResult" resultType="com.qg.anywork.model.StudentTestResult">
+    <select id="getTestResult" resultType="com.qg.anywork.model.bo.StudentTestResult">
         SELECT *
         FROM test_result
         WHERE test_paper_id = #{testpaperId}
@@ -260,7 +260,7 @@
           AND s.question_id in (SELECT q.question_id FROM question WHERE q.testpaper_id = #{testpaperId})
     </select>
 
-    <insert id="addCheckResult" parameterType="com.qg.anywork.model.CheckResult">
+    <insert id="addCheckResult" parameterType="com.qg.anywork.model.po.CheckResult">
         INSERT into check_result (if_check, object, subject, testpaper_id, student_id)
         VALUES (#{checkResult.ifCheck},
                 #{checkResult.object},

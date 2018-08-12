@@ -1,9 +1,12 @@
 package com.qg.anywork.web;
 
-import com.qg.anywork.dto.RequestResult;
 import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.OrganizationException;
-import com.qg.anywork.model.*;
+import com.qg.anywork.model.bo.StudentTestResult;
+import com.qg.anywork.model.dto.RequestResult;
+import com.qg.anywork.model.po.CheckResult;
+import com.qg.anywork.model.po.Organization;
+import com.qg.anywork.model.po.User;
 import com.qg.anywork.service.OrganizationService;
 import com.qg.anywork.service.TestService;
 import lombok.extern.slf4j.Slf4j;
@@ -101,7 +104,7 @@ public class OrganizationController {
      * @param request request
      * @param map map
      *            organizationId 组织ID
-     * @return request resu
+     * @return request request
      */
     @RequestMapping(value = "/leave", method = RequestMethod.POST)
     public RequestResult leave(HttpServletRequest request, @RequestBody Map map) {
@@ -121,17 +124,17 @@ public class OrganizationController {
 
     /***
      * 创建组织
-     * @param file file 组织头像
+     * @param file             file 组织头像
      * @param organizationName 组织名称
-     * @param description 描述
-     * @param request request
+     * @param description      描述
+     * @param request          request
      * @return request result
      * @throws IOException ioException
      */
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public RequestResult addOrganization(@RequestParam(value = "file", required = false) MultipartFile file,
-                                         @RequestParam(value = "organizationName", required = false) String organizationName,
-                                         @RequestParam(value = "description", required = false) String description,
+    @PostMapping("/create")
+    public RequestResult addOrganization(@RequestPart("file") MultipartFile file,
+                                         @RequestParam("organizationName") String organizationName,
+                                         @RequestParam("description") String description,
                                          HttpServletRequest request) throws IOException {
         if (description == null || "".equals(description)) {
             return new RequestResult<>(0, "描述为空");
@@ -139,7 +142,10 @@ public class OrganizationController {
         if (organizationName == null || "".equals(organizationName)) {
             return new RequestResult<>(0, "组织名为空");
         }
-        User user = (User) request.getSession().getAttribute("user");
+//        User user = (User) request.getSession().getAttribute("user");
+        User user = new User();
+        user.setMark(1);
+        user.setUserId(289);
         if (user.getMark() == 0) {
             return new RequestResult<>(0, "没有权限");
         }
@@ -149,7 +155,9 @@ public class OrganizationController {
         o.setTeacherId(user.getUserId());
         o.setDescription(description);
         o.setOrganizationName(organizationName);
-        organizationService.addOrganization(o);
+        if (organizationService.getByName(organizationName) != null) {
+            return new RequestResult<>(0, "组织名称已存在");
+        }
 
         if (file != null && !file.isEmpty()) {
             String filename = file.getOriginalFilename();
@@ -158,11 +166,12 @@ public class OrganizationController {
                 return new RequestResult<>(0, "上传的头像不合法");
             }
 
-            String photoName = o.getOrganizationId() + ".jpg";
+            String photoName = o.getOrganizationName() + ".jpg";
             FileUtils.copyInputStreamToFile(file.getInputStream(),
                     new File(request.getServletContext().getRealPath("/picture/organization"), photoName));
         }
-        return new RequestResult<>(1, "创建成功", o);
+
+        return organizationService.addOrganization(o);
     }
 
 
@@ -191,30 +200,31 @@ public class OrganizationController {
         if (o.getTeacherId() != user.getUserId()) {
             return new RequestResult<>(0, "您不是此组织的创建人");
         }
+        boolean flag = (organizationName != null && !"".equals(organizationName)) || (description != null && !"".equals(description));
+        if (flag) {
 
-        if ((organizationName != null && !"".equals(organizationName)) || (description != null && !"".equals(description))) {
             if ((description != null && !"".equals(description))) {
                 o.setDescription(description);
             }
             if ((organizationName != null && !"".equals(organizationName))) {
+                if (organizationService.getByName(organizationName) != null) {
+                    return new RequestResult<>(0, "组织名称已存在");
+                }
                 o.setOrganizationName(organizationName);
             }
+            if (file != null && !file.isEmpty()) {
+                String filename = file.getOriginalFilename();
+                assert filename != null;
+                if (!(filename.endsWith(".jpg") || filename.endsWith(".JPG") || filename.endsWith(".png") || filename.endsWith(".PNG"))) {
+                    return new RequestResult(0, "上传的头像不合法");
+                }
 
+                String photoName = organizationName + ".jpg";
+                FileUtils.copyInputStreamToFile(file.getInputStream(),
+                        new File(request.getServletContext().getRealPath("/picture/organization"), photoName));
+            }
             organizationService.alterOrganization(o);
         }
-
-        if (file != null && !file.isEmpty()) {
-            String filename = file.getOriginalFilename();
-            assert filename != null;
-            if (!(filename.endsWith(".jpg") || filename.endsWith(".JPG") || filename.endsWith(".png") || filename.endsWith(".PNG"))) {
-                return new RequestResult(0, "上传的头像不合法");
-            }
-
-            String photoName = organizationId + ".jpg";
-            FileUtils.copyInputStreamToFile(file.getInputStream(),
-                    new File(request.getServletContext().getRealPath("/picture/organization"), photoName));
-        }
-
         return new RequestResult<>(1, "修改成功", o);
     }
 
@@ -275,8 +285,10 @@ public class OrganizationController {
 
     /***
      * 获取试卷详情
-     * @param map
-     * @return
+     * @param map map
+     *            organizationId 组织ID
+     *            userId 用户ID
+     * @return 试卷详情
      */
     @RequestMapping(value = "/studentTestDetail", method = RequestMethod.POST)
     public RequestResult<StudentTestResult> getDetail(@RequestBody Map map) {
@@ -299,8 +311,10 @@ public class OrganizationController {
 
     /***
      * 获取组织下某学生的考试列表
-     * @param map
-     * @return
+     * @param map map
+     *            organizationId 组织ID
+     *            userId 用户ID
+     * @return 试卷列表
      */
     @RequestMapping(value = "/studentPracetice", method = RequestMethod.POST)
     public RequestResult<List<CheckResult>> studentPracetice(@RequestBody Map map) {

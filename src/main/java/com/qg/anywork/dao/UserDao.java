@@ -1,6 +1,6 @@
 package com.qg.anywork.dao;
 
-import com.qg.anywork.model.User;
+import com.qg.anywork.model.po.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;

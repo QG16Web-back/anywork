@@ -1,17 +1,17 @@
 package com.qg.anywork.web;
 
-import com.qg.anywork.dto.RequestResult;
+import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.question.ExcelReadException;
 import com.qg.anywork.exception.question.RedisNotExitException;
 import com.qg.anywork.exception.testpaper.NotPowerException;
 import com.qg.anywork.exception.testpaper.TestpaperIsNoExit;
-import com.qg.anywork.model.Question;
-import com.qg.anywork.model.Testpaper;
-import com.qg.anywork.model.User;
+import com.qg.anywork.model.po.Question;
+import com.qg.anywork.model.po.Testpaper;
+import com.qg.anywork.model.po.User;
 import com.qg.anywork.service.QuestionService;
 import com.qg.anywork.service.TestService;
-import com.qg.anywork.utils.DateUtil;
+import com.qg.anywork.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

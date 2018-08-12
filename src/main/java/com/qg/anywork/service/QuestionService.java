@@ -1,9 +1,9 @@
 package com.qg.anywork.service;
 
-import com.qg.anywork.dto.RequestResult;
+import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.exception.question.ExcelReadException;
-import com.qg.anywork.model.Question;
-import com.qg.anywork.model.Testpaper;
+import com.qg.anywork.model.po.Question;
+import com.qg.anywork.model.po.Testpaper;
 
 import java.io.InputStream;
 import java.io.OutputStream;

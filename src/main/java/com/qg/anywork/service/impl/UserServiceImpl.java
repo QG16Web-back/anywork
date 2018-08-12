@@ -2,14 +2,23 @@ package com.qg.anywork.service.impl;
 
 import com.qg.anywork.dao.RedisDao;
 import com.qg.anywork.dao.UserDao;
-import com.qg.anywork.dto.RequestResult;
+import com.qg.anywork.domain.StudentRepository;
+import com.qg.anywork.domain.UserRepository;
 import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.user.*;
-import com.qg.anywork.model.User;
+import com.qg.anywork.model.dto.RequestResult;
+import com.qg.anywork.model.po.Student;
+import com.qg.anywork.model.po.User;
 import com.qg.anywork.service.UserService;
-import com.qg.anywork.utils.Encryption;
+import com.qg.anywork.util.Encryption;
+import com.qg.anywork.util.ExcelUtil;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Create by ming on 18-8-5 上午11:20
@@ -27,20 +36,23 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private RedisDao redisDao;
+    @Autowired
+    private StudentRepository studentRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public void userMessageCheck(User user) {
         if (null == user) {
             throw new EmptyUserException("空用户对象");
+        } else if (userRepository.findByStudentId(user.getStudentId()) != null) {
+            throw new UserException("该学号已经被注册");
         } else if (!user.getEmail().matches("\\w+@\\w+(\\.\\w{2,3})*\\.\\w{2,3}") ||
-                !user.getUserName().matches("[a-z0-9A-Z\\u4e00-\\u9fa5]{1,15}") ||
                 !user.getPassword().matches("\\w{6,15}")) {
             throw new FormatterFaultException("注册信息格式错误");
-        } else {
-            // 检查用户是否存在
-            if (null != userDao.selectByEmail(user.getEmail())) {
-                throw new UserException("该用户已经存在");
-            }
+        } else if (userRepository.findByEmail(user.getEmail()) != null) {
+            throw new UserException("该邮箱已经被注册");
         }
     }
 
@@ -69,11 +81,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public RequestResult<User> login(String email, String password) {
-        if (email == null || password == null) {
+    public RequestResult<User> login(String studentId, String password) {
+        if (studentId == null || password == null) {
             throw new FormatterFaultException("空对象");
         }
-        User user = userDao.selectByEmail(email);
+        User user = userRepository.findByStudentId(studentId);
+        System.out.println(user);
         if (user == null) {
             throw new UserNotExitException("不存在的用户");
         } else if (!user.getPassword().equals(Encryption.getMD5(password))) {
@@ -90,10 +103,13 @@ public class UserServiceImpl implements UserService {
     public RequestResult<User> updateUser(User user) {
         if (user == null) {
             throw new FormatterFaultException("空用户对象");
-        } else if (!user.getEmail().matches("\\w+@\\w+(\\.\\w{2,3})*\\.\\w{2,3}") ||
-                !user.getUserName().matches("[a-z0-9A-Z\\u4e00-\\u9fa5]{1,15}")) {
+        } else if (!user.getUserName().matches("[a-z0-9A-Z\\u4e00-\\u9fa5]{1,15}")) {
             throw new FormatterFaultException("修改信息格式错误");
-        } else {
+        } else if (!"".equals(user.getPhone())) {
+            if (user.getPhone().matches("^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\\\\d{8}$")) {
+                throw new FormatterFaultException("修改信息格式错误");
+            }
+        } else{
             //置空密码
             user.setPassword("");
             userDao.updateUser(user);
@@ -102,22 +118,20 @@ public class UserServiceImpl implements UserService {
             user.setPassword("");
             return new RequestResult<>(StatEnum.INFORMATION_CHANGE_SUCCESS, realUser);
         }
+        return null;
     }
 
     @Override
-    public RequestResult<User> passwordChange(User user) {
-        if (user == null) {
-            throw new FormatterFaultException("空用户对象");
-        } else if (!user.getEmail().matches("\\w+@\\w+(\\.\\w{2,3})*\\.\\w{2,3}") ||
-                !user.getPassword().matches("[a-z0-9A-Z\\u4e00-\\u9fa5]{1,15}")) {
+    public boolean modifyPassword(int userId, String oldPassword, String newPassword) {
+        User user = userRepository.findByUserId(userId);
+        if (!user.getPassword().equals(Encryption.getMD5(oldPassword))) {
+            throw new UserException("原密码输入错误");
+        }
+        if (!newPassword.matches("[a-z0-9A-Z\\u4e00-\\u9fa5]{1,15}")) {
             throw new FormatterFaultException("修改信息格式错误");
         } else {
-            User r_user = userDao.selectByEmail(user.getEmail());
-            //加密
-            r_user.setPassword(Encryption.getMD5(user.getPassword()));
-            userDao.updateUser(r_user);
-            r_user.setPassword("");
-            return new RequestResult<User>(StatEnum.INFORMATION_CHANGE_SUCCESS, null);
+            userRepository.updatePasswordByUserId(userId, Encryption.getMD5(newPassword));
+            return true;
         }
     }
 
@@ -129,6 +143,26 @@ public class UserServiceImpl implements UserService {
         }
         user.setPassword("");
         return new RequestResult<>(StatEnum.INFORMATION_GET_MYSELF, user);
+    }
+
+    @Override
+    public RequestResult addStudent() {
+        String path = System.getProperty("user.dir") + "/src/main/resources";
+        File file = new File(path + "/static/名单.xlsx");
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        List<Student> students = new ArrayList<>();
+        try {
+            students = ExcelUtil.readStudentExcel(inputStream);
+        } catch (IOException | InvalidFormatException e) {
+            e.printStackTrace();
+        }
+        studentRepository.saveAll(students);
+        return new RequestResult(1, "添加成功");
     }
 }
 

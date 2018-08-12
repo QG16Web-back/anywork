@@ -5,7 +5,7 @@
 <mapper namespace="com.qg.anywork.dao.QuestionDao">
     <!--目的：为Dao接口方法提供SQL语句-->
 
-    <insert id="insertQuestion" parameterType="com.qg.anywork.model.Question" useGeneratedKeys="true"
+    <insert id="insertQuestion" parameterType="com.qg.anywork.model.po.Question" useGeneratedKeys="true"
             keyProperty="question.questionId">
         INSERT INTO question (content, type, A, B, C, D, `key`, socre, testpaper_id, other)
         VALUES (#{question.content},

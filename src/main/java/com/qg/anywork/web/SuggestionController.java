@@ -1,15 +1,12 @@
 package com.qg.anywork.web;
 
-import com.qg.anywork.dto.RequestResult;
-import com.qg.anywork.model.User;
+import com.qg.anywork.enums.StatEnum;
+import com.qg.anywork.model.dto.RequestResult;
+import com.qg.anywork.model.po.Suggestion;
+import com.qg.anywork.model.po.User;
 import com.qg.anywork.service.SuggestionService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -24,13 +21,22 @@ public class SuggestionController {
     @Autowired
     private SuggestionService suggestionService;
 
-    private static final Logger logger = LoggerFactory.getLogger(SuggestionController.class);
-
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public RequestResult addSuggestion(@RequestBody Map map, HttpServletRequest request) {
         User user = (User) request.getSession().getAttribute("user");
-//        User user = new User(); user.setUserId(1);
-        String suggestion = (String) map.get("suggestion");
-        return suggestionService.addSuggestion(user.getUserId(), suggestion);
+        String description = (String) map.get("description");
+        Suggestion suggestion = new Suggestion();
+        suggestion.setUser(user);
+        suggestion.setDescription(description);
+        return suggestionService.addSuggestion(suggestion);
+    }
+
+    @PostMapping("/show")
+    public RequestResult showSuggestion(HttpServletRequest request) {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user.getMark() == 0) {
+            return new RequestResult(StatEnum.NOT_HAVE_POWER);
+        }
+        return suggestionService.show();
     }
 }

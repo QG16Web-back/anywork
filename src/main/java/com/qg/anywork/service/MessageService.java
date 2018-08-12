@@ -1,7 +1,7 @@
 package com.qg.anywork.service;
 
-import com.qg.anywork.dto.RequestResult;
-import com.qg.anywork.model.Message;
+import com.qg.anywork.model.dto.RequestResult;
+import com.qg.anywork.model.bo.Message;
 import java.util.List;
 
 /**

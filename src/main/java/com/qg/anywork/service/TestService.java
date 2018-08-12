@@ -1,7 +1,12 @@
 package com.qg.anywork.service;
 
-import com.qg.anywork.dto.RequestResult;
-import com.qg.anywork.model.*;
+import com.qg.anywork.model.bo.TeacherSubmit;
+import com.qg.anywork.model.bo.StudentPaper;
+import com.qg.anywork.model.bo.StudentTestResult;
+import com.qg.anywork.model.dto.RequestResult;
+import com.qg.anywork.model.po.CheckResult;
+import com.qg.anywork.model.po.Question;
+import com.qg.anywork.model.po.Testpaper;
 
 import java.util.List;
 
@@ -14,6 +19,7 @@ public interface TestService {
     /***
      * 获取试题卷集合
      * @param organizationId　组织ID
+     * @param userId          用户ID
      * @return 试卷集合
      */
     RequestResult<List<Testpaper>> getTestList(int organizationId, int userId);
@@ -21,63 +27,61 @@ public interface TestService {
 
     /***
      * 获取练习卷集合
-     * @param organizationId
-     * @return
+     * @param organizationId 组织ID
+     * @param userId         用户ID
+     * @return 练习集合
      */
     RequestResult<List<Testpaper>> getPracticeList(int organizationId, int userId);
 
     /***
-     * 检查是否有做
-     * @param testpapers
-     * @param studentpapers
-     * @return
-     */
-    List<Testpaper> checkIfDo(List<Testpaper> testpapers, List<Testpaper> studentpapers);
-
-    /***
      * 根据章节id和组织id获取练习题
-     * @param organizationId
-     * @param chapterId
-     * @return
+     * @param organizationId 组织ID
+     * @param chapterId      章节ID
+     * @param userId         用户ID
+     * @return 练习题
      */
     RequestResult<List<Testpaper>> getPracticeByOCId(int organizationId, int chapterId, int userId);
 
     /***
      * 获取我做过的练习卷集合
-     * @return
+     * @param userId 用户ID
+     * @return 练习卷集合
      */
     RequestResult<List<Testpaper>> getMyPracticeList(int userId);
 
     /***
      * 获取某学生组织下做过的练习卷集合
-     * @return
+     * @param userId 用户ID
+     * @param organizationId 组织ID
+     * @return 试卷列表
      */
     RequestResult<List<CheckResult>> getPraceticeByOrganizationId(int userId, int organizationId);
 
     /***
      * 获取我做过的考试卷集合
-     * @return
+     * @param userId 用户ID
+     * @return 考试卷集合
      */
     RequestResult<List<Testpaper>> getMyTestList(int userId);
 
     /***
      * 获取问题集合
-     * @param testpaperId
-     * @return
+     * @param testpaperId 试卷ID
+     * @return Question
      */
     RequestResult<List<Question>> getQuestion(int testpaperId);
 
     /***
      * 获得考试结果
      * @param studentPaper  考试试卷
-     * @return
+     * @return 考试结果
      */
     StudentTestResult getResult(StudentPaper studentPaper);
 
     /***
      * 提交试卷获取结果
-     * @param studentPaper
-     * @return
+     * @param studentPaper 学生答卷
+     * @return 测试结果
      */
     RequestResult<StudentTestResult> submit(StudentPaper studentPaper);
 
@@ -93,9 +97,9 @@ public interface TestService {
 
     /***
      * 获取学生试卷详情
-     * @param testpaperId
-     * @param userId
-     * @return
+     * @param testpaperId 试卷ID
+     * @param userId 用户ID
+     * @return 试卷详情
      */
     RequestResult<StudentTestResult> getDetail(int testpaperId, int userId);
 
@@ -117,7 +121,7 @@ public interface TestService {
 
     /***
      * 更新相关分数
-     * @param teacherSubmit
+     * @param teacherSubmit teacherSubmit
      */
     void updateStudentTest(TeacherSubmit teacherSubmit);
 

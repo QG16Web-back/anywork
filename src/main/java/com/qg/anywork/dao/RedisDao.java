@@ -1,7 +1,7 @@
 package com.qg.anywork.dao;
 
-import com.qg.anywork.model.Question;
-import com.qg.anywork.model.User;
+import com.qg.anywork.model.po.Question;
+import com.qg.anywork.model.po.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
@@ -22,6 +22,7 @@ public class RedisDao {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @SuppressWarnings("unchecked")
     public void addQuestionList(int userId, ArrayList<Question> list) {
         String userStr = String.valueOf(userId);
         synchronized (list) {
@@ -34,6 +35,7 @@ public class RedisDao {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void removeQuestionList(int userId) {
         String userStr = String.valueOf(userId);
         while (redisTemplate.opsForList().size(userStr) > 0) {
@@ -42,10 +44,12 @@ public class RedisDao {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public List getQuestionList(int userId) {
         return redisTemplate.opsForList().range(String.valueOf(userId), 0, -1);
     }
 
+    @SuppressWarnings("unchecked")
     public void addUserMessage(String email, User user) {
         synchronized (user) {
             // 清除已经有的缓存信息
@@ -54,12 +58,14 @@ public class RedisDao {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void removeUserMessage(String email) {
         while (redisTemplate.opsForList().size(email) > 0) {
             redisTemplate.opsForList().rightPop(email);
         }
     }
 
+    @SuppressWarnings("unchecked")
     public User getUserMessage(String email) {
         User user = null;
         try {

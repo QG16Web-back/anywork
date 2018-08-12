@@ -1,6 +1,6 @@
 package com.qg.anywork.dao;
 
-import com.qg.anywork.model.Chapter;
+import com.qg.anywork.model.po.Chapter;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -23,15 +23,15 @@ public interface ChapterDao {
 
     /***
      * 增加章节
-     * @param chapter
-     * @return
+     * @param chapter 章节
+     * @return 1为成功，0为失败
      */
     int addChapter(@Param("chapter") Chapter chapter);
 
     /***
      * 删除章节
-     * @param chapterId
-     * @return
+     * @param chapterId 章节ID
+     * @return 1为成功，0为失败
      */
     int deleteChapter(@Param("chapterId") int chapterId);
 

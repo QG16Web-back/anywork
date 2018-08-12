@@ -21,6 +21,7 @@ public enum StatEnum {
     REGISTER_EMPTY_USER(0, "空用户对象"),
     REGISTER_FAMMTER_FAULT(0, "注册信息格式错误"),
     REGISTER_ALREADY_EXIST(0, "已存在的用户"),
+    STUDENT_ID_NOT_FOUND(0, "没有找到该学号对应的记录"),
 
     /**
      * 登录板块

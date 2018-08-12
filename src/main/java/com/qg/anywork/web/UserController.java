@@ -1,11 +1,14 @@
 package com.qg.anywork.web;
 
-import com.qg.anywork.dto.RequestResult;
+import com.qg.anywork.domain.StudentRepository;
+import com.qg.anywork.domain.UserRepository;
+import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.MailSendException;
 import com.qg.anywork.exception.ValcodeWrongException;
 import com.qg.anywork.exception.user.*;
-import com.qg.anywork.model.User;
+import com.qg.anywork.model.po.Student;
+import com.qg.anywork.model.po.User;
 import com.qg.anywork.service.MailService;
 import com.qg.anywork.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +42,13 @@ public class UserController {
     @Autowired
     private MailService mailService;
 
-    @RequestMapping(value = "/myinfo")
+    @Autowired
+    private StudentRepository studentRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @RequestMapping("/info")
     @ResponseBody
     public RequestResult<User> getUser(HttpServletRequest request) {
         try {
@@ -65,16 +74,16 @@ public class UserController {
         }
     }
 
-    @GetMapping("/exit")
+    @PostMapping("/exit")
     @ResponseBody
     public RequestResult<?> exit(HttpServletRequest request) {
         try {
             request.getSession().removeAttribute("user");
+            return new RequestResult<>(1, "用戶退出登录");
         } catch (Exception e) {
             log.warn("发生未知异常", e);
-        } finally {
-            throw new UserException("用戶退出登录");
         }
+        return new RequestResult<>(0, "用戶退出登录");
     }
 
     /**
@@ -82,14 +91,25 @@ public class UserController {
      * @param map     map
      * @return 用户id
      */
-    @RequestMapping(value = "/register", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/register", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
     public RequestResult<Integer> register(HttpServletRequest request,
                                            @RequestBody Map<String, String> map) {
+
+        String studentId = map.get("studentId");
+        Student student = studentRepository.findByStudentId(studentId);
+        try {
+            if (student == null) {
+                throw new UserException("没有找到对应的学号记录");
+            }
+        } catch (UserException e) {
+            return new RequestResult<>(StatEnum.STUDENT_ID_NOT_FOUND, 0);
+        }
         User user = new User();
         user.setEmail(map.get("email"));
         user.setPassword(map.get("password"));
-        user.setUserName(map.get("userName"));
+        user.setUserName(student.getStudentName());
+        user.setStudentId(student.getStudentId());
         user.setPhone(map.get("phone"));
         user.setMark(Integer.valueOf(map.get("mark")));
         try {
@@ -135,20 +155,20 @@ public class UserController {
      * @param map     map
      * @return user
      */
-    @RequestMapping(value = "/login", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/login", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
     public RequestResult<User> login(HttpServletRequest request, @RequestBody Map<String, String> map) {
-        String email = map.get("email");
+        String studentId = map.get("studentId");
         String password = map.get("password");
         String valcode = map.get("valcode");
         // 检查字段
-        if (email == null || password == null || valcode == null) {
+        if (studentId == null || password == null || valcode == null) {
             return new RequestResult<>(StatEnum.ERROR_PARAM, null);
         }
         try {
             // 验证码
             verify(request, valcode);
-            RequestResult<User> result = userService.login(email, password);
+            RequestResult<User> result = userService.login(studentId, password);
             // 存入Session
             User user = result.getData();
             request.getSession().setAttribute("user", user);
@@ -178,7 +198,7 @@ public class UserController {
      * @param map     map
      * @return request result
      */
-    @RequestMapping(value = "/change", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/password/change", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
     public RequestResult<User> passwordChange(HttpServletRequest request, @RequestBody Map<String, String> map) {
         try {
@@ -186,9 +206,13 @@ public class UserController {
             if (user == null) {
                 throw new UserNotLoginException("用户还未登录");
             }
-            String newPassword = map.get("password");
-            user.setPassword(newPassword);
-            return userService.passwordChange(user);
+            String oldPassword = map.get("oldPassword");
+            String newPassword = map.get("newPassword");
+            boolean flag = userService.modifyPassword(user.getUserId(), oldPassword, newPassword);
+            if (flag) {
+                user.setPassword(newPassword);
+            }
+            return new RequestResult<>(StatEnum.SUBMIT_TEST_SUCCESS, user);
         } catch (UserNotLoginException e) {
             log.warn("用户还未登录");
             return new RequestResult<>(StatEnum.USER_NOT_LOGIN, null);
@@ -199,7 +223,6 @@ public class UserController {
             log.warn("未知异常: ", e);
             return new RequestResult<>(StatEnum.DEFAULT_WRONG, null);
         }
-
     }
 
     /**
@@ -215,13 +238,11 @@ public class UserController {
         try {
             User user = (User) request.getSession().getAttribute("user");
             user.setPhone(map.get("phone"));
-            if (map.get("userName") != null && !"".equals(map.get("userName"))) {
-                user.setUserName(map.get("userName"));
-            }
+
             if (map.get("email") != null && !"".equals(map.get("email"))) {
                 user.setEmail(map.get("email"));
             }
-
+            // TODO 2018/08/11 数据校验
             RequestResult<User> result = userService.updateUser(user);
             request.getSession().setAttribute("user", result.getData());
             return result;
@@ -255,8 +276,12 @@ public class UserController {
                 assert filename != null;
                 if (filename.endsWith(".jpg") || filename.endsWith(".JPG") || filename.endsWith(".png") || filename.endsWith(".PNG")) {
                     //文件上传
+                    File picture = new File(request.getServletContext().getRealPath("/picture/user/"), user.getUserId() + ".jpg");
+                    if (!picture.exists()) {
+                        userRepository.updateImagePathByUserId(user.getUserId(), "/picture/user/" + user.getUserId() + ".jpg");
+                    }
                     FileUtils.copyInputStreamToFile(file.getInputStream(),
-                            new File(request.getServletContext().getRealPath("/picture"), user.getUserId() + ".jpg"));
+                            new File(request.getServletContext().getRealPath("/picture/user/"), user.getUserId() + ".jpg"));
                 } else {
                     return new RequestResult<>(StatEnum.FILE_FORMAT_ERROR, null);
                 }
@@ -274,6 +299,34 @@ public class UserController {
             log.warn("未知异常: ", e);
             return new RequestResult<User>(StatEnum.DEFAULT_WRONG, null);
         }
+    }
+
+    /**
+     * 忘了密码邮箱找回
+     *
+     * @param map
+     * @return
+     */
+    @RequestMapping(value = "/forget", method = RequestMethod.POST, produces = "application/json")
+    @ResponseBody
+    public RequestResult<?> sendMail(@RequestBody Map<String, String> map) {
+        try {
+            return mailService.sendPasswordMail(map.get("email"));
+        } catch (UserNotExitException e) {
+            log.warn("不存在的用户！", e);
+            return new RequestResult<>(StatEnum.LOGIN_NOT_EXIT_USER);
+        } catch (MailSendException e) {
+            log.warn("发送邮件失败！", e);
+            return new RequestResult<>(StatEnum.MAIL_SEND_FAIL);
+        } catch (Exception e) {
+            log.warn("未知异常: ", e);
+            return new RequestResult<>(StatEnum.DEFAULT_WRONG);
+        }
+    }
+
+    @GetMapping("/add")
+    public RequestResult addStudent() {
+        return userService.addStudent();
     }
 
     /**

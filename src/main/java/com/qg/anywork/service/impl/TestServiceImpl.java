@@ -3,10 +3,11 @@ package com.qg.anywork.service.impl;
 import com.qg.anywork.dao.OrganizationDao;
 import com.qg.anywork.dao.TestDao;
 import com.qg.anywork.dao.UserDao;
-import com.qg.anywork.dto.RequestResult;
+import com.qg.anywork.model.bo.*;
+import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.TestException;
-import com.qg.anywork.model.*;
+import com.qg.anywork.model.po.*;
 import com.qg.anywork.service.TestService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +46,6 @@ public class TestServiceImpl implements TestService {
     }
 
 
-    /***
-     * 获取练习卷集合
-     * @param organizationId　组织ID
-     * @return 练习集合
-     */
     @Override
     public RequestResult<List<Testpaper>> getPracticeList(int organizationId, int userId) {
         if (organizationDao.getById(organizationId) == null) {
@@ -67,8 +63,7 @@ public class TestServiceImpl implements TestService {
      * @param studentpapers
      * @return
      */
-    @Override
-    public List<Testpaper> checkIfDo(List<Testpaper> testpapers, List<Testpaper> studentpapers) {
+    private List<Testpaper> checkIfDo(List<Testpaper> testpapers, List<Testpaper> studentpapers) {
         List<Testpaper> testpapersList = new ArrayList<>();
         for (Testpaper t : testpapers) {
             int flag = 0;
@@ -79,34 +74,27 @@ public class TestServiceImpl implements TestService {
                     flag = 1;
                 }
             }
-            if (flag == 0) t.setChapterId(-1);
+            if (flag == 0) {
+                t.setChapterId(-1);
+            }
             testpapersList.add(t);
         }
 
         return testpapersList;
     }
 
-    /***
-     * 根据章节id和组织id获取练习题
-     * @param organizationId
-     * @param chapterId
-     * @return
-     */
     @Override
     public RequestResult<List<Testpaper>> getPracticeByOCId(int organizationId, int chapterId, int userId) {
-        if (organizationDao.getById(organizationId) == null) throw new TestException("无效的组织");
+        if (organizationDao.getById(organizationId) == null) {
+            throw new TestException("无效的组织");
+        }
         List<Testpaper> practiceList = testDao.getPracticeByOCId(organizationId, chapterId);
         List<Testpaper> studentpapers = testDao.getMyPractice(userId);
         List<Testpaper> testpaperList = checkIfDo(practiceList, studentpapers);
 
-        return new RequestResult(StatEnum.GET_TEST_SUCCESS, testpaperList);
+        return new RequestResult<>(StatEnum.GET_TEST_SUCCESS, testpaperList);
     }
 
-
-    /***
-     * 获取我做过的练习卷集合
-     * @return
-     */
     @Override
     public RequestResult<List<Testpaper>> getMyPracticeList(int userId) {
 
@@ -114,19 +102,15 @@ public class TestServiceImpl implements TestService {
         for (Testpaper t : testpapers) {
             t.setChapterId(0);
         }
-        return new RequestResult(StatEnum.GET_TEST_SUCCESS, testpapers);
+        return new RequestResult<>(StatEnum.GET_TEST_SUCCESS, testpapers);
     }
 
-    /***
-     * 获取某学生组织下做过的练习卷集合
-     * @return
-     */
     @Override
     public RequestResult<List<CheckResult>> getPraceticeByOrganizationId(int userId, int organizationId) {
 
         List<CheckResult> practice = testDao.getUserPracticeByOrganizationId(userId, organizationId);
 
-        List<CheckResult> checkResults = new ArrayList<CheckResult>();
+        List<CheckResult> checkResults = new ArrayList<>();
         List<Testpaper> testpapers = testDao.getPracticeByOrganizationId(organizationId);
         for (Testpaper t : testpapers) {
             int flag = 0;
@@ -150,46 +134,35 @@ public class TestServiceImpl implements TestService {
                 checkResults.add(checkResult);
             }
         }
-
-        return new RequestResult<List<CheckResult>>(1, "获取成功", checkResults);
-
+        return new RequestResult<>(1, "获取成功", checkResults);
     }
 
-    /***
-     * 获取我做过的考试卷集合
-     * @return
-     */
     @Override
     public RequestResult<List<Testpaper>> getMyTestList(int userId) {
         List<Testpaper> testpapers = testDao.getMyTest(userId);
         for (Testpaper t : testpapers) {
             t.setChapterId(0);
         }
-        return new RequestResult(StatEnum.GET_TEST_SUCCESS, testpapers);
+        return new RequestResult<>(StatEnum.GET_TEST_SUCCESS, testpapers);
     }
 
-    /***
-     * 获取问题集合
-     * @param testpaperId
-     * @return
-     */
     @Override
     public RequestResult<List<Question>> getQuestion(int testpaperId) {
-        Testpaper testpaper = testDao.getTestpaperByTestpaperId(testpaperId);
-        if (new Date().before(testpaper.getCreateTime()) && testpaper.getTestpaperType() == 1)
+        Testpaper testpaper = testDao.getTestPaperByTestpaperId(testpaperId);
+        if (new Date().before(testpaper.getCreateTime()) && testpaper.getTestpaperType() == 1) {
             throw new TestException("考试未开始");
+        }
         List<Question> questions = testDao.getQuestionByTestpaperId(testpaperId);
         for (Question question : questions) {
             question.setKey(null);
         }
-        return new RequestResult(StatEnum.GET_TEST_SUCCESS, questions);
+        return new RequestResult<>(StatEnum.GET_TEST_SUCCESS, questions);
     }
-
 
     /***
      * 获得考试结果
      * @param studentPaper  考试试卷
-     * @return
+     * @return 试卷结果
      */
     @Override
     public StudentTestResult getResult(StudentPaper studentPaper) {
@@ -198,7 +171,7 @@ public class TestServiceImpl implements TestService {
         studentTestResult.setStudentId(studentPaper.getStudentId());
         studentTestResult.setTestpaperId(studentPaper.getTestpaperId());
 
-        List<StudentAnswerAnalysis> studentAnswerAnalysises = new ArrayList<StudentAnswerAnalysis>();
+        List<StudentAnswerAnalysis> studentAnswerAnalysises = new ArrayList<>();
 
         double socre = 0;
 
@@ -230,24 +203,25 @@ public class TestServiceImpl implements TestService {
                     //填空
                     if (question.getType() == 3) {
                         int isTrue = 1;
-                        String SPLIT = "∏";
+                        String split = "#";
                         int index;
                         int number = question.getOther();
-                        double fillingSocre = 0.0;
+                        double fillingScore = 0.0;
                         //正确答案数组
-                        String[] answer = question.getKey().split(SPLIT);
+                        String[] answer = question.getKey().split(split);
                         //学生答案数组
-                        String[] studentFillingAnswer = studentAnswer.getStudentAnswer().split(SPLIT);
+                        String[] studentFillingAnswer = studentAnswer.getStudentAnswer().split(split);
 
                         for (index = 0; index < number; index++) {
-                            if (answer[index].equals(studentFillingAnswer[index]))
-                                fillingSocre += question.getSocre() / number;
-                            else
+                            if (answer[index].equals(studentFillingAnswer[index])) {
+                                fillingScore += question.getSocre() / number;
+                            } else {
                                 isTrue = 0;
+                            }
                         }
                         studentAnswerAnalysis.setIsTrue(isTrue == 1 ? 1 : 0);
-                        studentAnswerAnalysis.setSocre(fillingSocre);
-                        socre += fillingSocre;
+                        studentAnswerAnalysis.setSocre(fillingScore);
+                        socre += fillingScore;
                     }
                     studentAnswerAnalysis.setStudentId(studentPaper.getStudentId());
                     studentAnswerAnalysises.add(studentAnswerAnalysis);
@@ -273,26 +247,26 @@ public class TestServiceImpl implements TestService {
         return studentTestResult;
     }
 
-    /***
-     * 提交试卷获取结果
-     * @param studentPaper
-     * @return
-     */
     @Override
     public RequestResult<StudentTestResult> submit(StudentPaper studentPaper) {
 
-        Testpaper testpaper = testDao.getTestpaperByTestpaperId(studentPaper.getTestpaperId());
+        // 获得对应试卷
+        Testpaper testpaper = testDao.getTestPaperByTestpaperId(studentPaper.getTestpaperId());
 
         //是否已经做过该套题的标志
         boolean flag = testDao.isSubmit(testpaper.getTestpaperId(), studentPaper.getStudentId()) > 0;
 
-        if (flag && testpaper.getTestpaperType() == 1) throw new TestException("已经提交过试卷了，无法再次提交");
+        if (flag && testpaper.getTestpaperType() == 1) {
+            throw new TestException("已经提交过试卷了，无法再次提交");
+        }
 
         StudentTestResult studentTestResult = this.getResult(studentPaper);
 
         //如果为考试则必须校验考试时间
         if (testpaper.getTestpaperType() == 1) {
-            if (new Date().after(testpaper.getEndingTime())) throw new TestException("考试已经结束");
+            if (new Date().after(testpaper.getEndingTime())) {
+                throw new TestException("考试已经结束");
+            }
         }
 
         if (flag) {
@@ -314,56 +288,35 @@ public class TestServiceImpl implements TestService {
             for (StudentAnswerAnalysis s : studentAnswerAnalysis) {
                 testDao.addStudentAnswer(s);
             }
-        }
-        if (flag) {
+        } else {
             for (StudentAnswerAnalysis s : studentAnswerAnalysis) {
                 testDao.updateStudentAnswer(s);
             }
         }
-        return new RequestResult<StudentTestResult>(StatEnum.SUBMIT_TEST_SUCCESS, studentTestResult);
+        return new RequestResult<>(StatEnum.SUBMIT_TEST_SUCCESS, studentTestResult);
     }
 
-
-    /**
-     * 增加一张试卷/练习
-     *
-     * @param testpaper
-     */
     @Override
     public void addTestpaper(Testpaper testpaper) {
         testDao.addTestpaper(testpaper);
     }
 
-    //更新一张试卷/练习的总分
     @Override
     public boolean updateTextpaper(int testpaperId, int socre) {
-        if (testDao.updateSocreOfTestpaper(testpaperId, socre) == 1) {
-            return true;
-        }
-        return false;
+        return testDao.updateSocreOfTestpaper(testpaperId, socre) == 1;
     }
 
-    /***
-     * 获取学生试卷详情
-     * @param testpaperId
-     * @param userId
-     * @return
-     */
     @Override
     public RequestResult<StudentTestResult> getDetail(int testpaperId, int userId) {
         StudentTestResult studentTestResult = testDao.getTestResult(testpaperId, userId);
-        if (studentTestResult == null) return new RequestResult(0, "没有此记录");
-        List<StudentAnswerAnalysis> studentAnswerAnalysises = testDao.getStudentAnswer(testpaperId, userId);
-        studentTestResult.setStudentAnswerAnalysis(studentAnswerAnalysises);
-        return new RequestResult<StudentTestResult>(1, "成功", studentTestResult);
+        if (studentTestResult == null) {
+            return new RequestResult<>(0, "没有此记录");
+        }
+        List<StudentAnswerAnalysis> studentAnswerAnalysis = testDao.getStudentAnswer(testpaperId, userId);
+        studentTestResult.setStudentAnswerAnalysis(studentAnswerAnalysis);
+        return new RequestResult<>(1, "成功", studentTestResult);
     }
 
-    /***
-     * 获取组织下某学生的考试列表
-     * @param organizationId
-     * @param userId
-     * @return
-     */
     @Override
     public RequestResult<List<CheckResult>> getCheckResultByUser(int organizationId, int userId) {
         List<CheckResult> checkResultsByUser = testDao.getCheckResultByUser(organizationId, userId);
@@ -392,15 +345,9 @@ public class TestServiceImpl implements TestService {
             }
         }
 
-        return new RequestResult<List<CheckResult>>(1, "获取成功", checkResults);
+        return new RequestResult<>(1, "获取成功", checkResults);
     }
 
-    /***
-     *获取某套题组织内成员的完成情况
-     * @param organizationId
-     * @param testpaperId
-     * @return
-     */
     @Override
     public RequestResult<List<CheckResult>> getCheckResultByTestpaperId(int organizationId, int testpaperId) {
         List<CheckResult> checkResultsByTest = testDao.getCheckResultByTestpaperId(organizationId, testpaperId);
@@ -424,19 +371,13 @@ public class TestServiceImpl implements TestService {
                 checkResult.setStudentId(u.getUserId());
                 checkResult.setStudentName(u.getUserName());
                 checkResult.setIfCheck(0);
-                checkResult.setTestpaper(testDao.getTestpaperByTestpaperId(testpaperId));
+                checkResult.setTestpaper(testDao.getTestPaperByTestpaperId(testpaperId));
                 checkResults.add(checkResult);
             }
         }
-
-
-        return new RequestResult<List<CheckResult>>(1, "获取成功", checkResults);
+        return new RequestResult<>(1, "获取成功", checkResults);
     }
 
-    /***
-     * 更新相关分数
-     * @param teacherSubmit
-     */
     @Override
     public void updateStudentTest(TeacherSubmit teacherSubmit) {
         List<TeacherJudge> teacherJudges = teacherSubmit.getTeacherJudge();
@@ -444,8 +385,11 @@ public class TestServiceImpl implements TestService {
         double object = 0;
         for (TeacherJudge t : teacherJudges) {
             int type = testDao.getQuestionById(t.getQuestionId()).getType();
-            if (type == 4 || type == 6 || type == 5) subject += t.getSocre();
-            else object += t.getSocre();
+            if (type == 4 || type == 6 || type == 5) {
+                subject += t.getSocre();
+            } else {
+                object += t.getSocre();
+            }
             //更新studentAnswer
             testDao.updateStudentAnswerSocre(t.getSocre(), teacherSubmit.getStudentId(), t.getQuestionId());
         }
@@ -463,5 +407,4 @@ public class TestServiceImpl implements TestService {
         studentTestResult.setSocre(studentTestResult.getSocre() + subject);
         testDao.updateTestResult(studentTestResult);
     }
-
 }

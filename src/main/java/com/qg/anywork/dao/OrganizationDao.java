@@ -1,7 +1,7 @@
 package com.qg.anywork.dao;
 
-import com.qg.anywork.model.Organization;
-import com.qg.anywork.model.User;
+import com.qg.anywork.model.po.Organization;
+import com.qg.anywork.model.po.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -70,8 +70,17 @@ public interface OrganizationDao {
      */
     int getOrganizationCount(@Param("organizationId") int organizationId);
 
+
+    /**
+     * 根据组织名称查找组织
+     *
+     * @param organizationName 组织名称
+     * @return 组织
+     */
+    Organization findByOrganizationName(@Param("organizationName") String organizationName);
+
     /***
-     * 添加组织借口
+     * 添加组织
      * @param organization 组织
      * @return int
      */
