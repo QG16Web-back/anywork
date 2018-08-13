@@ -9,14 +9,18 @@ import com.qg.anywork.service.ChapterService;
 import com.qg.anywork.service.TestService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * @author logan
@@ -32,6 +36,9 @@ public class TestController {
 
     @Autowired
     private ChapterService chapterService;
+
+    @Resource(name = "defaultThreadPool")
+    private ThreadPoolTaskExecutor executor;
 
     /***
      * 获取试题集合
@@ -122,12 +129,12 @@ public class TestController {
      * @return 测试结果
      */
     @RequestMapping(value = "/submit", method = RequestMethod.POST)
-    public RequestResult<StudentTestResult> submit(@RequestBody StudentPaper studentPaper, HttpServletRequest request) {
+    public RequestResult<StudentTestResult> submit(@RequestBody StudentPaper studentPaper, HttpServletRequest request) throws ExecutionException, InterruptedException {
         if (studentPaper == null) {
             return new RequestResult<>(StatEnum.REQUEST_ERROR);
         }
-        RequestResult<StudentTestResult> studentTestResult;
-        studentTestResult = testService.submit(studentPaper);
+        Future<RequestResult<StudentTestResult>> future = executor.submit(() -> testService.submit(studentPaper));
+        RequestResult<StudentTestResult> studentTestResult = future.get();
         request.getSession().setAttribute("studentTestResult", studentTestResult.getData());
         return studentTestResult;
     }

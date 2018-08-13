@@ -15,10 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,6 +29,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * @author FunriLy
@@ -49,6 +53,9 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Resource(name = "defaultThreadPool")
+    private ThreadPoolTaskExecutor executor;
 
     @RequestMapping("/info")
     @ResponseBody
@@ -128,7 +135,7 @@ public class UserController {
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
-    public RequestResult<User> login(HttpServletRequest request, @RequestBody Map<String, String> map) {
+    public RequestResult<User> login(HttpServletRequest request, @RequestBody Map<String, String> map) throws ExecutionException, InterruptedException {
         String studentId = map.get("studentId");
         String password = map.get("password");
         String valcode = map.get("valcode");
@@ -138,8 +145,10 @@ public class UserController {
         }
         // 验证码
         verify(request, valcode);
-        RequestResult<User> result = userService.login(studentId, password);
+        Future<RequestResult<User>> future = executor.submit(() -> userService.login(studentId, password));
+        RequestResult<User> result = future.get();
         // 存入Session
+        assert result != null;
         User user = result.getData();
         request.getSession().setAttribute("user", user);
         return result;

@@ -14,6 +14,7 @@ import com.qg.anywork.util.Encryption;
 import com.qg.anywork.util.ExcelUtil;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -28,6 +29,7 @@ import java.util.List;
  * I'm the one to ignite the darkened skies.
  */
 @Service
+@Scope("prototype")
 public class UserServiceImpl implements UserService {
 
     @Autowired

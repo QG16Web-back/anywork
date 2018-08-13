@@ -12,6 +12,7 @@ import com.qg.anywork.model.po.*;
 import com.qg.anywork.service.TestService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
+@Scope("prototype")
 public class TestServiceImpl implements TestService {
 
     @Autowired
