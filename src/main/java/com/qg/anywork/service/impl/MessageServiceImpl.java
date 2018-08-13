@@ -3,9 +3,10 @@ package com.qg.anywork.service.impl;
 import com.qg.anywork.dao.MessageDao;
 import com.qg.anywork.dao.OrganizationDao;
 import com.qg.anywork.dao.UserDao;
+import com.qg.anywork.exception.message.MessageException;
 import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.enums.StatEnum;
-import com.qg.anywork.exception.ValcodeWrongException;
+import com.qg.anywork.exception.user.ValcodeWrongException;
 import com.qg.anywork.exception.testpaper.NotPowerException;
 import com.qg.anywork.exception.user.UserException;
 import com.qg.anywork.model.bo.Message;
@@ -52,7 +53,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public RequestResult<List<Message>> getReceiveMessage(int userId, int page, String userName) {
         if (page < 0) {
-            throw new ValcodeWrongException("页面值非法，小于0");
+            throw new MessageException(StatEnum.PAGE_IS_ERROR);
         }
         int start = page * MESSAGE_NUMBER;
         int end = start + 10;
@@ -67,7 +68,7 @@ public class MessageServiceImpl implements MessageService {
                 logger.warn("用户接收消息获取未知异常：" + e.getMessage());
             }
         }
-        return new RequestResult<List<Message>>(StatEnum.MESSAGE_LIST, list);
+        return new RequestResult<>(StatEnum.MESSAGE_LIST, list);
     }
 
     /**
@@ -84,10 +85,10 @@ public class MessageServiceImpl implements MessageService {
         Organization organization = organizationDao.getById(organId);
         if (organization.getTeacherId() != userId) {
             // 用户不是组织的创建者
-            throw new NotPowerException("用户没有相应的权限来查看消息！");
+            throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
         }
         if (page < 0) {
-            throw new ValcodeWrongException("页面值非法，小于0");
+            throw new MessageException(StatEnum.PAGE_IS_ERROR);
         }
         int start = page * MESSAGE_NUMBER;
         int end = start + 10;
@@ -123,7 +124,7 @@ public class MessageServiceImpl implements MessageService {
                 receiveName = userDao.selectById(message.getReceiveId()).getUserName();
             }
         } catch (NullPointerException e) {
-            throw new UserException("不存在的用户！");
+            throw new UserException(StatEnum.LOGIN_NOT_EXIT_USER);
         }
         String content = message.getContent();
         content.replaceAll(String.valueOf(message.getSendId()), sendName);

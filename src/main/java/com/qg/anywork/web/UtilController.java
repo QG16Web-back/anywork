@@ -1,9 +1,7 @@
 package com.qg.anywork.web;
 
-import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.enums.StatEnum;
-import com.qg.anywork.exception.MailSendException;
-import com.qg.anywork.exception.user.UserNotExitException;
+import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.service.MailService;
 import com.qg.anywork.service.UserService;
 import com.qg.anywork.util.Encryption;
@@ -80,24 +78,16 @@ public class UtilController {
     @RequestMapping(value = "/reset", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
     public RequestResult<String> resetPassword(@RequestBody Map<String, String> map) {
-        try {
-            String email = map.get("email");
-            String ciphertext = map.get("ciphertext");
-            if (email == null || "".equals(email) || ciphertext == null || "".equals(ciphertext)) {
-                return new RequestResult<>(StatEnum.ERROR_PARAM);
-            }
-            if (ciphertext.equals(Encryption.getMD5(email))) {
-                String password = mailService.resetPassword(email);
-                return new RequestResult<>(StatEnum.PASSWORD_RESET, password);
-            }
+        String email = map.get("email");
+        String ciphertext = map.get("ciphertext");
+        if (email == null || "".equals(email) || ciphertext == null || "".equals(ciphertext)) {
             return new RequestResult<>(StatEnum.ERROR_PARAM);
-        } catch (UserNotExitException e) {
-            logger.warn("不存在的用户！", e);
-            return new RequestResult<>(StatEnum.LOGIN_NOT_EXIT_USER);
-        } catch (Exception e) {
-            logger.warn("未知异常: ", e);
-            return new RequestResult<>(StatEnum.DEFAULT_WRONG);
         }
+        if (ciphertext.equals(Encryption.getMD5(email))) {
+            String password = mailService.resetPassword(email);
+            return new RequestResult<>(StatEnum.PASSWORD_RESET, password);
+        }
+        return new RequestResult<>(StatEnum.ERROR_PARAM);
     }
 
     /**

@@ -1,7 +1,7 @@
 package com.qg.anywork.config;
 
 import com.qg.anywork.model.dto.RequestResult;
-import com.qg.anywork.exception.AnyWorkException;
+import com.qg.anywork.exception.AbstractAnyWorkException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @ResponseBody
 public class ExceptionHandlerAdvice {
 
-    @ExceptionHandler(AnyWorkException.class)
-    public RequestResult handleException(AnyWorkException e) {
+    @ExceptionHandler(AbstractAnyWorkException.class)
+    public RequestResult handleException(AbstractAnyWorkException e) {
         return new RequestResult<>(e.getStatEnum(), null);
     }
 }

@@ -4,7 +4,7 @@ import com.qg.anywork.dao.RedisDao;
 import com.qg.anywork.dao.UserDao;
 import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.enums.StatEnum;
-import com.qg.anywork.exception.MailSendException;
+import com.qg.anywork.exception.mail.MailSendException;
 import com.qg.anywork.exception.user.UserNotExitException;
 import com.qg.anywork.model.po.User;
 import com.qg.anywork.service.MailService;
@@ -41,7 +41,7 @@ public class MailServiceImpl implements MailService {
     public RequestResult<?> sendPasswordMail(String email) {
         User user = userDao.selectByEmail(email);
         if (user == null) {
-            throw new UserNotExitException("不存在的用户！");
+            throw new UserNotExitException(StatEnum.LOGIN_NOT_EXIT_USER);
         }
         mailUtil.send(email, user.getUserName(), 2);
         return new RequestResult<>(StatEnum.MAIL_SEND_SUCCESS);
@@ -64,7 +64,7 @@ public class MailServiceImpl implements MailService {
         //将密码存入数据库
         User user = userDao.selectByEmail(email);
         if (user == null) {
-            throw new UserNotExitException("不存在的用户！");
+            throw new UserNotExitException(StatEnum.LOGIN_NOT_EXIT_USER);
         }
         //密码加密并存入数据库
         user.setPassword(Encryption.getMD5(password));

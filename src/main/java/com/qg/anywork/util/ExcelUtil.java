@@ -1,5 +1,6 @@
 package com.qg.anywork.util;
 
+import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.question.ExcelReadException;
 import com.qg.anywork.model.po.Question;
 import com.qg.anywork.model.po.Student;
@@ -65,190 +66,6 @@ public class ExcelUtil {
 
         return new ExcelUtil().readQuest(input, Question.class, map1, map2, map3, map2, map2, map2);
     }
-
-    /**
-     * 读取试卷题目
-     *
-     * @param input
-     * @param clazz
-     * @param map1
-     * @param map2
-     * @param map3
-     * @param map4
-     * @param map5
-     * @param map6
-     * @param <T>
-     * @return
-     * @throws Exception
-     */
-    @SuppressWarnings("unchecked")
-    private <T> List<Question> readQuest(InputStream input, Class<T> clazz,
-                                         Map<Integer, String> map1,                      //选择题
-                                         Map<Integer, String> map2,                      //判断题
-                                         Map<Integer, String> map3,                      //填空题
-                                         Map<Integer, String> map4,                      //问答题
-                                         Map<Integer, String> map5,                      //编程题
-                                         Map<Integer, String> map6) throws Exception {   //综合题
-
-        List<Question> questionList = new ArrayList<>();
-
-        try {
-            Workbook wb = WorkbookFactory.create(input);
-            Sheet sheet = wb.getSheetAt(0);
-            Field field = null;
-            Class tempClazz = Question.class;
-
-            //从第二行开始读取
-            for (int i = 2; i <= sheet.getLastRowNum(); i++) {
-                Row row = sheet.getRow(i);
-                if (null == row) {
-                    //空行不处理
-                    continue;
-                }
-
-                Map<Integer, String> map = null;
-                //获取每一行的第一个单元格
-                Cell cell = row.getCell(0);
-                if (null == cell) {
-                    //空行不处理
-                    continue;
-                }
-
-                //存储类型
-                String status = cell.getStringCellValue();
-                if (status.startsWith("A")) {
-                    //解析选择题
-                    map = map1;
-                } else if (status.startsWith("B")) {
-                    //判断题
-                    map = map2;
-                } else if (status.startsWith("C")) {
-                    //填空题
-                    map = map3;
-                } else if (status.startsWith("D")) {
-                    //问答题
-                    map = map4;
-                } else if (status.startsWith("E")) {
-                    //编程题
-                    map = map5;
-                } else if (status.startsWith("F")) {
-                    //综合题
-                    map = map6;
-                } else {
-                    //未知信息
-                    continue;
-                }
-
-                T t = (T) tempClazz.newInstance();
-                T t1 = (T) tempClazz.newInstance();
-
-                //从第二个单元格开始读取
-                for (int j = 1; j < row.getLastCellNum(); j++) {
-                    //获取存储类型
-                    try {
-                        field = tempClazz.getDeclaredField(map.get(j));
-                    } catch (NullPointerException e) {
-                        break;
-                    }
-
-                    field.setAccessible(true);
-                    //获得单元格对象
-                    Cell realCell = row.getCell(j);
-                    if (null == realCell || "".equals(realCell.toString())) {
-                        continue;
-                    }
-                    t = addingT(field, t1, realCell);
-                }
-
-                //强制转换类型
-                Question question = (Question) t;
-                if (null == question.getContent()) {
-                    continue;
-                }
-
-                if (status.startsWith("A")) {
-                    question.setType(1);
-                } else if (status.startsWith("B")) {
-                    question.setType(2);
-                } else if (status.startsWith("C")) {
-                    question.setType(3);
-                    question.setKey(question.getKey().replaceAll("#", "∏"));    //替換答案中非法字符
-                } else if (status.startsWith("D")) {
-                    question.setType(4);
-                } else if (status.startsWith("E")) {
-                    question.setType(5);
-                } else if (status.startsWith("F")) {
-                    question.setType(6);
-                }
-
-                questionList.add(question);
-            }
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return questionList;
-    }
-
-    private <T> T addingT(Field field, T t, Cell cell) throws IllegalArgumentException, IllegalAccessException {
-        switch (cell.getCellType()) {
-            case Cell.CELL_TYPE_STRING:     //字符串
-                field.set(t, cell.getStringCellValue());
-                break;
-
-            case Cell.CELL_TYPE_BOOLEAN:    //Boolean对象
-                field.set(t, cell.getBooleanCellValue());
-                break;
-
-            case Cell.CELL_TYPE_NUMERIC:
-
-                //是否是日期格式
-                if (DateUtil.isCellDateFormatted(cell)) {
-                    //DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                    field.set(t, cell.getDateCellValue());
-                } else {
-                    //读取为数字
-                    Integer longVal = (int) Math.round(cell.getNumericCellValue());
-                    double doubleVal = Math.round(cell.getNumericCellValue());
-
-                    if (Double.parseDouble(longVal + ".0") == doubleVal) {
-                        String type = field.getType().toString();
-                        if ("class java.lang.String".equals(type)) {
-                            field.set(t, longVal + "");
-                        } else {
-                            field.set(t, longVal);
-                        }
-                    } else {
-                        field.set(t, doubleVal);
-                    }
-                }
-                break;
-
-            case Cell.CELL_TYPE_FORMULA:    //公式
-                field.set(t, cell.getCellFormula());
-                break;
-
-            case HSSFCell.CELL_TYPE_BLANK:  //空值
-                break;
-
-            case HSSFCell.CELL_TYPE_ERROR:  //故障
-                break;
-            default:
-                break;
-        }
-
-        return t;
-    }
-
-    /**
-     * 输出Excel
-     */
-
 
     /**
      * 将数据导出为Excel
@@ -472,7 +289,7 @@ public class ExcelUtil {
 
                 } catch (SecurityException | NoSuchMethodException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
-                    throw new ExcelReadException("Excel导出失败！" + e.getMessage());
+                    throw new ExcelReadException(StatEnum.FILE_EXPORT_FAIL);
                 }
             }
         }
@@ -488,22 +305,6 @@ public class ExcelUtil {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    /**
-     * 输出每种题目的标题
-     *
-     * @param headers
-     * @param row
-     * @param style
-     */
-    private void addCell(String[] headers, HSSFRow row, HSSFCellStyle style) {
-        for (int i = 0; i < headers.length; i++) {
-            HSSFCell cell = row.createCell(i);
-            cell.setCellStyle(style);
-            HSSFRichTextString text = new HSSFRichTextString(headers[i]);
-            cell.setCellValue(text);
         }
     }
 
@@ -528,5 +329,200 @@ public class ExcelUtil {
             students.add(student);
         }
         return students;
+    }
+
+    /**
+     * 读取试卷题目
+     *
+     * @param input
+     * @param clazz
+     * @param map1
+     * @param map2
+     * @param map3
+     * @param map4
+     * @param map5
+     * @param map6
+     * @param <T>
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    private <T> List<Question> readQuest(InputStream input, Class<T> clazz,
+                                         Map<Integer, String> map1,                      //选择题
+                                         Map<Integer, String> map2,                      //判断题
+                                         Map<Integer, String> map3,                      //填空题
+                                         Map<Integer, String> map4,                      //问答题
+                                         Map<Integer, String> map5,                      //编程题
+                                         Map<Integer, String> map6) throws Exception {   //综合题
+
+        List<Question> questionList = new ArrayList<>();
+
+        try {
+            Workbook wb = WorkbookFactory.create(input);
+            Sheet sheet = wb.getSheetAt(0);
+            Field field = null;
+            Class tempClazz = Question.class;
+
+            //从第二行开始读取
+            for (int i = 2; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                if (null == row) {
+                    //空行不处理
+                    continue;
+                }
+
+                Map<Integer, String> map = null;
+                //获取每一行的第一个单元格
+                Cell cell = row.getCell(0);
+                if (null == cell) {
+                    //空行不处理
+                    continue;
+                }
+
+                //存储类型
+                String status = cell.getStringCellValue();
+                if (status.startsWith("A")) {
+                    //解析选择题
+                    map = map1;
+                } else if (status.startsWith("B")) {
+                    //判断题
+                    map = map2;
+                } else if (status.startsWith("C")) {
+                    //填空题
+                    map = map3;
+                } else if (status.startsWith("D")) {
+                    //问答题
+                    map = map4;
+                } else if (status.startsWith("E")) {
+                    //编程题
+                    map = map5;
+                } else if (status.startsWith("F")) {
+                    //综合题
+                    map = map6;
+                } else {
+                    //未知信息
+                    continue;
+                }
+
+                T t = (T) tempClazz.newInstance();
+                T t1 = (T) tempClazz.newInstance();
+
+                //从第二个单元格开始读取
+                for (int j = 1; j < row.getLastCellNum(); j++) {
+                    //获取存储类型
+                    try {
+                        field = tempClazz.getDeclaredField(map.get(j));
+                    } catch (NullPointerException e) {
+                        break;
+                    }
+
+                    field.setAccessible(true);
+                    //获得单元格对象
+                    Cell realCell = row.getCell(j);
+                    if (null == realCell || "".equals(realCell.toString())) {
+                        continue;
+                    }
+                    t = addingT(field, t1, realCell);
+                }
+
+                //强制转换类型
+                Question question = (Question) t;
+                if (null == question.getContent()) {
+                    continue;
+                }
+
+                if (status.startsWith("A")) {
+                    question.setType(1);
+                } else if (status.startsWith("B")) {
+                    question.setType(2);
+                } else if (status.startsWith("C")) {
+                    question.setType(3);
+                    question.setKey(question.getKey().replaceAll("#", "∏"));    //替換答案中非法字符
+                } else if (status.startsWith("D")) {
+                    question.setType(4);
+                } else if (status.startsWith("E")) {
+                    question.setType(5);
+                } else if (status.startsWith("F")) {
+                    question.setType(6);
+                }
+
+                questionList.add(question);
+            }
+        } finally {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return questionList;
+    }
+
+    private <T> T addingT(Field field, T t, Cell cell) throws IllegalArgumentException, IllegalAccessException {
+        switch (cell.getCellType()) {
+            case Cell.CELL_TYPE_STRING:     //字符串
+                field.set(t, cell.getStringCellValue());
+                break;
+
+            case Cell.CELL_TYPE_BOOLEAN:    //Boolean对象
+                field.set(t, cell.getBooleanCellValue());
+                break;
+
+            case Cell.CELL_TYPE_NUMERIC:
+
+                //是否是日期格式
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    //DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                    field.set(t, cell.getDateCellValue());
+                } else {
+                    //读取为数字
+                    Integer longVal = (int) Math.round(cell.getNumericCellValue());
+                    double doubleVal = Math.round(cell.getNumericCellValue());
+
+                    if (Double.parseDouble(longVal + ".0") == doubleVal) {
+                        String type = field.getType().toString();
+                        if ("class java.lang.String".equals(type)) {
+                            field.set(t, longVal + "");
+                        } else {
+                            field.set(t, longVal);
+                        }
+                    } else {
+                        field.set(t, doubleVal);
+                    }
+                }
+                break;
+
+            case Cell.CELL_TYPE_FORMULA:    //公式
+                field.set(t, cell.getCellFormula());
+                break;
+
+            case HSSFCell.CELL_TYPE_BLANK:  //空值
+                break;
+
+            case HSSFCell.CELL_TYPE_ERROR:  //故障
+                break;
+            default:
+                break;
+        }
+
+        return t;
+    }
+
+    /**
+     * 输出每种题目的标题
+     *
+     * @param headers
+     * @param row
+     * @param style
+     */
+    private void addCell(String[] headers, HSSFRow row, HSSFCellStyle style) {
+        for (int i = 0; i < headers.length; i++) {
+            HSSFCell cell = row.createCell(i);
+            cell.setCellStyle(style);
+            HSSFRichTextString text = new HSSFRichTextString(headers[i]);
+            cell.setCellValue(text);
+        }
     }
 }

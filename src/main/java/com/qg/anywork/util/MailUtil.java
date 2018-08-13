@@ -1,6 +1,7 @@
 package com.qg.anywork.util;
 
-import com.qg.anywork.exception.MailSendException;
+import com.qg.anywork.enums.StatEnum;
+import com.qg.anywork.exception.mail.MailSendException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -67,7 +68,7 @@ public class MailUtil {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new MailSendException("发送邮件失败");
+            throw new MailSendException(StatEnum.MAIL_SEND_FAIL);
         }
         javaMailSender.send(message);
     }

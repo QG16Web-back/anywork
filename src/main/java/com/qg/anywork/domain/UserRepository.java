@@ -67,4 +67,14 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Transactional(rollbackOn = Exception.class)
     @Query("UPDATE User user set user.imagePath = :imagePath where user.userId = :userId")
     int updateImagePathByUserId(@Param("userId") int userId, @Param("imagePath") String imagePath);
+
+    /**
+     * 根据学号删除记录
+     *
+     * @param studentId 学号
+     * @return int
+     */
+    @Modifying
+    @Transactional(rollbackOn = Exception.class)
+    int deleteAllByStudentId(@Param("studentId") String studentId);
 }
