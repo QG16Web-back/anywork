@@ -103,22 +103,22 @@ public class UserServiceImpl implements UserService {
     public RequestResult<User> updateUser(User user) {
         if (user == null) {
             throw new FormatterFaultException(StatEnum.REGISTER_EMPTY_USER);
-        } else if (!user.getUserName().matches("[a-z0-9A-Z\\u4e00-\\u9fa5]{1,15}")) {
+        }
+        if (!user.getUserName().matches("[a-z0-9A-Z\\u4e00-\\u9fa5]{1,15}")) {
             throw new FormatterFaultException(StatEnum.USERNAME_FORMAT_ERROR);
-        } else if (!"".equals(user.getPhone())) {
+        }
+        if (!"".equals(user.getPhone())) {
             if (user.getPhone().matches("^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\\\\d{8}$")) {
                 throw new FormatterFaultException(StatEnum.PHONE_FORMAT_ERROR);
             }
-        } else {
-            //置空密码
-            user.setPassword("");
-            userDao.updateUser(user);
-            //查找新的用户实体
-            User realUser = userDao.selectById(user.getUserId());
-            user.setPassword("");
-            return new RequestResult<>(StatEnum.INFORMATION_CHANGE_SUCCESS, realUser);
         }
-        return null;
+        //置空密码
+        user.setPassword("");
+        userDao.updateUser(user);
+        //查找新的用户实体
+        User realUser = userDao.selectById(user.getUserId());
+        user.setPassword("");
+        return new RequestResult<>(StatEnum.INFORMATION_CHANGE_SUCCESS, realUser);
     }
 
     @Override
