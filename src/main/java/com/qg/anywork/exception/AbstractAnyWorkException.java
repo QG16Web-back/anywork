@@ -10,11 +10,11 @@ import com.qg.anywork.enums.StatEnum;
  * @author ming
  * I'm the one to ignite the darkened skies.
  */
-public class AnyWorkException extends RuntimeException {
+public abstract class AbstractAnyWorkException extends RuntimeException {
 
     private StatEnum statEnum;
 
-    public AnyWorkException(StatEnum statEnum) {
+    public AbstractAnyWorkException(StatEnum statEnum) {
         super(statEnum.getStateInfo());
         this.statEnum = statEnum;
     }

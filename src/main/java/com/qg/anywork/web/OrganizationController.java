@@ -1,7 +1,6 @@
 package com.qg.anywork.web;
 
 import com.qg.anywork.enums.StatEnum;
-import com.qg.anywork.exception.OrganizationException;
 import com.qg.anywork.model.bo.StudentTestResult;
 import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.model.po.CheckResult;
@@ -48,14 +47,9 @@ public class OrganizationController {
      */
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     public RequestResult<List<Organization>> search(HttpServletRequest request, @RequestBody Map map) {
-        try {
-            User user = (User) request.getSession().getAttribute("user");
-            String organizationName = (String) map.get("organizationName");
-            return organizationService.search(organizationName, user.getUserId());
-        } catch (Exception e) {
-            log.warn(e.getMessage());
-            return new RequestResult<>(StatEnum.ORGAN_SEARCH_FAIL);
-        }
+        User user = (User) request.getSession().getAttribute("user");
+        String organizationName = (String) map.get("organizationName");
+        return organizationService.search(organizationName, user.getUserId());
     }
 
     /***
@@ -69,18 +63,10 @@ public class OrganizationController {
      */
     @RequestMapping(value = "/join", method = RequestMethod.POST)
     public RequestResult<?> join(HttpServletRequest request, @RequestBody Map map) {
-        try {
-            User user = (User) request.getSession().getAttribute("user");
-            String organizationId = (String) map.get("organizationId");
-            String token = (String) map.get("token");
-            return organizationService.join(Integer.parseInt(organizationId), Long.parseLong(token), user.getUserId());
-        } catch (OrganizationException e) {
-            log.warn(e.getMessage());
-            return new RequestResult(0, e.getMessage());
-        } catch (Exception e) {
-            log.warn(e.getMessage());
-            return new RequestResult(StatEnum.ORGAN_JOIN_FAIL);
-        }
+        User user = (User) request.getSession().getAttribute("user");
+        String organizationId = (String) map.get("organizationId");
+        String token = (String) map.get("token");
+        return organizationService.join(Integer.parseInt(organizationId), Long.parseLong(token), user.getUserId());
     }
 
     /***
@@ -109,17 +95,12 @@ public class OrganizationController {
     @RequestMapping(value = "/leave", method = RequestMethod.POST)
     public RequestResult leave(HttpServletRequest request, @RequestBody Map map) {
 
-        try {
-            User user = (User) request.getSession().getAttribute("user");
-            if (user == null) {
-                return new RequestResult(StatEnum.ORGAN_SEARCH_FAIL);
-            }
-            int organizationId = (int) map.get("organizationId");
-            return organizationService.exitOrganization(organizationId, user.getUserId());
-        } catch (Exception e) {
-            log.warn(e.getMessage());
-            return new RequestResult(0, e.getMessage());
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
+            return new RequestResult(StatEnum.ORGAN_SEARCH_FAIL);
         }
+        int organizationId = (int) map.get("organizationId");
+        return organizationService.exitOrganization(organizationId, user.getUserId());
     }
 
     /***
@@ -242,12 +223,7 @@ public class OrganizationController {
         if (user.getMark() == 0) {
             return new RequestResult(0, "无此权限");
         }
-        try {
-            return organizationService.deleteOrganization(organizationId, user.getUserId());
-        } catch (Exception e) {
-            log.warn(e.getMessage());
-            return new RequestResult(0, e.getMessage());
-        }
+        return organizationService.deleteOrganization(organizationId, user.getUserId());
     }
 
     /***
@@ -274,13 +250,7 @@ public class OrganizationController {
     @RequestMapping(value = "/student", method = RequestMethod.POST)
     public RequestResult<List<User>> getStudentOfOrganization(@RequestBody Map map) {
         int organizationId = (int) map.get("organizationId");
-        try {
-            return organizationService.getOrganizationPeople(organizationId);
-        } catch (Exception e) {
-            log.warn(e.getMessage());
-            return new RequestResult<>(0, e.getMessage());
-        }
-
+        return organizationService.getOrganizationPeople(organizationId);
     }
 
     /***
@@ -299,7 +269,7 @@ public class OrganizationController {
 
     /***
      * 获取组织下某学生的考试列表
-     * @param map
+     * @param map map
      * @return
      */
     @RequestMapping(value = "/studentTest", method = RequestMethod.POST)

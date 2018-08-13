@@ -1,16 +1,15 @@
 package com.qg.anywork.exception.user;
 
+import com.qg.anywork.enums.StatEnum;
+
 /**
- * Created by FunriLy on 2017/7/10.
+ * @author FunriLy
+ * @date 2017/7/10
  * From small beginnings comes great things.
  */
-public class UserLoginFailException extends RuntimeException {
+public class UserLoginFailException extends UserException {
 
-    public UserLoginFailException(String message) {
-        super(message);
-    }
-
-    public UserLoginFailException(String message, Throwable cause) {
-        super(message, cause);
+    public UserLoginFailException(StatEnum statEnum) {
+        super(statEnum);
     }
 }

@@ -7,9 +7,9 @@ import com.qg.anywork.enums.StatEnum;
  * @date 2017/7/10
  * From small beginnings comes great things.
  */
-public class FormatterFaultException extends UserException {
+public class ValcodeWrongException extends UserException {
 
-    public FormatterFaultException(StatEnum statEnum) {
+    public ValcodeWrongException(StatEnum statEnum) {
         super(statEnum);
     }
 }

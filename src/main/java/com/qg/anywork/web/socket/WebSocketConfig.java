@@ -10,7 +10,7 @@ import org.springframework.web.socket.server.standard.ServerEndpointExporter;
  * @author ming
  * I'm the one to ignite the darkened skies.
  */
-@Configuration
+//@Configuration
 public class WebSocketConfig {
 
     @Bean

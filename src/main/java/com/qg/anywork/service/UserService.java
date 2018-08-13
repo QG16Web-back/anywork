@@ -2,7 +2,10 @@ package com.qg.anywork.service;
 
 import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.model.po.User;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 /**
  * @author FunriLy
@@ -66,5 +69,5 @@ public interface UserService {
      *
      * @return Request result
      */
-    RequestResult addStudent();
+    RequestResult addStudent() throws IOException, InvalidFormatException;
 }

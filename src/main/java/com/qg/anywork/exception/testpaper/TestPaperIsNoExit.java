@@ -7,9 +7,9 @@ import com.qg.anywork.enums.StatEnum;
  * @date 2017/8/18
  * From small beginnings comes great things.
  */
-public class NotPowerException extends TestPaperException {
+public class TestPaperIsNoExit extends TestPaperException {
 
-    public NotPowerException(StatEnum statEnum) {
+    public TestPaperIsNoExit(StatEnum statEnum) {
         super(statEnum);
     }
 }

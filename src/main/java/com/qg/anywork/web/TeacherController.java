@@ -1,7 +1,7 @@
 package com.qg.anywork.web;
 
-import com.qg.anywork.model.bo.TeacherSubmit;
 import com.qg.anywork.model.bo.StudentTestResult;
+import com.qg.anywork.model.bo.TeacherSubmit;
 import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.model.po.CheckResult;
 import com.qg.anywork.model.po.User;
@@ -53,12 +53,7 @@ public class TeacherController {
         if (user.getMark() == 0) {
             return new RequestResult<>(0, "权限不足");
         }
-        try {
-            testService.updateStudentTest(teacherSubmit);
-            return testService.getDetail(teacherSubmit.getTestpaperId(), teacherSubmit.getStudentId());
-        } catch (Exception e) {
-            log.warn(e.getMessage());
-            return new RequestResult<>(0, e.getMessage());
-        }
+        testService.updateStudentTest(teacherSubmit);
+        return testService.getDetail(teacherSubmit.getTestpaperId(), teacherSubmit.getStudentId());
     }
 }

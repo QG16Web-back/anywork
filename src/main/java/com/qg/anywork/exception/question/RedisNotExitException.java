@@ -1,17 +1,16 @@
 package com.qg.anywork.exception.question;
 
 
+import com.qg.anywork.enums.StatEnum;
+
 /**
- * Created by FunriLy on 2017/7/13.
+ * @author FunriLy
+ * @date 2017/7/13
  * From small beginnings comes great things.
  */
-public class RedisNotExitException extends RuntimeException {
+public class RedisNotExitException extends QuestionException {
 
-    public RedisNotExitException(String message) {
-        super(message);
-    }
-
-    public RedisNotExitException(String message, Throwable cause) {
-        super(message, cause);
+    public RedisNotExitException(StatEnum statEnum) {
+        super(statEnum);
     }
 }

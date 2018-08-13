@@ -19,9 +19,11 @@ public enum StatEnum {
      */
     REGISTER_SUCESS(1, "用户注册成功"),
     REGISTER_EMPTY_USER(0, "空用户对象"),
-    REGISTER_FAMMTER_FAULT(0, "注册信息格式错误"),
+    REGISTER_FORMAT_FAULT(0, "注册信息格式错误"),
     REGISTER_ALREADY_EXIST(0, "已存在的用户"),
     STUDENT_ID_NOT_FOUND(0, "没有找到该学号对应的记录"),
+    STUDENT_ID_HAS_BEEN_REGISTERED(0, "该学号已经被注册"),
+    MAIL_HAS_BEEN_REGISTERED(0, "邮箱已经被注册"),
 
     /**
      * 登录板块
@@ -31,11 +33,17 @@ public enum StatEnum {
     LOGIN_USER_MISMATCH(0, "用户名或密码错误"),
     USER_NOT_LOGIN(0, "用户还未登录"),
     USER_LOGIN_OUT(1, "用戶退出登录"),
+    LOGIN_HAVE_ERROR(0, "用户登录发生错误"),
 
     /**
      * 更新用户信息板块
      */
     INFORMATION_CHANGE_SUCCESS(1, "用户更改信息成功"),
+    OLD_PASSWORD_ERROR(0, "原密码输入错误"),
+    NEW_PASSWORD_FORMAT_ERROR(0, "新密码格式错误"),
+    PASSWORD_FORMAT_ERROR(0, "密码格式错误"),
+    USERNAME_FORMAT_ERROR(0, "用户名格式不对"),
+    PHONE_FORMAT_ERROR(0, "手机格式错误"),
     FROMATTER_WARNING(0, "格式有误"),
     INFORMATION_GET_MYSELF(1, "获取个人信息"),
 
@@ -63,6 +71,9 @@ public enum StatEnum {
     DELETE_TEST_SUCCESS(1, "删除试卷/练习成功"),
     DELETE_TEST_FAIL(0, "删除试卷/练习失败"),
     TEST_IS_NOT_EXIT(0, "试卷/练习不存在"),
+    EXAM_DID_NOT_START_YET(0, "考试还未开始"),
+    THE_EXAM_IS_OVER(0, "考试已经结束"),
+    EXAM_CANNOT_BE_SUBMITTED_REPEATEDLY(0, "考试无法重复提交"),
 
     /**
      * 组织板块
@@ -71,6 +82,13 @@ public enum StatEnum {
     ORGAN_SEARCH_FAIL(0, "搜索组织失败"),
     ORGAN_JOIN_SUCCESS(1, "加入组织成功"),
     ORGAN_JOIN_FAIL(0, "加入组织失败"),
+    ORGANIZATION_NOT_EXIST(0, "组织不存在"),
+    CHAPTER_TOO_LONG(0, "章节名过长"),
+    THE_NAME_IS_NULL(0, "搜索的组织名为空"),
+    USER_HAS_JOINED_THE_ORGANIZATION(0, "用户已加入该组织"),
+    USER_HAS_NOT_JOINED_THE_ORGANIZATION(0, "用户未加入该组织"),
+    THE_TOKEN_IS_ERROR(0, "口令错误"),
+    INVALID_ORGANIZATION(0, "无效的组织"),
 
     /***
      * 做题模块
@@ -91,6 +109,15 @@ public enum StatEnum {
      * 消息模块
      */
     MESSAGE_LIST(1, "获取用户消息列表"),
+    PAGE_IS_ERROR(0, "页面值非法"),
+
+
+    /**
+     * 缓存模块
+     */
+    REDIS_CACHE_NOT_FOUND(0, "未找到相应的缓存文件"),
+
+    DATA_LIST_IS_NULL(0, "数据列表为空")
     ;
 
     private int state;

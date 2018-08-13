@@ -3,10 +3,11 @@ package com.qg.anywork.service.impl;
 import com.qg.anywork.dao.OrganizationDao;
 import com.qg.anywork.dao.TestDao;
 import com.qg.anywork.dao.UserDao;
+import com.qg.anywork.exception.organization.OrganizationException;
 import com.qg.anywork.model.bo.*;
 import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.enums.StatEnum;
-import com.qg.anywork.exception.TestException;
+import com.qg.anywork.exception.test.TestException;
 import com.qg.anywork.model.po.*;
 import com.qg.anywork.service.TestService;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,7 @@ public class TestServiceImpl implements TestService {
     @Override
     public RequestResult<List<Testpaper>> getTestList(int organizationId, int userId) {
         if (organizationDao.getById(organizationId) == null) {
-            throw new TestException("无效的组织");
+            throw new OrganizationException(StatEnum.INVALID_ORGANIZATION);
         }
         List<Testpaper> testpapers = testDao.getTestByOrganizationId(organizationId);
         List<Testpaper> studentpapers = testDao.getMyTest(userId);
@@ -49,7 +50,7 @@ public class TestServiceImpl implements TestService {
     @Override
     public RequestResult<List<Testpaper>> getPracticeList(int organizationId, int userId) {
         if (organizationDao.getById(organizationId) == null) {
-            throw new TestException("无效的组织");
+            throw new OrganizationException(StatEnum.INVALID_ORGANIZATION);
         }
         List<Testpaper> practiceList = testDao.getPracticeByOrganizationId(organizationId);
         List<Testpaper> studentpapers = testDao.getMyPractice(userId);
@@ -86,7 +87,7 @@ public class TestServiceImpl implements TestService {
     @Override
     public RequestResult<List<Testpaper>> getPracticeByOCId(int organizationId, int chapterId, int userId) {
         if (organizationDao.getById(organizationId) == null) {
-            throw new TestException("无效的组织");
+            throw new OrganizationException(StatEnum.INVALID_ORGANIZATION);
         }
         List<Testpaper> practiceList = testDao.getPracticeByOCId(organizationId, chapterId);
         List<Testpaper> studentpapers = testDao.getMyPractice(userId);
@@ -150,7 +151,7 @@ public class TestServiceImpl implements TestService {
     public RequestResult<List<Question>> getQuestion(int testpaperId) {
         Testpaper testpaper = testDao.getTestPaperByTestpaperId(testpaperId);
         if (new Date().before(testpaper.getCreateTime()) && testpaper.getTestpaperType() == 1) {
-            throw new TestException("考试未开始");
+            throw new TestException(StatEnum.EXAM_DID_NOT_START_YET);
         }
         List<Question> questions = testDao.getQuestionByTestpaperId(testpaperId);
         for (Question question : questions) {
@@ -257,7 +258,7 @@ public class TestServiceImpl implements TestService {
         boolean flag = testDao.isSubmit(testpaper.getTestpaperId(), studentPaper.getStudentId()) > 0;
 
         if (flag && testpaper.getTestpaperType() == 1) {
-            throw new TestException("已经提交过试卷了，无法再次提交");
+            throw new TestException(StatEnum.EXAM_CANNOT_BE_SUBMITTED_REPEATEDLY);
         }
 
         StudentTestResult studentTestResult = this.getResult(studentPaper);
@@ -265,7 +266,7 @@ public class TestServiceImpl implements TestService {
         //如果为考试则必须校验考试时间
         if (testpaper.getTestpaperType() == 1) {
             if (new Date().after(testpaper.getEndingTime())) {
-                throw new TestException("考试已经结束");
+                throw new TestException(StatEnum.THE_EXAM_IS_OVER);
             }
         }
 

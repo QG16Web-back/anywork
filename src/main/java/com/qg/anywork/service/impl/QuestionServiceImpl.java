@@ -7,7 +7,7 @@ import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.question.ExcelReadException;
 import com.qg.anywork.exception.question.RedisNotExitException;
-import com.qg.anywork.exception.testpaper.TestpaperIsNoExit;
+import com.qg.anywork.exception.testpaper.TestPaperIsNoExit;
 import com.qg.anywork.model.po.Question;
 import com.qg.anywork.model.po.Testpaper;
 import com.qg.anywork.service.QuestionService;
@@ -53,7 +53,7 @@ public class QuestionServiceImpl implements QuestionService {
         try {
             list = ExcelUtil.getQuestionList(input);
         } catch (Exception e) {
-            throw new ExcelReadException("Excel读取出错：" + e.getMessage(), e);
+            throw new ExcelReadException(StatEnum.FILE_EXPORT_FAIL);
         }
 
         if (null != list) {
@@ -61,7 +61,7 @@ public class QuestionServiceImpl implements QuestionService {
             redisDao.removeQuestionList(userId);
             redisDao.addQuestionList(userId, new ArrayList<>(list));
         }
-        return new RequestResult<List<Question>>(StatEnum.FILE_READ_SUCCESS, list);
+        return new RequestResult<>(StatEnum.FILE_READ_SUCCESS, list);
     }
 
     /**
@@ -72,6 +72,7 @@ public class QuestionServiceImpl implements QuestionService {
      * @return
      */
     @Override
+    @SuppressWarnings("unchecked")
     public int addTestpaper(int userId, int testpaperId) {
         List<Question> list = null;
         int socre = 0;
@@ -97,7 +98,7 @@ public class QuestionServiceImpl implements QuestionService {
 
 
         } else {
-            throw new RedisNotExitException("未找到相应的缓存文件！");
+            throw new RedisNotExitException(StatEnum.REDIS_CACHE_NOT_FOUND);
         }
 
         return socre;
@@ -131,7 +132,7 @@ public class QuestionServiceImpl implements QuestionService {
     public Testpaper findTestpaperById(int testpaperId) {
         Testpaper testpaper = testDao.getTestPaperByTestpaperId(testpaperId);
         if (testpaper == null) {
-            throw new TestpaperIsNoExit("试卷并不存在！");
+            throw new TestPaperIsNoExit(StatEnum.TEST_IS_NOT_EXIT);
         }
         return testpaper;
     }
@@ -140,7 +141,7 @@ public class QuestionServiceImpl implements QuestionService {
     public void exportExcel(int testpaperId, int userid, OutputStream out) throws ExcelReadException {
         List<Question> questionList = testDao.getQuestionByTestpaperId(testpaperId);
         if (questionList == null || questionList.isEmpty()) {
-            throw new ExcelReadException("数据列表为空");
+            throw new ExcelReadException(StatEnum.DATA_LIST_IS_NULL);
         }
         ExcelUtil.export(userid + "", questionList, out, "yyyy-MM-dd HH:mm:ss");
     }

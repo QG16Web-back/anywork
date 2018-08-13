@@ -1,8 +1,6 @@
 package com.qg.anywork.web;
 
 import com.qg.anywork.enums.StatEnum;
-import com.qg.anywork.exception.OrganizationException;
-import com.qg.anywork.exception.TestException;
 import com.qg.anywork.model.bo.StudentPaper;
 import com.qg.anywork.model.bo.StudentTestResult;
 import com.qg.anywork.model.dto.RequestResult;
@@ -47,17 +45,8 @@ public class TestController {
         if (organizationId == null || "".equals(organizationId)) {
             return new RequestResult<>(StatEnum.REQUEST_ERROR);
         }
-
-        try {
-            User user = (User) request.getSession().getAttribute("user");
-            return testService.getTestList(Integer.parseInt(organizationId), user.getUserId());
-        } catch (TestException e) {
-            log.warn(e.getMessage());
-            return new RequestResult<>(0, e.getMessage());
-        } catch (Exception e) {
-            log.warn(e.getMessage());
-            return new RequestResult<>(StatEnum.GET_TEST_FAIL);
-        }
+        User user = (User) request.getSession().getAttribute("user");
+        return testService.getTestList(Integer.parseInt(organizationId), user.getUserId());
     }
 
 
@@ -70,18 +59,10 @@ public class TestController {
      */
     @RequestMapping(value = "/practiceListByChapter", method = RequestMethod.POST)
     public RequestResult<List<Testpaper>> getPracticeByOCId(@RequestBody Map map, HttpServletRequest request) {
-        try {
-            User user = (User) request.getSession().getAttribute("user");
-            int organizationId = (int) map.get("organizationId");
-            int chapterId = (int) map.get("chapterId");
-            return testService.getPracticeByOCId(organizationId, chapterId, user.getUserId());
-        } catch (TestException e) {
-            log.warn(e.getMessage());
-            return new RequestResult<>(0, e.getMessage());
-        } catch (Exception e) {
-            log.warn(e.getMessage());
-            return new RequestResult<>(StatEnum.GET_TEST_FAIL);
-        }
+        User user = (User) request.getSession().getAttribute("user");
+        int organizationId = (int) map.get("organizationId");
+        int chapterId = (int) map.get("chapterId");
+        return testService.getPracticeByOCId(organizationId, chapterId, user.getUserId());
     }
 
 
@@ -97,18 +78,8 @@ public class TestController {
         if (organizationId == null || "".equals(organizationId)) {
             return new RequestResult<>(StatEnum.REQUEST_ERROR);
         }
-
-        try {
-
-            User user = (User) request.getSession().getAttribute("user");
-            return testService.getPracticeList(Integer.parseInt(organizationId), user.getUserId());
-        } catch (TestException e) {
-            log.warn(e.getMessage());
-            return new RequestResult<>(0, e.getMessage());
-        } catch (Exception e) {
-            log.warn(e.getMessage());
-            return new RequestResult<>(StatEnum.GET_TEST_FAIL);
-        }
+        User user = (User) request.getSession().getAttribute("user");
+        return testService.getPracticeList(Integer.parseInt(organizationId), user.getUserId());
     }
 
     /***
@@ -141,16 +112,8 @@ public class TestController {
      */
     @RequestMapping(method = RequestMethod.POST)
     public RequestResult<List<Question>> getQuestion(@RequestBody Map map) {
-        try {
-            String testpaperId = (String) map.get("testpaperId");
-            return testService.getQuestion(Integer.parseInt(testpaperId));
-        } catch (TestException e) {
-            log.warn(e.getMessage());
-            return new RequestResult<>(0, e.getMessage());
-        } catch (Exception e) {
-            log.warn(e.getMessage());
-            return new RequestResult<>(StatEnum.GET_TEST_FAIL);
-        }
+        String testpaperId = (String) map.get("testpaperId");
+        return testService.getQuestion(Integer.parseInt(testpaperId));
     }
 
     /***
@@ -163,23 +126,10 @@ public class TestController {
         if (studentPaper == null) {
             return new RequestResult<>(StatEnum.REQUEST_ERROR);
         }
-
         RequestResult<StudentTestResult> studentTestResult;
-
-        try {
-            studentTestResult = testService.submit(studentPaper);
-            request.getSession().setAttribute("studentTestResult", studentTestResult.getData());
-            return studentTestResult;
-        } catch (TestException e) {
-            log.warn(e.getMessage());
-            return new RequestResult<>(0, e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.warn(e.getMessage());
-            return new RequestResult<>(StatEnum.SUBMIT_TEST_FAIL);
-        }
-
-
+        studentTestResult = testService.submit(studentPaper);
+        request.getSession().setAttribute("studentTestResult", studentTestResult.getData());
+        return studentTestResult;
     }
 
     /***
@@ -215,12 +165,7 @@ public class TestController {
     @RequestMapping(value = "/chapter", method = RequestMethod.POST)
     public RequestResult<List<Chapter>> getChapter(@RequestBody Map map) {
         int organizationId = (int) map.get("organizationId");
-        try {
-            return chapterService.getByOrganizationId(organizationId);
-        } catch (OrganizationException e) {
-            log.warn(e.getMessage());
-            return new RequestResult<>(0, e.getMessage());
-        }
+        return chapterService.getByOrganizationId(organizationId);
     }
 
     /***
@@ -234,12 +179,7 @@ public class TestController {
         if (user.getMark() == 0) {
             return new RequestResult<>(0, "无此权限");
         }
-        try {
-            return chapterService.addChapter(chapter);
-        } catch (Exception e) {
-            log.warn(e.getMessage());
-            return new RequestResult<>(0, e.getMessage());
-        }
+        return chapterService.addChapter(chapter);
     }
 
     /***

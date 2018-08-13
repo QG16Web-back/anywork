@@ -2,7 +2,7 @@ package com.qg.anywork.service.impl;
 
 import com.qg.anywork.dao.OrganizationDao;
 import com.qg.anywork.enums.StatEnum;
-import com.qg.anywork.exception.OrganizationException;
+import com.qg.anywork.exception.organization.OrganizationException;
 import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.model.po.Organization;
 import com.qg.anywork.model.po.User;
@@ -30,7 +30,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public RequestResult<List<Organization>> search(String organizationName, int userId) {
         if (organizationName == null) {
-            throw new OrganizationException("搜索的组织名为null");
+            throw new OrganizationException(StatEnum.THE_NAME_IS_NULL);
         }
         List<Organization> organizations = organizationDao.getByKeyWords("%" + organizationName + "%");
         List<Organization> myOrganizations = organizationDao.getByUserId(userId);
@@ -61,14 +61,14 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public synchronized RequestResult<Organization> join(int organizationId, long token, int userId) {
         if (organizationDao.isJoin(organizationId, userId) > 0) {
-            throw new OrganizationException("用户已加入该组织");
+            throw new OrganizationException(StatEnum.USER_HAS_JOINED_THE_ORGANIZATION);
         }
         Organization organization = organizationDao.getById(organizationId);
         if (organization == null) {
-            throw new OrganizationException("组织不存在");
+            throw new OrganizationException(StatEnum.ORGANIZATION_NOT_EXIST);
         }
         if (organization.getToken() != token) {
-            throw new OrganizationException("口令错误");
+            throw new OrganizationException(StatEnum.THE_TOKEN_IS_ERROR);
         }
         organizationDao.joinOrganization(organizationId, userId);
         return new RequestResult<>(StatEnum.ORGAN_JOIN_SUCCESS, organization);
@@ -87,7 +87,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public RequestResult exitOrganization(int organizationId, int userId) {
         if (organizationDao.isJoin(organizationId, userId) == 0) {
-            throw new OrganizationException("用户未加入该组织");
+            throw new OrganizationException(StatEnum.USER_HAS_NOT_JOINED_THE_ORGANIZATION);
         }
         int flag = organizationDao.exitOrganization(organizationId, userId);
         if (flag == 0) {
@@ -120,10 +120,10 @@ public class OrganizationServiceImpl implements OrganizationService {
     public RequestResult deleteOrganization(int organizationId, int userId) {
         Organization o = organizationDao.getById(organizationId);
         if (o == null) {
-            throw new OrganizationException("组织不存在");
+            throw new OrganizationException(StatEnum.ORGANIZATION_NOT_EXIST);
         }
         if (o.getTeacherId() != userId) {
-            throw new OrganizationException("没有删除权限");
+            throw new OrganizationException(StatEnum.NOT_HAVE_POWER);
         }
         int flag = organizationDao.deleteOrganization(organizationId);
 
@@ -147,7 +147,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public RequestResult<List<User>> getOrganizationPeople(int organizationId) {
         if (organizationDao.getById(organizationId) == null) {
-            throw new OrganizationException("该组织不存在");
+            throw new OrganizationException(StatEnum.ORGANIZATION_NOT_EXIST);
         }
         List<User> users = organizationDao.getOrganizationPeople(organizationId);
         if (users.isEmpty()) {

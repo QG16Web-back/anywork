@@ -1,6 +1,7 @@
 package com.qg.anywork.web.socket;
 
 import com.qg.anywork.config.GetHttpSessionConfigurator;
+import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.user.UserNotLoginException;
 import com.qg.anywork.model.po.User;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +20,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * @author ming
  * I'm the one to ignite the darkened skies.
  */
-@Component
-@ServerEndpoint(value = "/websocket", configurator = GetHttpSessionConfigurator.class)
+//@Component
+//@ServerEndpoint(value = "/websocket", configurator = GetHttpSessionConfigurator.class)
 @Slf4j
 public class OnlineWebSocket {
 
@@ -73,7 +74,7 @@ public class OnlineWebSocket {
             this.userId = ((User) httpSession.getAttribute("user")).getUserId();
         } catch (Exception e) {
             log.warn("用户连接WebSocket发生错误 ：", e);
-            throw new UserNotLoginException("用户登录发生错误！");
+            throw new UserNotLoginException(StatEnum.LOGIN_HAVE_ERROR);
         }
         // 绑定用户id与session会话
         routetab.put(userId, session);
