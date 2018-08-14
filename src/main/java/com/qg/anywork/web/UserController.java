@@ -3,6 +3,8 @@ package com.qg.anywork.web;
 import com.qg.anywork.domain.StudentRepository;
 import com.qg.anywork.domain.UserRepository;
 import com.qg.anywork.enums.StatEnum;
+import com.qg.anywork.exception.common.ParamEmptyException;
+import com.qg.anywork.exception.common.ParamNotExistException;
 import com.qg.anywork.exception.user.UserException;
 import com.qg.anywork.exception.user.UserNotLoginException;
 import com.qg.anywork.exception.user.ValcodeWrongException;
@@ -16,7 +18,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,7 +38,7 @@ import java.util.concurrent.Future;
  * @date 2017/7/10
  * From small beginnings comes great things.
  */
-@Controller
+@RestController
 @RequestMapping("/user")
 @Slf4j
 public class UserController {
@@ -58,7 +59,6 @@ public class UserController {
     private ThreadPoolTaskExecutor executor;
 
     @RequestMapping("/info")
-    @ResponseBody
     public RequestResult<User> getUser(HttpServletRequest request) {
         try {
             User user = (User) request.getSession().getAttribute("user");
@@ -70,15 +70,14 @@ public class UserController {
     }
 
     @RequestMapping(value = "/{userId}/info", produces = "application/json;charset=UTF-8")
-    @ResponseBody
     public RequestResult<User> getInfo(@PathVariable int userId) {
         return userService.findUserInfo(userId);
     }
 
     @PostMapping("/exit")
-    @ResponseBody
     public RequestResult<?> exit(HttpServletRequest request) {
         try {
+            log.info(((User) request.getSession().getAttribute("user")).getUserName() + "退出登录");
             request.getSession().removeAttribute("user");
             return new RequestResult<>(1, "用戶退出登录");
         } catch (Exception e) {
@@ -93,7 +92,6 @@ public class UserController {
      * @return 用户id
      */
     @RequestMapping(value = "/register", method = RequestMethod.POST, produces = "application/json")
-    @ResponseBody
     public RequestResult<Integer> register(HttpServletRequest request,
                                            @RequestBody Map<String, String> map) {
 
@@ -134,7 +132,6 @@ public class UserController {
      * @return user
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST, produces = "application/json")
-    @ResponseBody
     public RequestResult<User> login(HttpServletRequest request, @RequestBody Map<String, String> map) throws ExecutionException, InterruptedException {
         String studentId = map.get("studentId");
         String password = map.get("password");
@@ -150,6 +147,7 @@ public class UserController {
         // 存入Session
         assert result != null;
         User user = result.getData();
+        log.info(user.getUserName() + "登录");
         request.getSession().setAttribute("user", user);
         return result;
     }
@@ -162,7 +160,6 @@ public class UserController {
      * @return request result
      */
     @RequestMapping(value = "/password/change", method = RequestMethod.POST, produces = "application/json")
-    @ResponseBody
     public RequestResult<User> passwordChange(HttpServletRequest request, @RequestBody Map<String, String> map) {
         User user = (User) request.getSession().getAttribute("user");
         if (user == null) {
@@ -185,7 +182,6 @@ public class UserController {
      * @return request result
      */
     @RequestMapping(value = "/update", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    @ResponseBody
     public RequestResult<User> updateUser(HttpServletRequest request, @RequestBody Map<String, String> map) {
         User user = (User) request.getSession().getAttribute("user");
         user.setPhone(map.get("phone"));
@@ -207,7 +203,6 @@ public class UserController {
      * @return request result
      */
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    @ResponseBody
     public RequestResult<?> uploadPicture(HttpServletRequest request, @RequestParam("file") MultipartFile file) throws IOException {
         User user = (User) request.getSession().getAttribute("user");
         //上传图片
@@ -222,6 +217,7 @@ public class UserController {
                 }
                 FileUtils.copyInputStreamToFile(file.getInputStream(),
                         new File(request.getServletContext().getRealPath("/picture/user/"), user.getUserId() + ".jpg"));
+                log.info(user.getUserName() + "上传了头像");
             } else {
                 return new RequestResult<>(StatEnum.FILE_FORMAT_ERROR, null);
             }
@@ -239,10 +235,28 @@ public class UserController {
      * @return request result
      */
     @RequestMapping(value = "/forget", method = RequestMethod.POST, produces = "application/json")
-    @ResponseBody
     public RequestResult<?> sendMail(@RequestBody Map<String, String> map) {
+        if (!map.containsKey("email")) {
+            throw new ParamNotExistException(StatEnum.PARAM_IS_NOT_EXIST);
+        }
+        if ("".equals(map.get("eamil")) || null == map.get("email")) {
+            throw new ParamEmptyException(StatEnum.PARAM_IS_EMPTY);
+        }
+        log.info(map.get("email") + "忘记密码");
         return mailService.sendPasswordMail(map.get("email"));
     }
+
+
+    @PostMapping("/forget/new")
+    public RequestResult resetPassword(HttpServletRequest request, @RequestBody Map<String, String> map) {
+        if ("".equals(map.get("password")) || null == map.get("password") || "".equals(map.get("repeatPassword")) || null == map.get("repeatPassword")) {
+            throw new ParamEmptyException(StatEnum.PARAM_IS_EMPTY);
+        }
+        String email = (String) request.getSession().getAttribute("email");
+        log.info("get " + email);
+        return userService.resetPassword(email, map.get("password"), map.get("repeatPassword"));
+    }
+
 
     @GetMapping("/add")
     public RequestResult addStudent() throws IOException, InvalidFormatException {

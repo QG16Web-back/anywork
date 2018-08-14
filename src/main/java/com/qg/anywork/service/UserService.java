@@ -64,6 +64,17 @@ public interface UserService {
      */
     boolean modifyPassword(int userId, String oldPassword, String newPassword);
 
+
+    /**
+     * 重置密码
+     *
+     * @param email          邮箱
+     * @param password       密码
+     * @param repeatPassword 重复密码
+     * @return request result
+     */
+    RequestResult resetPassword(String email, String password, String repeatPassword);
+
     /**
      * 添加学生
      *

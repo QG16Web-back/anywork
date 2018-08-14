@@ -77,4 +77,17 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Modifying
     @Transactional(rollbackOn = Exception.class)
     int deleteAllByStudentId(@Param("studentId") String studentId);
+
+
+    /**
+     * 根据邮箱修改密码
+     *
+     * @param email    邮箱
+     * @param password 密码
+     * @return 1为修改成功，0为修改失败
+     */
+    @Modifying
+    @Transactional(rollbackOn = Exception.class)
+    @Query("UPDATE User user set user.password = :password where user.email = :email")
+    int updatePasswordByEmail(@Param("email") String email, @Param("password") String password);
 }

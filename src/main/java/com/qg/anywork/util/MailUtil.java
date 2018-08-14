@@ -22,16 +22,24 @@ import javax.mail.internet.MimeMessage;
 public class MailUtil {
 
     /**
+     * 服务器地址
+     */
+    private final static String HOST = "10.21.56.107";
+
+    /**
      * 登录URL
      */
-    private final static String LOGIN_URL = "http://10.21.56.107:8080/html/login.html";
+    private final static String LOGIN_URL = "http://" + HOST + ":8080/html/login.html";
 
     /**
      * 校验邮箱URL
      */
-    private final static String CHECK_EMAIL_URL = "http://10.21.56.107:8080/utils/check";
+    private final static String CHECK_EMAIL_URL = "http://" + HOST + ":8080/utils/check";
 
-    private final static String PASSWORD_URL = "http://10.21.56.107:8080/html/newPassword.html";
+    /**
+     * 忘记密码URL
+     */
+    private final static String PASSWORD_URL = "http://" + HOST + ":8080/utils/reset";
 
     @Autowired
     private JavaMailSender javaMailSender;
@@ -67,7 +75,6 @@ public class MailUtil {
                 throw new Exception("未知参数");
             }
         } catch (Exception e) {
-            e.printStackTrace();
             throw new MailSendException(StatEnum.MAIL_SEND_FAIL);
         }
         javaMailSender.send(message);

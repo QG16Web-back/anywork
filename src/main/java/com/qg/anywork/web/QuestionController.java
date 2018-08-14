@@ -66,7 +66,7 @@ public class QuestionController {
                 return questionService.addQuestionList(file.getInputStream(), user.getUserId());
             }
         }
-        return new RequestResult<List<Question>>(StatEnum.FILE_UPLOAD_FAIL, null);
+        return new RequestResult<>(StatEnum.FILE_UPLOAD_FAIL, null);
     }
 
     /**
@@ -86,7 +86,7 @@ public class QuestionController {
             //没有权限处理
             // TODO: 2017/7/17 可以检查一下权限
             if (user.getMark() != 1) {
-                return new RequestResult<Integer>(StatEnum.NOT_HAVE_POWER, 0);
+                return new RequestResult<>(StatEnum.NOT_HAVE_POWER, 0);
             }
 
             Testpaper testpaper = new Testpaper();
@@ -175,7 +175,7 @@ public class QuestionController {
                                               @PathVariable("organizationId") int organizationId, @PathVariable("testpaperId") int testpaperId) throws FileNotFoundException {
         User user = (User) request.getSession().getAttribute("user");
         if (user == null) {
-            return new RequestResult<Integer>(StatEnum.USER_NOT_LOGIN, 0);
+            return new RequestResult<>(StatEnum.USER_NOT_LOGIN, 0);
         }
         Testpaper testpaper = questionService.findTestpaperById(testpaperId);
         //权限验证

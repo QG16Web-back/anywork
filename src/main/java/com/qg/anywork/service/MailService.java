@@ -14,7 +14,7 @@ public interface MailService {
     /**
      * 发送密码邮箱
      *
-     * @param email email
+     * @param email   email
      * @return request result
      */
     RequestResult<?> sendPasswordMail(String email);
@@ -26,12 +26,4 @@ public interface MailService {
      * @return request result
      */
     RequestResult<Integer> sendRegisterMail(User user);
-
-    /**
-     * 忘记密码邮箱验证
-     *
-     * @param email email
-     * @return 密码
-     */
-    String resetPassword(String email);
 }

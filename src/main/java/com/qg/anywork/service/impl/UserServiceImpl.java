@@ -103,22 +103,22 @@ public class UserServiceImpl implements UserService {
     public RequestResult<User> updateUser(User user) {
         if (user == null) {
             throw new FormatterFaultException(StatEnum.REGISTER_EMPTY_USER);
-        } else if (!user.getUserName().matches("[a-z0-9A-Z\\u4e00-\\u9fa5]{1,15}")) {
-            throw new FormatterFaultException(StatEnum.USERNAME_FORMAT_ERROR);
-        } else if (!"".equals(user.getPhone())) {
-            if (user.getPhone().matches("^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\\\\d{8}$")) {
+        }
+        if (!user.getEmail().matches("\\w+@\\w+(\\.\\w{2,3})*\\.\\w{2,3}")) {
+            throw new FormatterFaultException(StatEnum.EMAIL_FORMAT_ERROR);
+        }
+        if (!"".equals(user.getPhone()) || user.getPhone() != null) {
+            if (!user.getPhone().matches("^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\\d{8}$")) {
                 throw new FormatterFaultException(StatEnum.PHONE_FORMAT_ERROR);
             }
-        } else {
-            //置空密码
-            user.setPassword("");
-            userDao.updateUser(user);
-            //查找新的用户实体
-            User realUser = userDao.selectById(user.getUserId());
-            user.setPassword("");
-            return new RequestResult<>(StatEnum.INFORMATION_CHANGE_SUCCESS, realUser);
         }
-        return null;
+        //置空密码
+        user.setPassword("");
+        userDao.updateUser(user);
+        //查找新的用户实体
+        User realUser = userDao.selectById(user.getUserId());
+        user.setPassword("");
+        return new RequestResult<>(StatEnum.INFORMATION_CHANGE_SUCCESS, realUser);
     }
 
     @Override
@@ -127,12 +127,32 @@ public class UserServiceImpl implements UserService {
         if (!user.getPassword().equals(Encryption.getMD5(oldPassword))) {
             throw new PasswordException(StatEnum.OLD_PASSWORD_ERROR);
         }
-        if (!newPassword.matches("[a-z0-9A-Z\\u4e00-\\u9fa5]{1,15}")) {
+        if (!newPassword.matches("\\w{6,15}")) {
             throw new PasswordException(StatEnum.NEW_PASSWORD_FORMAT_ERROR);
         } else {
             userRepository.updatePasswordByUserId(userId, Encryption.getMD5(newPassword));
             return true;
         }
+    }
+
+    @Override
+    public RequestResult resetPassword(String email, String password, String repeatPassword) {
+        if ("".equals(email) || email == null) {
+            throw new UserException(StatEnum.ERROR_PARAM);
+        }
+        if (!password.equals(repeatPassword)) {
+            throw new PasswordException(StatEnum.INCONSISTENT_PASSWORD);
+        }
+        if (!password.matches("[a-z0-9A-Z\\u4e00-\\u9fa5]{1,15}")) {
+            throw new PasswordException(StatEnum.NEW_PASSWORD_FORMAT_ERROR);
+        }
+        int flag = userRepository.updatePasswordByEmail(email, Encryption.getMD5(password));
+        if (flag == 1) {
+            return new RequestResult(StatEnum.PASSWORD_RESET_SUCCESS);
+        } else {
+            return new RequestResult(StatEnum.PASSWORD_RESET_FAIL);
+        }
+
     }
 
     @Override

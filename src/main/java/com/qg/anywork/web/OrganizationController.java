@@ -123,9 +123,7 @@ public class OrganizationController {
         if (organizationName == null || "".equals(organizationName)) {
             return new RequestResult<>(0, "组织名为空");
         }
-//        User user = (User) request.getSession().getAttribute("user");
-        User user = new User();
-        user.setMark(1);
+        User user = (User) request.getSession().getAttribute("user");
         user.setUserId(289);
         if (user.getMark() == 0) {
             return new RequestResult<>(0, "没有权限");
@@ -270,7 +268,7 @@ public class OrganizationController {
     /***
      * 获取组织下某学生的考试列表
      * @param map map
-     * @return
+     * @return 学生的考试列表
      */
     @RequestMapping(value = "/studentTest", method = RequestMethod.POST)
     public RequestResult<List<CheckResult>> studentTest(@RequestBody Map map) {

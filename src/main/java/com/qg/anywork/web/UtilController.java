@@ -1,7 +1,7 @@
 package com.qg.anywork.web;
 
 import com.qg.anywork.enums.StatEnum;
-import com.qg.anywork.model.dto.RequestResult;
+import com.qg.anywork.exception.common.ParamEmptyException;
 import com.qg.anywork.service.MailService;
 import com.qg.anywork.service.UserService;
 import com.qg.anywork.util.Encryption;
@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -22,7 +22,6 @@ import javax.servlet.http.HttpSession;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Random;
 
 /**
@@ -36,7 +35,6 @@ import java.util.Random;
 @RequestMapping("/utils")
 @Slf4j
 public class UtilController {
-    private static final Logger logger = LoggerFactory.getLogger(UtilController.class);
 
     @Autowired
     private MailService mailService;
@@ -71,23 +69,19 @@ public class UtilController {
 
     /**
      * 验证邮箱秘钥,修改密码
-     *
-     * @param map
-     * @return
      */
-    @RequestMapping(value = "/reset", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    @ResponseBody
-    public RequestResult<String> resetPassword(@RequestBody Map<String, String> map) {
-        String email = map.get("email");
-        String ciphertext = map.get("ciphertext");
+    @GetMapping("/reset")
+    public String resetPassword(HttpServletRequest request) {
+        String email = request.getParameter("email");
+        String ciphertext = request.getParameter("ciphertext");
         if (email == null || "".equals(email) || ciphertext == null || "".equals(ciphertext)) {
-            return new RequestResult<>(StatEnum.ERROR_PARAM);
+            throw new ParamEmptyException(StatEnum.PARAM_IS_EMPTY);
         }
         if (ciphertext.equals(Encryption.getMD5(email))) {
-            String password = mailService.resetPassword(email);
-            return new RequestResult<>(StatEnum.PASSWORD_RESET, password);
+            request.getSession().setAttribute("email", email);
+            return "redirect:../html/newPassword.html";
         }
-        return new RequestResult<>(StatEnum.ERROR_PARAM);
+        return null;
     }
 
     /**

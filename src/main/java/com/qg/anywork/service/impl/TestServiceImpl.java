@@ -206,7 +206,7 @@ public class TestServiceImpl implements TestService {
                     //填空
                     if (question.getType() == 3) {
                         int isTrue = 1;
-                        String split = "#";
+                        String split = "∏";
                         int index;
                         int number = question.getOther();
                         double fillingScore = 0.0;

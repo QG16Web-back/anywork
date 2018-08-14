@@ -14,6 +14,9 @@ public enum StatEnum {
     CAUSE_TROUBLE(0, "你不要搞事"),
     ERROR_PARAM(0, "输入参数有误"),
     REQUEST_ERROR(0, "请求信息异常"),
+    PARAM_IS_EMPTY(0, "参数为空"),
+    PARAM_IS_NOT_EXIST(0, "参数不存在"),
+
     /**
      * 注册板块
      */
@@ -41,11 +44,16 @@ public enum StatEnum {
     INFORMATION_CHANGE_SUCCESS(1, "用户更改信息成功"),
     OLD_PASSWORD_ERROR(0, "原密码输入错误"),
     NEW_PASSWORD_FORMAT_ERROR(0, "新密码格式错误"),
+    EMAIL_FORMAT_ERROR(0, "邮箱格式错误"),
     PASSWORD_FORMAT_ERROR(0, "密码格式错误"),
     USERNAME_FORMAT_ERROR(0, "用户名格式不对"),
     PHONE_FORMAT_ERROR(0, "手机格式错误"),
     FROMATTER_WARNING(0, "格式有误"),
     INFORMATION_GET_MYSELF(1, "获取个人信息"),
+    NOT_FOUND_USER_USE_THIS_EMAIL(0, "没有找到该邮箱对应的用户"),
+    INCONSISTENT_PASSWORD(0, "密码不一致"),
+    PASSWORD_RESET_SUCCESS(1, "密码重置成功"),
+    PASSWORD_RESET_FAIL(0, "密码重置失败"),
 
 
     /**
@@ -104,6 +112,7 @@ public enum StatEnum {
     MAIL_SEND_SUCCESS(1, "邮件发送成功"),
     MAIL_SEND_FAIL(0, "邮件发送失败"),
     PASSWORD_RESET(1, "重置密码成功"),
+    MAIL_VERIFICATION_SUCCESS(1, "邮箱验证成功"),
 
     /**
      * 消息模块
@@ -117,8 +126,7 @@ public enum StatEnum {
      */
     REDIS_CACHE_NOT_FOUND(0, "未找到相应的缓存文件"),
 
-    DATA_LIST_IS_NULL(0, "数据列表为空")
-    ;
+    DATA_LIST_IS_NULL(0, "数据列表为空");
 
     private int state;
     private String stateInfo;
@@ -126,6 +134,15 @@ public enum StatEnum {
     StatEnum(int state, String stateInfo) {
         this.state = state;
         this.stateInfo = stateInfo;
+    }
+
+    public static StatEnum statOf(int index) {
+        for (StatEnum state : values()) {
+            if (state.getState() == index) {
+                return state;
+            }
+        }
+        return null;
     }
 
     public int getState() {
@@ -142,14 +159,5 @@ public enum StatEnum {
 
     public void setStateInfo(String stateInfo) {
         this.stateInfo = stateInfo;
-    }
-
-    public static StatEnum statOf(int index) {
-        for (StatEnum state : values()) {
-            if (state.getState() == index) {
-                return state;
-            }
-        }
-        return null;
     }
 }

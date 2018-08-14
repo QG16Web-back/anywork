@@ -68,14 +68,6 @@ public class RedisConfig extends CachingConfigurerSupport {
                 .RedisCacheManagerBuilder
                 .fromConnectionFactory(jedisConnectionFactory);
         return builder.build();
-//        RedisCacheManager rcm = new RedisCacheManager(redisTemplate);
-//        //设置缓存过期时间
-//        rcm.setDefaultExpiration(5 * 60);
-//        //设置value的过期时间
-//        Map<String, Long> map = new HashMap<>();
-//        map.put("test", 60L);
-//        rcm.setExpires(map);
-//        return rcm;
     }
 
     /**

@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * 用户实体
@@ -16,7 +17,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Table(name = "user")
 @Entity
-public class User {
+public class User implements Serializable {
 
     /**
      * id
@@ -67,11 +68,4 @@ public class User {
      */
     @Column(name = "image_path")
     private String imagePath;
-//
-//    /**
-//     * 建议
-//     */
-//    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    @JoinColumn(name = "user_id")
-//    private List<Suggestion> suggestions;
 }

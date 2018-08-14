@@ -25,7 +25,7 @@ public class MessageUtil {
         String typeName = testpaper.getTestpaperType() == 0 ? "练习" : "试卷";
         String content = authorId + "发布了一套" + typeName
                 + ":《" + testpaper.getTestpaperTitle() + "》，结束时间为："
-                + DateUtil.dateToString(testpaper.getEndingTime()) + ", 请尽快完成！";
+                + DateUtil.format(testpaper.getEndingTime()) + ", 请尽快完成！";
         for (int userid : useridList) {
             Message message = new Message(authorId, userid, content, 1);
             messageList.add(message);
