@@ -3,6 +3,7 @@ package com.qg.anywork.model.bo;
 import com.qg.anywork.util.CommonDateUtil;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Date;
  * From small beginnings comes great things.
  */
 @Data
-public class Message {
+public class Message implements Serializable {
 
     // TODO: 2017/7/10 需要确定有哪些类型的消息
 

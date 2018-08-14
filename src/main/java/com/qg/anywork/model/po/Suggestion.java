@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * Create by ming on 18-8-10 下午9:42
@@ -16,7 +17,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "suggestion")
-public class Suggestion {
+public class Suggestion implements Serializable {
 
     @Id
     @Column(name = "suggestion_id")

@@ -3,6 +3,8 @@ package com.qg.anywork.model.bo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * 学生答案实体
  *
@@ -12,7 +14,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class StudentAnswer {
+public class StudentAnswer implements Serializable {
 
     /**
      * 学生答案ID

@@ -4,6 +4,7 @@ import com.qg.anywork.model.po.StudentAnswerAnalysis;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -15,7 +16,7 @@ import java.util.List;
  */
 @Data
 @NoArgsConstructor
-public class StudentTestResult {
+public class StudentTestResult implements Serializable {
 
     /**
      * 考试结果ID

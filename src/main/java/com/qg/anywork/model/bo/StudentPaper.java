@@ -3,6 +3,7 @@ package com.qg.anywork.model.bo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
  */
 @Data
 @NoArgsConstructor
-public class StudentPaper {
+public class StudentPaper implements Serializable {
 
     /**
      * 学生答卷id

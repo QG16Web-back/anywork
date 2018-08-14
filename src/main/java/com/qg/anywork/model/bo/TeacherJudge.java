@@ -3,12 +3,14 @@ package com.qg.anywork.model.bo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * @author ming
  */
 @Data
 @NoArgsConstructor
-public class TeacherJudge {
+public class TeacherJudge implements Serializable {
 
     /**
      * 问题id

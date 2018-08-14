@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 /**
  * @author logan
@@ -18,7 +19,7 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @Entity
 @Table(name = "chapter")
-public class Chapter {
+public class Chapter  implements Serializable {
 
     /**
      * 章节ID
