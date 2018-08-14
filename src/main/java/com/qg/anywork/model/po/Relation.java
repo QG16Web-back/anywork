@@ -3,6 +3,8 @@ package com.qg.anywork.model.po;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * @author FunriLy
  * @date 2017/7/10
@@ -10,7 +12,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class Relation {
+public class Relation implements Serializable {
 
     /**
      * ID

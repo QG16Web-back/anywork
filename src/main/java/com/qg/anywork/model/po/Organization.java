@@ -3,6 +3,8 @@ package com.qg.anywork.model.po;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * 组织实体
  *
@@ -12,7 +14,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class Organization {
+public class Organization implements Serializable {
 
     /**
      * ID

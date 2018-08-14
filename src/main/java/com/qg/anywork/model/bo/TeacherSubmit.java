@@ -4,6 +4,7 @@ import com.qg.anywork.model.bo.TeacherJudge;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ import java.util.List;
  */
 @Data
 @NoArgsConstructor
-public class TeacherSubmit {
+public class TeacherSubmit implements Serializable {
 
     /**
      * 答题者Id

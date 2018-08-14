@@ -3,6 +3,8 @@ package com.qg.anywork.model.bo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * 试卷与学生的关系表
  *
@@ -12,7 +14,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class Footing {
+public class Footing implements Serializable {
 
     /**
      * 关系ID

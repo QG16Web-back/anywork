@@ -3,13 +3,15 @@ package com.qg.anywork.model.po;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * @author logan
  * @date 2017/7/10
  */
 @Data
 @NoArgsConstructor
-public class StudentAnswerAnalysis {
+public class StudentAnswerAnalysis implements Serializable {
 
     /**
      * 分析id 暂无用处
