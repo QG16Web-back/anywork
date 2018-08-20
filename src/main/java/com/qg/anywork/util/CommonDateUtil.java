@@ -1,15 +1,18 @@
 package com.qg.anywork.util;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
  * 时间工具类
- * Created by FunriLy on 2017/9/25.
+ *
+ * @author FunriLy
+ * @date 2017/9/25
  * From small beginnings comes great things.
  */
 public class CommonDateUtil {
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static ThreadLocal<DateFormat> threadLocal = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 
     /**
      * 获取当前时间的时间戳
@@ -35,7 +38,7 @@ public class CommonDateUtil {
      * @return 当前时间的SimpleDateFormat对象
      */
     public static String getNowFormat() {
-        return sdf.format(new Date(System.currentTimeMillis()));
+        return threadLocal.get().format(new Date(System.currentTimeMillis()));
     }
 
     /**

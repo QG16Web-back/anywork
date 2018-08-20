@@ -96,7 +96,9 @@ public enum StatEnum {
     USER_HAS_JOINED_THE_ORGANIZATION(0, "用户已加入该组织"),
     USER_HAS_NOT_JOINED_THE_ORGANIZATION(0, "用户未加入该组织"),
     THE_TOKEN_IS_ERROR(0, "口令错误"),
+    TOKEN_IS_NULL(0, "口令为空"),
     INVALID_ORGANIZATION(0, "无效的组织"),
+    MY_ORGANIZATION_IS_NULL(0, "您还未创建组织"),
 
     /***
      * 做题模块
@@ -126,7 +128,21 @@ public enum StatEnum {
      */
     REDIS_CACHE_NOT_FOUND(0, "未找到相应的缓存文件"),
 
-    DATA_LIST_IS_NULL(0, "数据列表为空");
+    DATA_LIST_IS_NULL(0, "数据列表为空"),
+
+
+    /**
+     * 公告模块
+     */
+    MESSAGE_PUBLISH_SUCCESS(1, "公告发布成功"),
+
+    LIST_MESSAGE_SUCCESS(1, "获取公告列表成功"),
+
+    NOT_SUCH_MESSAGE(0, "没有该公告"),
+
+    MESSAGE_LIST_IS_NULL(0, "公告列表为空")
+    ;
+
 
     private int state;
     private String stateInfo;

@@ -6,7 +6,7 @@ import com.qg.anywork.model.bo.StudentTestResult;
 import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.model.po.CheckResult;
 import com.qg.anywork.model.po.Question;
-import com.qg.anywork.model.po.Testpaper;
+import com.qg.anywork.model.po.TestPaper;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public interface TestService {
      * @param userId          用户ID
      * @return 试卷集合
      */
-    RequestResult<List<Testpaper>> getTestList(int organizationId, int userId);
+    RequestResult<List<TestPaper>> getTestList(int organizationId, int userId);
 
 
     /***
@@ -31,7 +31,7 @@ public interface TestService {
      * @param userId         用户ID
      * @return 练习集合
      */
-    RequestResult<List<Testpaper>> getPracticeList(int organizationId, int userId);
+    RequestResult<List<TestPaper>> getPracticeList(int organizationId, int userId);
 
     /***
      * 根据章节id和组织id获取练习题
@@ -40,14 +40,14 @@ public interface TestService {
      * @param userId         用户ID
      * @return 练习题
      */
-    RequestResult<List<Testpaper>> getPracticeByOCId(int organizationId, int chapterId, int userId);
+    RequestResult<List<TestPaper>> getPracticeByOCId(int organizationId, int chapterId, int userId);
 
     /***
      * 获取我做过的练习卷集合
      * @param userId 用户ID
      * @return 练习卷集合
      */
-    RequestResult<List<Testpaper>> getMyPracticeList(int userId);
+    RequestResult<List<TestPaper>> getMyPracticeList(int userId);
 
     /***
      * 获取某学生组织下做过的练习卷集合
@@ -62,7 +62,7 @@ public interface TestService {
      * @param userId 用户ID
      * @return 考试卷集合
      */
-    RequestResult<List<Testpaper>> getMyTestList(int userId);
+    RequestResult<List<TestPaper>> getMyTestList(int userId);
 
     /***
      * 获取问题集合
@@ -90,7 +90,7 @@ public interface TestService {
      *
      * @param testpaper
      */
-    void addTestpaper(Testpaper testpaper);
+    void addTestpaper(TestPaper testpaper);
 
     //更新一张试卷/练习的总分
     boolean updateTextpaper(int testpaperId, int socre);

@@ -1,18 +1,23 @@
 package com.qg.anywork.service.impl;
 
+import com.qg.anywork.dao.MessageDao;
 import com.qg.anywork.dao.OrganizationDao;
 import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.organization.OrganizationException;
 import com.qg.anywork.model.dto.RequestResult;
+import com.qg.anywork.model.po.Message;
 import com.qg.anywork.model.po.Organization;
 import com.qg.anywork.model.po.User;
 import com.qg.anywork.service.OrganizationService;
+import com.qg.anywork.util.DateUtil;
+import com.qg.anywork.web.socket.OnlineWebSocket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Create by ming on 18-8-5 下午1:47
@@ -27,6 +32,9 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Autowired
     private OrganizationDao organizationDao;
 
+    @Autowired
+    private MessageDao messageDao;
+
     @Override
     public RequestResult<List<Organization>> search(String organizationName, int userId) {
         if (organizationName == null) {
@@ -35,8 +43,8 @@ public class OrganizationServiceImpl implements OrganizationService {
         List<Organization> organizations = organizationDao.getByKeyWords("%" + organizationName + "%");
         List<Organization> myOrganizations = organizationDao.getByUserId(userId);
         List<Integer> myOrganizationsId = new ArrayList<>();
-        for (Organization myO : myOrganizations) {
-            myOrganizationsId.add(myO.getOrganizationId());
+        for (Organization organization : myOrganizations) {
+            myOrganizationsId.add(organization.getOrganizationId());
         }
         for (Organization o : organizations) {
             o.setCount(organizationDao.getOrganizationCount(o.getOrganizationId()));
@@ -59,7 +67,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public synchronized RequestResult<Organization> join(int organizationId, long token, int userId) {
+    public synchronized RequestResult<Organization> join(int organizationId, String token, int userId) {
         if (organizationDao.isJoin(organizationId, userId) > 0) {
             throw new OrganizationException(StatEnum.USER_HAS_JOINED_THE_ORGANIZATION);
         }
@@ -67,11 +75,11 @@ public class OrganizationServiceImpl implements OrganizationService {
         if (organization == null) {
             throw new OrganizationException(StatEnum.ORGANIZATION_NOT_EXIST);
         }
-        if (organization.getToken() != token) {
+        if (!organization.getToken().equals(token)) {
             throw new OrganizationException(StatEnum.THE_TOKEN_IS_ERROR);
         }
         organizationDao.joinOrganization(organizationId, userId);
-        return new RequestResult<>(StatEnum.ORGAN_JOIN_SUCCESS, organization);
+        return new RequestResult<>(StatEnum.ORGAN_JOIN_SUCCESS);
     }
 
     @Override
@@ -98,8 +106,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     public RequestResult addOrganization(Organization organization) {
-        int randomInt = new Random().nextInt(99999);
-        organization.setToken(randomInt);
+        organization.setToken(organization.getToken());
         int flag = organizationDao.addOrganization(organization);
         if (flag == 1) {
             organizationDao.joinOrganization(organization.getOrganizationId(), organization.getTeacherId());
@@ -117,7 +124,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public RequestResult deleteOrganization(int organizationId, int userId) {
+    public RequestResult deleteOrganization(int organizationId, int userId) throws IOException {
         Organization o = organizationDao.getById(organizationId);
         if (o == null) {
             throw new OrganizationException(StatEnum.ORGANIZATION_NOT_EXIST);
@@ -128,16 +135,36 @@ public class OrganizationServiceImpl implements OrganizationService {
         int flag = organizationDao.deleteOrganization(organizationId);
 
         if (flag == 1) {
+            List<User> users = organizationDao.getOrganizationPeople(organizationId);
+            organizationDao.deleteOrganizationUserRelation(organizationId);
+            if (!users.isEmpty()) {
+                Message message = Message.builder()
+                        .userId(userId)
+                        .title("组织公告")
+                        .content("您所在的组织\"" + o.getOrganizationName() + "\"" + "已经被创建人解散")
+                        .publisher(o.getTeacherName())
+                        .createTime(DateUtil.format(new Date()))
+                        .build();
+                List<Integer> userIds = new ArrayList<>();
+                for (User user : users) {
+                    userIds.add(user.getUserId());
+                }
+                messageDao.insertMessage(message);
+                messageDao.insertUserMessage(message.getMessageId(), userIds);
+                OnlineWebSocket.publishMessage(message, userIds, message.getPublisher());
+            }
             return new RequestResult(1, "删除组织成功");
         } else {
             return new RequestResult(0, "删除组织失败");
         }
     }
 
-
     @Override
     public RequestResult<List<Organization>> getMyOrganization(int userId) {
         List<Organization> organizations = organizationDao.getMyOrganization(userId);
+        if (organizations.isEmpty()) {
+            throw new OrganizationException(StatEnum.MY_ORGANIZATION_IS_NULL);
+        }
         for (Organization o : organizations) {
             o.setCount(organizationDao.getOrganizationCount(o.getOrganizationId()));
         }
@@ -151,9 +178,8 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
         List<User> users = organizationDao.getOrganizationPeople(organizationId);
         if (users.isEmpty()) {
-            return new RequestResult<>(1, "该组织还没有学生");
+            return new RequestResult<>(0, "该组织还没有学生");
         }
         return new RequestResult<>(1, "获取成功", users);
     }
-
 }

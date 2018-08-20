@@ -8,7 +8,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeUtility;
 
 
 /**
@@ -63,7 +65,8 @@ public class MailUtil {
         try {
             message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            helper.setFrom(from);
+            String nick = MimeUtility.encodeText("AnyWork");
+            helper.setFrom(new InternetAddress(nick + " <" + from + ">"));
             helper.setTo(email);
             if (index == 1) {
                 helper.setSubject("主题：用户注册验证");

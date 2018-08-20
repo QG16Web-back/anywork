@@ -4,7 +4,7 @@ import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.testpaper.NotPowerException;
 import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.model.po.Question;
-import com.qg.anywork.model.po.Testpaper;
+import com.qg.anywork.model.po.TestPaper;
 import com.qg.anywork.model.po.User;
 import com.qg.anywork.service.QuestionService;
 import com.qg.anywork.service.TestService;
@@ -77,7 +77,7 @@ public class QuestionController {
      * @param organizationId
      * @return
      */
-    @RequestMapping(value = "/{organizationId}/release", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    @PostMapping("/{organizationId}/release")
     @ResponseBody
     public RequestResult<Integer> releaseTestpaper(HttpServletRequest request, @RequestBody Map map, @PathVariable int organizationId) {
         User user = (User) request.getSession().getAttribute("user");
@@ -89,7 +89,7 @@ public class QuestionController {
                 return new RequestResult<>(StatEnum.NOT_HAVE_POWER, 0);
             }
 
-            Testpaper testpaper = new Testpaper();
+            TestPaper testpaper = new TestPaper();
             testpaper.setAuthorId(user.getUserId());
             testpaper.setOrganizationId(organizationId);
             testpaper.setTestpaperTitle((String) map.get("testpaperTitle"));
@@ -128,7 +128,7 @@ public class QuestionController {
      */
     @RequestMapping(value = "/{organizationId}/submit", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public RequestResult<Integer> submitTestpaper(HttpServletRequest request, @RequestBody Testpaper testpaper,
+    public RequestResult<Integer> submitTestpaper(HttpServletRequest request, @RequestBody TestPaper testpaper,
                                                   @PathVariable int organizationId) {
         User user = (User) request.getSession().getAttribute("user");
         int testpaperId = 0;
@@ -177,7 +177,7 @@ public class QuestionController {
         if (user == null) {
             return new RequestResult<>(StatEnum.USER_NOT_LOGIN, 0);
         }
-        Testpaper testpaper = questionService.findTestpaperById(testpaperId);
+        TestPaper testpaper = questionService.findTestpaperById(testpaperId);
         //权限验证
         if (user.getMark() != 1 || user.getUserId() != testpaper.getAuthorId()) {
             throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
@@ -213,7 +213,7 @@ public class QuestionController {
      * @param testpaperId 试卷Id
      */
     private void deleteTestpaper(int testpaperId, User user) {
-        Testpaper testpaper = questionService.findTestpaperById(testpaperId);
+        TestPaper testpaper = questionService.findTestpaperById(testpaperId);
         // 权限验证
         if (user.getMark() != 1 || user.getUserId() != testpaper.getAuthorId()) {
             throw new NotPowerException(StatEnum.NOT_HAVE_POWER);

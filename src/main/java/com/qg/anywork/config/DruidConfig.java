@@ -10,10 +10,10 @@ import javax.sql.DataSource;
 import java.sql.SQLException;
 
 /**
- * Created by zggdczfr on 2017/1/22.
+ * @author ming
  */
 @Configuration
-public class DruidDBConfig {
+public class DruidConfig {
 
     @Value("${spring.datasource.url}")
     private String dbUrl;

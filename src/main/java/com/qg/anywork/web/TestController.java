@@ -47,7 +47,7 @@ public class TestController {
      * @return 试题列表
      */
     @RequestMapping(value = "/testList", method = RequestMethod.POST)
-    public RequestResult<List<Testpaper>> search(@RequestBody Map map, HttpServletRequest request) {
+    public RequestResult<List<TestPaper>> search(@RequestBody Map map, HttpServletRequest request) {
         String organizationId = (String) map.get("organizationId");
         if (organizationId == null || "".equals(organizationId)) {
             return new RequestResult<>(StatEnum.REQUEST_ERROR);
@@ -65,7 +65,7 @@ public class TestController {
      * @return 试卷列表
      */
     @RequestMapping(value = "/practiceListByChapter", method = RequestMethod.POST)
-    public RequestResult<List<Testpaper>> getPracticeByOCId(@RequestBody Map map, HttpServletRequest request) {
+    public RequestResult<List<TestPaper>> getPracticeByOCId(@RequestBody Map map, HttpServletRequest request) {
         User user = (User) request.getSession().getAttribute("user");
         int organizationId = (int) map.get("organizationId");
         int chapterId = (int) map.get("chapterId");
@@ -80,7 +80,7 @@ public class TestController {
      * @return 练习
      */
     @RequestMapping(value = "/practiceList", method = RequestMethod.POST)
-    public RequestResult<List<Testpaper>> searchPractice(@RequestBody Map map, HttpServletRequest request) {
+    public RequestResult<List<TestPaper>> searchPractice(@RequestBody Map map, HttpServletRequest request) {
         String organizationId = (String) map.get("organizationId");
         if (organizationId == null || "".equals(organizationId)) {
             return new RequestResult<>(StatEnum.REQUEST_ERROR);
@@ -95,7 +95,7 @@ public class TestController {
      * @return 练习卷
      */
     @RequestMapping(value = "/getMyPractice", method = RequestMethod.POST)
-    public RequestResult<List<Testpaper>> getMyPractice(HttpServletRequest request) {
+    public RequestResult<List<TestPaper>> getMyPractice(HttpServletRequest request) {
         User user = (User) request.getSession().getAttribute("user");
         return testService.getMyPracticeList(user.getUserId());
     }
@@ -106,7 +106,7 @@ public class TestController {
      * @return 试卷
      */
     @RequestMapping(value = "/getMyTest", method = RequestMethod.POST)
-    public RequestResult<List<Testpaper>> getMyTest(HttpServletRequest request) {
+    public RequestResult<List<TestPaper>> getMyTest(HttpServletRequest request) {
         User user = (User) request.getSession().getAttribute("user");
         return testService.getMyTestList(user.getUserId());
     }

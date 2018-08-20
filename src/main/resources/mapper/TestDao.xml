@@ -33,7 +33,7 @@
         <result property="object" column="object"/>
         <result property="subject" column="subject"/>
 
-        <association property="testpaper" javaType="com.qg.anywork.model.po.Testpaper">
+        <association property="testpaper" javaType="com.qg.anywork.model.po.TestPaper">
             <id property="testpaperId" column="testpaper_id"/>
             <result property="testpaperTitle" column="testpaper_title"/>
             <result property="createTime" column="create_time"/>
@@ -49,7 +49,7 @@
         <result property="object" column="socre"/>
         <result property="subject" column="subject"/>
 
-        <association property="testpaper" javaType="com.qg.anywork.model.po.Testpaper">
+        <association property="testpaper" javaType="com.qg.anywork.model.po.TestPaper">
             <id property="testpaperId" column="testpaper_id"/>
             <result property="testpaperTitle" column="testpaper_title"/>
             <result property="createTime" column="create_time"/>
@@ -59,9 +59,9 @@
     </resultMap>
 
     <!--目的：为Dao接口方法提供SQL语句-->
-    <select id="getTestByOrganizationId" resultType="com.qg.anywork.model.po.Testpaper">
+    <select id="getTestByOrganizationId" resultType="com.qg.anywork.model.po.TestPaper">
         SELECT *
-        FROM testpaper
+        FROM test_paper
         WHERE organization_id = #{organizationId}
           AND testpaper_type = 1
     </select>
@@ -79,7 +79,7 @@
                t.testpaper_score
         FROM test_result c,
              user u,
-             testpaper t
+             test_paper t
         WHERE c.student_id = #{userId}
           AND c.student_id = u.user_id
           AND t.organization_id = #{organizationId}
@@ -88,7 +88,7 @@
     </select>
 
 
-    <select id="getPracticeByOrganizationId" resultType="com.qg.anywork.model.po.Testpaper">
+    <select id="getPracticeByOrganizationId" resultType="com.qg.anywork.model.po.TestPaper">
         SELECT t.testpaper_id,
                t.testpaper_title,
                t.author_id,
@@ -99,7 +99,7 @@
                t.testpaper_score,
                t.testpaper_type,
                t.organization_id
-        FROM testpaper t,
+        FROM test_paper t,
              chapter c
         WHERE t.organization_id = #{organizationId}
           AND t.testpaper_type = 0
@@ -113,15 +113,15 @@
           AND student_id = #{userId};
     </select>
 
-    <select id="getPracticeByOCId" resultType="com.qg.anywork.model.po.Testpaper">
+    <select id="getPracticeByOCId" resultType="com.qg.anywork.model.po.TestPaper">
         SELECT *
-        FROM testpaper
+        FROM test_paper
         WHERE organization_id = #{organizationId}
           AND chapter_id = #{chapterId}
           AND testpaper_type = 0;
     </select>
 
-    <select id="getMyPractice" resultType="com.qg.anywork.model.po.Testpaper">
+    <select id="getMyPractice" resultType="com.qg.anywork.model.po.TestPaper">
         SELECT t.testpaper_id,
                t.testpaper_title,
                t.author_id,
@@ -132,7 +132,7 @@
                t.testpaper_score,
                t.testpaper_type,
                t.organization_id
-        FROM testpaper t,
+        FROM test_paper t,
              test_result r,
              chapter c
         WHERE t.testpaper_id = r.test_paper_id
@@ -141,7 +141,7 @@
           AND c.chapter_id = t.chapter_id;
     </select>
 
-    <select id="getMyTest" resultType="com.qg.anywork.model.po.Testpaper">
+    <select id="getMyTest" resultType="com.qg.anywork.model.po.TestPaper">
         SELECT t.testpaper_id,
                t.testpaper_title,
                t.author_id,
@@ -152,7 +152,7 @@
                t.testpaper_score,
                t.testpaper_type,
                t.organization_id
-        FROM testpaper t,
+        FROM test_paper t,
              test_result r,
              chapter c
         WHERE t.testpaper_id = r.test_paper_id
@@ -161,9 +161,9 @@
           AND c.chapter_id = t.chapter_id;
     </select>
 
-    <select id="getTestPaperByTestpaperId" resultType="com.qg.anywork.model.po.Testpaper">
+    <select id="getTestPaperByTestpaperId" resultType="com.qg.anywork.model.po.TestPaper">
         SELECT *
-        FROM testpaper
+        FROM test_paper
         WHERE testpaper_id = #{testpaperId};
     </select>
 
@@ -179,7 +179,8 @@
         WHERE question_id = #{questionId}
     </select>
 
-    <insert id="addTestResult" parameterType="com.qg.anywork.model.bo.StudentTestResult" keyProperty="studentTestResultId">
+    <insert id="addTestResult" parameterType="com.qg.anywork.model.bo.StudentTestResult"
+            keyProperty="studentTestResultId">
         INSERT ignore INTO test_result (student_id, test_paper_id, socre)
         VALUE (#{testResult.studentId}, #{testResult.testpaperId}, #{testResult.socre})
     </insert>
@@ -221,15 +222,15 @@
         #{studentAnswerAnalysis.question.questionId}
     </update>
 
-    <insert id="addTestpaper" parameterType="com.qg.anywork.model.po.Testpaper" useGeneratedKeys="true"
+    <insert id="addTestpaper" parameterType="com.qg.anywork.model.po.TestPaper" useGeneratedKeys="true"
             keyProperty="testpaper.testpaperId">
-        INSERT INTO testpaper (testpaper_title,
-                               author_id,
-                               create_time,
-                               ending_time,
-                               testpaper_type,
-                               organization_id,
-                               chapter_id)
+        INSERT INTO test_paper (testpaper_title,
+                                author_id,
+                                create_time,
+                                ending_time,
+                                testpaper_type,
+                                organization_id,
+                                chapter_id)
         VALUES (#{testpaper.testpaperTitle},
                 #{testpaper.authorId},
                 #{testpaper.createTime},
@@ -240,7 +241,7 @@
     </insert>
 
     <update id="updateSocreOfTestpaper">
-        UPDATE testpaper
+        UPDATE test_paper
         SET testpaper_score = #{score}
         WHERE testpaper_id = #{testpaperId}
     </update>
@@ -282,7 +283,7 @@
                t.testpaper_score
         FROM check_result c,
              user u,
-             testpaper t
+             test_paper t
         WHERE c.student_id = #{userId}
           AND c.student_id = u.user_id
           AND t.organization_id = #{organizationId}
@@ -302,7 +303,7 @@
                t.testpaper_score
         FROM check_result c,
              user u,
-             testpaper t
+             test_paper t
         WHERE c.testpaper_id = #{testpaperId}
           AND c.student_id = u.user_id
           AND t.organization_id = #{organizationId}
@@ -327,7 +328,7 @@
 
     <delete id="deleteTestpaper">
         DELETE
-        FROM testpaper
+        FROM test_paper
         WHERE testpaper_id = #{testpaperId}
     </delete>
 

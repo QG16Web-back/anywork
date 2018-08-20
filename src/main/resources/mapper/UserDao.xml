@@ -4,24 +4,6 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.qg.anywork.dao.UserDao">
     <!--目的：为Dao接口方法提供SQL语句-->
-
-    <!--映射实体对象-->
-    <resultMap id="UserResultMap" type="com.qg.anywork.model.po.User">
-        <id property="userId" column="user_id"/>
-        <result property="password" column="password"/>
-        <result property="userName" column="user_name"/>
-        <result property="email" column="email"/>
-        <result property="phone" column="phone"/>
-        <result property="mark" column="mark"/>
-        <result property="studentId" column="student_id"/>
-        <result property="imagePath" column="image_path"/>
-    </resultMap>
-
-    <insert id="insertUser" parameterType="com.qg.anywork.model.po.User" useGeneratedKeys="true" keyProperty="user.userId">
-        INSERT INTO user (password, user_name, email, phone, mark, student_id)
-        VALUES (#{user.password}, #{user.userName}, #{user.email}, #{user.phone}, #{user.mark}, #{user.studentId})
-    </insert>
-
     <update id="updateUser">
         UPDATE user
         <set>
@@ -40,16 +22,4 @@
         </set>
         WHERE user_id = #{user.userId}
     </update>
-
-    <select id="selectById" resultMap="UserResultMap">
-        SELECT *
-        FROM user
-        WHERE user_id = #{userId}
-    </select>
-
-    <select id="selectByEmail" resultMap="UserResultMap">
-        SELECT *
-        FROM user
-        WHERE email = #{email}
-    </select>
 </mapper>

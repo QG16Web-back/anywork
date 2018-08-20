@@ -1,6 +1,7 @@
 package com.qg.anywork.dao;
 
-import com.qg.anywork.model.bo.Message;
+import com.github.pagehelper.Page;
+import com.qg.anywork.model.po.Message;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -20,48 +21,111 @@ public interface MessageDao {
 
     /**
      * 插入一条消息实体记录
+     *
      * @param message 消息实体
-     * @return
+     * @return int
      */
     int insertMessage(@Param("message") Message message);
 
-    /**
-     * 批量插入消息数据
-     * @param list 消息列表
-     * @return
-     */
-    int insertMessageList(@Param("list") List<Message> list);
 
     /**
-     * 班级老师获取发过的通知
-     * @param userId 教师id
-     * @param classId 班级id
-     * @param startNum 开始标记
-     * @param sizeNum 条数
-     * @return
+     * 插入组织与公告的对应记录
+     *
+     * @param messageId       公告ID
+     * @param organizationIds 组织ID集合
+     * @return int
      */
-    List<Message> getSendMessageList(int userId, int classId, int startNum, int sizeNum);
+    int insertMessageAndOrganization(@Param("messageId") int messageId, @Param("organizationIds") List<Integer> organizationIds);
+
 
     /**
-     * 获得用户收到的消息
-     * @param userid 用户
-     * @param startNum 开始标记
-     * @param sizeNum 条数
-     * @return
+     * 插入公告与用户的对应记录
+     *
+     * @param messageId 公告ID
+     * @param userIds   用户ID集合
+     * @return int
      */
-    List<Message> getReceiveMessageList(int userid, int startNum, int sizeNum);
+    int insertUserMessage(@Param("messageId") int messageId, @Param("userIds") List<Integer> userIds);
 
     /**
-     * 删除一条消息记录
-     * @param messageId 消息id
-     * @return
+     * 根据ID查找公告
+     *
+     * @param userId ID
+     * @return Message列表
      */
-    int deleteMessage(@Param("messageId") int messageId);
+    Page<Message> findMessageByUserId(@Param("userId") Integer userId);
 
     /**
-     * 根据消息id获得实体消息
-     * @param messageId 消息id
-     * @return
+     * 根据公告ID删除公告
+     *
+     * @param messageId 公告ID
+     * @return int
      */
-    Message getMessageById(@Param("messageId") int messageId);
+    int deleteMessageById(@Param("messageId") Integer messageId);
+
+    /**
+     * 删除公告与用户的对应记录
+     *
+     * @param messageId 公告ID
+     * @return int
+     */
+    int deleteMessageUserByMessageId(@Param("messageId") Integer messageId);
+
+    /**
+     * 删除公告与组织的对应记录
+     *
+     * @param messageId 公告ID
+     * @return int
+     */
+    int deleteMessageOrganizationByMessageId(@Param("messageId") Integer messageId);
+
+    /**
+     * 根据userId和公告Id查找
+     *
+     * @param userId    用户ID
+     * @param messageId 公告ID
+     * @return message
+     */
+    Message findByUserIdAndMessageId(@Param("userId") Integer userId, @Param("messageId") Integer messageId);
+
+    /**
+     * 查看已读公告
+     *
+     * @param messageIds 公告ID集合
+     * @return 已读公告
+     */
+    Page<Message> findHaveReadMessageExceptMessageIds(@Param("messageIds") List<Integer> messageIds);
+
+    /**
+     * 查看未读公告
+     *
+     * @param messageIds 公告ID集合
+     * @return 未读公告
+     */
+    Page<Message> findUnreadMessage(@Param("messageIds") List<Integer> messageIds);
+
+    /**
+     * 根据用户ID获取公告ID列表
+     *
+     * @param userId 用户ID
+     * @return 公告ID列表
+     */
+    List<Integer> getAllMessageIdByUserId(@Param("userId") Integer userId);
+
+    /**
+     * 根据公告ID查找公告
+     *
+     * @param messageId 公告ID
+     * @return 公告
+     */
+    Message findByMessageId(@Param("messageId") Integer messageId);
+
+    /**
+     * 根据用户Id和公告ID删除公告与用户对应的记录
+     *
+     * @param userId    用户ID
+     * @param messageId 公告ID
+     * @return int
+     */
+    int deleteMessageByUserIdAndMessageId(@Param("userId") Integer userId, @Param("messageId") Integer messageId);
 }

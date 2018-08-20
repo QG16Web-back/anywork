@@ -4,8 +4,8 @@ import com.qg.anywork.domain.SuggestionRepository;
 import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.model.po.Suggestion;
-import com.qg.anywork.model.po.User;
 import com.qg.anywork.service.SuggestionService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +21,7 @@ import java.util.Map;
  * I'm the one to ignite the darkened skies.
  */
 @Service
+@Slf4j
 public class SuggestionServiceImpl implements SuggestionService {
 
     @Autowired
@@ -32,6 +33,7 @@ public class SuggestionServiceImpl implements SuggestionService {
             return new RequestResult(0, "请填写你的建议");
         }
         suggestionRepository.save(suggestion);
+        log.info("{}添加了一条建议", suggestion.getUser().getUserName());
         return new RequestResult(1, "成功");
     }
 
@@ -40,7 +42,7 @@ public class SuggestionServiceImpl implements SuggestionService {
         List<Suggestion> suggestions = suggestionRepository.findAll();
         List<Object> list = new ArrayList<>();
         for (Suggestion suggestion : suggestions) {
-            Map<String, String> map = new HashMap<>();
+            Map<String, String> map = new HashMap<>(2);
             map.put("userName", suggestion.getUser().getUserName());
             map.put("description", suggestion.getDescription());
             list.add(map);

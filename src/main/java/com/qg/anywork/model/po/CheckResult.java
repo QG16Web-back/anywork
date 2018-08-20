@@ -45,5 +45,5 @@ public class CheckResult implements Serializable {
     /**
      * 相应的试卷类
      */
-    Testpaper testpaper;
+    TestPaper testpaper;
 }

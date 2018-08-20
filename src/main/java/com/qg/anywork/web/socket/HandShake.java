@@ -4,8 +4,6 @@ import com.qg.anywork.model.po.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.http.server.ServletServerHttpRequest;
-import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
@@ -13,12 +11,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
- * Create by ming on 18-8-11 上午9:26
+ * Create by ming on 18-8-18 上午8:41
  *
  * @author ming
  * I'm the one to ignite the darkened skies.
  */
-//@Component
 @Slf4j
 public class HandShake implements HandshakeInterceptor {
 
@@ -28,7 +25,7 @@ public class HandShake implements HandshakeInterceptor {
             HttpServletRequest request = (HttpServletRequest) serverHttpRequest;
             User user = (User) request.getSession().getAttribute("user");
             Integer userId = user.getUserId();
-            map.put("user", userId);
+            map.put("userId", userId);
         }
         log.info("握手之前: " + serverHttpRequest.getRemoteAddress().toString());
         return true;

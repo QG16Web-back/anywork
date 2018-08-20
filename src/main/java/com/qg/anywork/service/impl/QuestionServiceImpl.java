@@ -9,7 +9,7 @@ import com.qg.anywork.exception.question.ExcelReadException;
 import com.qg.anywork.exception.question.RedisNotExitException;
 import com.qg.anywork.exception.testpaper.TestPaperIsNoExit;
 import com.qg.anywork.model.po.Question;
-import com.qg.anywork.model.po.Testpaper;
+import com.qg.anywork.model.po.TestPaper;
 import com.qg.anywork.service.QuestionService;
 import com.qg.anywork.util.ExcelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +49,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public RequestResult<List<Question>> addQuestionList(InputStream input, int userId) {
 
-        List<Question> list = null;
+        List<Question> list;
         try {
             list = ExcelUtil.getQuestionList(input);
         } catch (Exception e) {
@@ -129,8 +129,8 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public Testpaper findTestpaperById(int testpaperId) {
-        Testpaper testpaper = testDao.getTestPaperByTestpaperId(testpaperId);
+    public TestPaper findTestpaperById(int testpaperId) {
+        TestPaper testpaper = testDao.getTestPaperByTestpaperId(testpaperId);
         if (testpaper == null) {
             throw new TestPaperIsNoExit(StatEnum.TEST_IS_NOT_EXIT);
         }

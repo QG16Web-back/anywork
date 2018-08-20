@@ -44,7 +44,12 @@ public class Organization implements Serializable {
     /**
      * 口令
      */
-    private long token;
+    private String token;
+
+    /**
+     * 组织头像路径
+     */
+    private String imagePath;
 
     /**
      * 组织人数
@@ -56,5 +61,4 @@ public class Organization implements Serializable {
      */
     private int isJoin;
 
-    //TODO:考虑老师登录后是否要带上学生列表或者试卷列表
 }

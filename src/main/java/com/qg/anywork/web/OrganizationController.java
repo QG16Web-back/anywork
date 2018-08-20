@@ -1,6 +1,8 @@
 package com.qg.anywork.web;
 
 import com.qg.anywork.enums.StatEnum;
+import com.qg.anywork.exception.organization.OrganizationException;
+import com.qg.anywork.exception.testpaper.NotPowerException;
 import com.qg.anywork.model.bo.StudentTestResult;
 import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.model.po.CheckResult;
@@ -64,9 +66,12 @@ public class OrganizationController {
     @RequestMapping(value = "/join", method = RequestMethod.POST)
     public RequestResult<?> join(HttpServletRequest request, @RequestBody Map map) {
         User user = (User) request.getSession().getAttribute("user");
-        String organizationId = (String) map.get("organizationId");
         String token = (String) map.get("token");
-        return organizationService.join(Integer.parseInt(organizationId), Long.parseLong(token), user.getUserId());
+        if (token == null || "".equals(token)) {
+            throw new OrganizationException(StatEnum.TOKEN_IS_NULL);
+        }
+        return organizationService.join(Integer.parseInt(map.get("organizationId").toString()), token, user.getUserId());
+
     }
 
     /***
@@ -116,6 +121,7 @@ public class OrganizationController {
     public RequestResult addOrganization(@RequestPart("file") MultipartFile file,
                                          @RequestParam("organizationName") String organizationName,
                                          @RequestParam("description") String description,
+                                         @RequestParam("token") String token,
                                          HttpServletRequest request) throws IOException {
         if (description == null || "".equals(description)) {
             return new RequestResult<>(0, "描述为空");
@@ -123,10 +129,12 @@ public class OrganizationController {
         if (organizationName == null || "".equals(organizationName)) {
             return new RequestResult<>(0, "组织名为空");
         }
+        if (token == null || "".equals(token)) {
+            return new RequestResult(0, "口令为空");
+        }
         User user = (User) request.getSession().getAttribute("user");
-        user.setUserId(289);
         if (user.getMark() == 0) {
-            return new RequestResult<>(0, "没有权限");
+            throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
         }
 
         Organization o = new Organization();
@@ -134,22 +142,23 @@ public class OrganizationController {
         o.setTeacherId(user.getUserId());
         o.setDescription(description);
         o.setOrganizationName(organizationName);
+        o.setToken(token);
         if (organizationService.getByName(organizationName) != null) {
             return new RequestResult<>(0, "组织名称已存在");
         }
-
         if (file != null && !file.isEmpty()) {
             String filename = file.getOriginalFilename();
             assert filename != null;
             if (!(filename.endsWith(".jpg") || filename.endsWith(".JPG") || filename.endsWith(".png") || filename.endsWith(".PNG"))) {
-                return new RequestResult<>(0, "上传的头像不合法");
+                return new RequestResult<>(0, "上传的头像格式不支持");
             }
-
             String photoName = o.getOrganizationName() + ".jpg";
             FileUtils.copyInputStreamToFile(file.getInputStream(),
                     new File(request.getServletContext().getRealPath("/picture/organization"), photoName));
+            o.setImagePath("/picture/organization/" + photoName);
+        } else {
+            o.setImagePath("/picture/image.png");
         }
-
         return organizationService.addOrganization(o);
     }
 
@@ -165,45 +174,44 @@ public class OrganizationController {
      * @throws IOException ioException
      */
     @RequestMapping(value = "/alter", method = RequestMethod.POST)
-    public RequestResult alter(@RequestParam(value = "file", required = false) MultipartFile file,
-                               @RequestParam(value = "organizationId", required = true) int organizationId,
-                               @RequestParam(value = "organizationName", required = false) String organizationName,
-                               @RequestParam(value = "description", required = false) String description,
+    public RequestResult alter(@RequestParam(value = "file") MultipartFile file,
+                               @RequestParam(value = "organizationId") int organizationId,
+                               @RequestParam(value = "organizationName") String organizationName,
+                               @RequestParam(value = "description") String description,
                                HttpServletRequest request) throws IOException {
         User user = (User) request.getSession().getAttribute("user");
+        if (description == null || "".equals(description)) {
+            return new RequestResult<>(0, "描述为空");
+        }
+        if (organizationName == null || "".equals(organizationName)) {
+            return new RequestResult<>(0, "组织名为空");
+        }
         if (user.getMark() == 0) {
             return new RequestResult<>(0, "没有权限");
         }
-
         Organization o = organizationService.getById(organizationId);
         if (o.getTeacherId() != user.getUserId()) {
             return new RequestResult<>(0, "您不是此组织的创建人");
         }
-        boolean flag = (organizationName != null && !"".equals(organizationName)) || (description != null && !"".equals(description));
-        if (flag) {
 
-            if ((description != null && !"".equals(description))) {
-                o.setDescription(description);
-            }
-            if ((organizationName != null && !"".equals(organizationName))) {
-                if (organizationService.getByName(organizationName) != null) {
-                    return new RequestResult<>(0, "组织名称已存在");
-                }
-                o.setOrganizationName(organizationName);
-            }
-            if (file != null && !file.isEmpty()) {
-                String filename = file.getOriginalFilename();
-                assert filename != null;
-                if (!(filename.endsWith(".jpg") || filename.endsWith(".JPG") || filename.endsWith(".png") || filename.endsWith(".PNG"))) {
-                    return new RequestResult(0, "上传的头像不合法");
-                }
-
-                String photoName = organizationName + ".jpg";
-                FileUtils.copyInputStreamToFile(file.getInputStream(),
-                        new File(request.getServletContext().getRealPath("/picture/organization"), photoName));
-            }
-            organizationService.alterOrganization(o);
+        o.setDescription(description);
+        if (organizationService.getByName(organizationName) != null) {
+            return new RequestResult<>(0, "组织名称已存在");
         }
+        o.setOrganizationName(organizationName);
+
+        if (file != null && !file.isEmpty()) {
+            String filename = file.getOriginalFilename();
+            assert filename != null;
+            if (!(filename.endsWith(".jpg") || filename.endsWith(".JPG") || filename.endsWith(".png") || filename.endsWith(".PNG"))) {
+                return new RequestResult(0, "上传的头像格式不支持");
+            }
+            String photoName = organizationName + ".jpg";
+            FileUtils.copyInputStreamToFile(file.getInputStream(),
+                    new File(request.getServletContext().getRealPath("/picture/organization"), photoName));
+            o.setImagePath("/picture/organization/" + photoName);
+        }
+        organizationService.alterOrganization(o);
         return new RequestResult<>(1, "修改成功", o);
     }
 
@@ -215,7 +223,7 @@ public class OrganizationController {
      * @return request result
      */
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
-    public RequestResult delete(HttpServletRequest request, @RequestBody Map map) {
+    public RequestResult delete(HttpServletRequest request, @RequestBody Map map) throws IOException {
         int organizationId = (int) map.get("organizationId");
         User user = (User) request.getSession().getAttribute("user");
         if (user.getMark() == 0) {
@@ -290,6 +298,4 @@ public class OrganizationController {
         int organizationId = (int) map.get("organizationId");
         return testService.getPraceticeByOrganizationId(userId, organizationId);
     }
-
-
 }

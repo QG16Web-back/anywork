@@ -9,12 +9,14 @@ import java.util.List;
 
 /**
  * 试卷实体
- * Created by FunriLy on 2017/7/10.
+ *
+ * @author FunriLy
+ * @date 2017/7/10
  * From small beginnings comes great things.
  */
 @Data
 @NoArgsConstructor
-public class Testpaper implements Serializable {
+public class TestPaper implements Serializable {
 
     /**
      * 试卷ID
@@ -62,7 +64,7 @@ public class Testpaper implements Serializable {
     private int testpaperScore;
 
     /**
-     * 试卷类型，0为练习、1为考试，若将来扩展可在这个字段上实现
+     * 试卷类型，0为练习、1为考试，2为预习题，3为课后复习题，若将来扩展可在这个字段上实现
      */
     private int testpaperType;
 

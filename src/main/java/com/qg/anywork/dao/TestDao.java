@@ -4,7 +4,7 @@ import com.qg.anywork.model.bo.StudentTestResult;
 import com.qg.anywork.model.po.CheckResult;
 import com.qg.anywork.model.po.Question;
 import com.qg.anywork.model.po.StudentAnswerAnalysis;
-import com.qg.anywork.model.po.Testpaper;
+import com.qg.anywork.model.po.TestPaper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -23,27 +23,34 @@ public interface TestDao {
     /***
      * 获取组织下的考试列表
      * @param organizationId 组织id
-     * @return List<Testpaper> 返回该组织的考试列表
+     * @return List<TestPaper> 返回该组织的考试列表
      */
-    List<Testpaper> getTestByOrganizationId(@Param("organizationId") int organizationId);
+    List<TestPaper> getTestByOrganizationId(@Param("organizationId") int organizationId);
 
     /***
      * 获取组织下的练习列表
      * @param organizationId 组织id
-     * @return List<Testpaper> 返回该组织的练习列表
+     * @return List<TestPaper> 返回该组织的练习列表
      */
-    List<Testpaper> getPracticeByOrganizationId(@Param("organizationId") int organizationId);
+    List<TestPaper> getPracticeByOrganizationId(@Param("organizationId") int organizationId);
 
     /***
      * 根据组织id和章id获取练习
      * @param organizationId 组织id
      * @param chapterId 章节id
-     * @return List<Testpaper> 返回该组织某章节下的练习列表
+     * @return List<TestPaper> 返回该组织某章节下的练习列表
      * TODO 名字未查出
      */
-    List<Testpaper> getPracticeByOCId(@Param("organizationId") int organizationId, @Param("chapterId") int chapterId);
+    List<TestPaper> getPracticeByOCId(@Param("organizationId") int organizationId, @Param("chapterId") int chapterId);
 
-    List<CheckResult> getUserPracticeByOrganizationId(@Param("userId") int userId, @Param("organizationId") int organizaitonId);
+    /**
+     * 获取
+     *
+     * @param userId         用户ID
+     * @param organizationId 组织ID
+     * @return list
+     */
+    List<CheckResult> getUserPracticeByOrganizationId(@Param("userId") int userId, @Param("organizationId") int organizationId);
 
     /**
      * 获得我的练习卷集合
@@ -51,7 +58,7 @@ public interface TestDao {
      * @param userId 用户ID
      * @return 练习卷集合
      */
-    List<Testpaper> getMyPractice(@Param("userId") int userId);
+    List<TestPaper> getMyPractice(@Param("userId") int userId);
 
     /**
      * 获得我的考试集合
@@ -59,14 +66,14 @@ public interface TestDao {
      * @param userId 用户ID
      * @return 考试卷集合
      */
-    List<Testpaper> getMyTest(@Param("userId") int userId);
+    List<TestPaper> getMyTest(@Param("userId") int userId);
 
     /***
      * 根据试卷id获取试卷信息
      * @param testpaperId 试卷id
-     * @return Testpaper 返回问卷对象
+     * @return TestPaper 返回问卷对象
      */
-    Testpaper getTestPaperByTestpaperId(@Param("testpaperId") int testpaperId);
+    TestPaper getTestPaperByTestpaperId(@Param("testpaperId") int testpaperId);
 
 
     /***
@@ -125,7 +132,7 @@ public interface TestDao {
      * @param testpaper 试卷
      * @return 1为添加成功 0为添加失败
      */
-    int addTestpaper(@Param("testpaper") Testpaper testpaper);
+    int addTestpaper(@Param("testpaper") TestPaper testpaper);
 
     /**
      * 删除一张试卷

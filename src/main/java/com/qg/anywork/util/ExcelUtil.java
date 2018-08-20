@@ -10,8 +10,6 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,25 +24,25 @@ import java.util.regex.Pattern;
 
 /**
  * 操作Excel表格的工具类
- * Created by FunriLy on 2017/7/12.
+ *
+ * @author FunriLy
+ * @date 2017/7/12
  * From small beginnings comes great things.
  */
 public class ExcelUtil {
 
-    public static final ExcelUtil util = new ExcelUtil();
-
-    private static final Logger logger = LoggerFactory.getLogger(ExcelUtil.class);
+    private static final ExcelUtil UTIL = new ExcelUtil();
 
     /**
      * 读取解析Excel文件流
      *
-     * @param input
-     * @return
-     * @throws Exception
+     * @param input 文件输入流
+     * @return 返回试卷问题列表
+     * @throws Exception Exception
      */
     public static List<Question> getQuestionList(InputStream input) throws Exception {
         //选择题
-        Map<Integer, String> map1 = new HashMap<>();
+        Map<Integer, String> map1 = new HashMap<>(7);
         map1.put(1, "content");
         map1.put(2, "A");
         map1.put(3, "B");
@@ -53,18 +51,18 @@ public class ExcelUtil {
         map1.put(6, "key");
         map1.put(7, "socre");
         //判断题、问答题、编程题、综合题
-        Map<Integer, String> map2 = new HashMap<>();
+        Map<Integer, String> map2 = new HashMap<>(3);
         map2.put(1, "content");
         map2.put(2, "key");
         map2.put(3, "socre");
         //填空题、
-        Map<Integer, String> map3 = new HashMap<>();
+        Map<Integer, String> map3 = new HashMap<>(4);
         map3.put(1, "content");
         map3.put(2, "key");
         map3.put(3, "socre");
         map3.put(4, "other");
 
-        return new ExcelUtil().readQuest(input, Question.class, map1, map2, map3, map2, map2, map2);
+        return new ExcelUtil().readQuest(input, map1, map2, map3, map2, map2, map2);
     }
 
     /**
@@ -192,37 +190,37 @@ public class ExcelUtil {
                             case "1":
                                 value = "A" + (A_num++);
                                 String[] headers1 = {"选择题", "题目内容", "选项A", "选项B", "选项C", "选项D", "正确答案", "分数"};
-                                util.addCell(headers1, pre_row, style);
+                                UTIL.addCell(headers1, pre_row, style);
                                 index += 2;
                                 break;
                             case "2":
                                 value = "B" + (B_num++);
                                 String[] headers2 = {"判断题", "题目内容", "正确答案", "分数"};
-                                util.addCell(headers2, pre_row, style);
+                                UTIL.addCell(headers2, pre_row, style);
                                 index += 2;
                                 break;
                             case "3":
                                 value = "C" + (C_num++);
                                 String[] headers3 = {"填空题", "题目内容", "正确答案", "分数", "个数"};
-                                util.addCell(headers3, pre_row, style);
+                                UTIL.addCell(headers3, pre_row, style);
                                 index += 2;
                                 break;
                             case "4":
                                 value = "D" + (D_num++);
                                 String[] headers4 = {"问答题", "题目内容", "正确答案", "分数"};
-                                util.addCell(headers4, pre_row, style);
+                                UTIL.addCell(headers4, pre_row, style);
                                 index += 2;
                                 break;
                             case "5":
                                 value = "E" + (E_num++);
                                 String[] headers5 = {"编程题", "题目内容", "正确答案", "分数"};
-                                util.addCell(headers5, pre_row, style);
+                                UTIL.addCell(headers5, pre_row, style);
                                 index += 2;
                                 break;
                             case "6":
                                 value = "F" + (F_num++);
                                 String[] headers6 = {"综合题", "题目内容", "正确答案", "分数"};
-                                util.addCell(headers6, pre_row, style);
+                                UTIL.addCell(headers6, pre_row, style);
                                 index += 2;
                                 break;
                             default:
@@ -334,20 +332,18 @@ public class ExcelUtil {
     /**
      * 读取试卷题目
      *
-     * @param input
-     * @param clazz
-     * @param map1
-     * @param map2
-     * @param map3
-     * @param map4
-     * @param map5
-     * @param map6
-     * @param <T>
-     * @return
-     * @throws Exception
+     * @param input 文件输入流
+     * @param map1  选择题
+     * @param map2  判断题
+     * @param map3  填空题
+     * @param map4  问答题
+     * @param map5  编程题
+     * @param map6  综合题
+     * @return 试卷问题列表
+     * @throws Exception Exception
      */
     @SuppressWarnings("unchecked")
-    private <T> List<Question> readQuest(InputStream input, Class<T> clazz,
+    private <T> List<Question> readQuest(InputStream input,
                                          Map<Integer, String> map1,                      //选择题
                                          Map<Integer, String> map2,                      //判断题
                                          Map<Integer, String> map3,                      //填空题
@@ -360,7 +356,7 @@ public class ExcelUtil {
         try {
             Workbook wb = WorkbookFactory.create(input);
             Sheet sheet = wb.getSheetAt(0);
-            Field field = null;
+            Field field;
             Class tempClazz = Question.class;
 
             //从第二行开始读取
@@ -371,7 +367,7 @@ public class ExcelUtil {
                     continue;
                 }
 
-                Map<Integer, String> map = null;
+                Map<Integer, String> map;
                 //获取每一行的第一个单元格
                 Cell cell = row.getCell(0);
                 if (null == cell) {
@@ -437,7 +433,8 @@ public class ExcelUtil {
                     question.setType(2);
                 } else if (status.startsWith("C")) {
                     question.setType(3);
-                    question.setKey(question.getKey().replaceAll("#", "∏"));    //替換答案中非法字符
+                    //替換答案中非法字符
+                    question.setKey(question.getKey().replaceAll("#", "∏"));
                 } else if (status.startsWith("D")) {
                     question.setType(4);
                 } else if (status.startsWith("E")) {
@@ -462,11 +459,12 @@ public class ExcelUtil {
 
     private <T> T addingT(Field field, T t, Cell cell) throws IllegalArgumentException, IllegalAccessException {
         switch (cell.getCellType()) {
-            case Cell.CELL_TYPE_STRING:     //字符串
+            //字符串
+            case Cell.CELL_TYPE_STRING:
                 field.set(t, cell.getStringCellValue());
                 break;
-
-            case Cell.CELL_TYPE_BOOLEAN:    //Boolean对象
+            //Boolean对象
+            case Cell.CELL_TYPE_BOOLEAN:
                 field.set(t, cell.getBooleanCellValue());
                 break;
 
@@ -493,15 +491,15 @@ public class ExcelUtil {
                     }
                 }
                 break;
-
-            case Cell.CELL_TYPE_FORMULA:    //公式
+            //公式
+            case Cell.CELL_TYPE_FORMULA:
                 field.set(t, cell.getCellFormula());
                 break;
-
-            case HSSFCell.CELL_TYPE_BLANK:  //空值
+            //空值
+            case HSSFCell.CELL_TYPE_BLANK:
                 break;
-
-            case HSSFCell.CELL_TYPE_ERROR:  //故障
+            //故障
+            case HSSFCell.CELL_TYPE_ERROR:
                 break;
             default:
                 break;

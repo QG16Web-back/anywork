@@ -5,11 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * 时间转换器
- *
- * @author FunriLy
- * @date 2017/8/19
- * From small beginnings comes great things.
+ * @author ming
  */
 public class DateUtil {
 

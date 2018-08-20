@@ -3,7 +3,7 @@ package com.qg.anywork.service;
 import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.exception.question.ExcelReadException;
 import com.qg.anywork.model.po.Question;
-import com.qg.anywork.model.po.Testpaper;
+import com.qg.anywork.model.po.TestPaper;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -42,7 +42,7 @@ public interface QuestionService {
      */
     void deleteTestpaper(int testpaperId);
 
-    Testpaper findTestpaperById(int testpaperId);
+    TestPaper findTestpaperById(int testpaperId);
 
     void exportExcel(int testpaperId, int userid, OutputStream out) throws ExcelReadException;
 }

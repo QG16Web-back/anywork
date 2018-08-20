@@ -1,23 +1,25 @@
 package com.qg.anywork.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.qg.anywork.dao.MessageDao;
 import com.qg.anywork.dao.OrganizationDao;
-import com.qg.anywork.dao.UserDao;
+import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.message.MessageException;
 import com.qg.anywork.model.dto.RequestResult;
-import com.qg.anywork.enums.StatEnum;
-import com.qg.anywork.exception.user.ValcodeWrongException;
-import com.qg.anywork.exception.testpaper.NotPowerException;
-import com.qg.anywork.exception.user.UserException;
-import com.qg.anywork.model.bo.Message;
+import com.qg.anywork.model.po.Message;
 import com.qg.anywork.model.po.Organization;
+import com.qg.anywork.model.po.User;
 import com.qg.anywork.service.MessageService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.qg.anywork.util.DateUtil;
+import com.qg.anywork.web.socket.OnlineWebSocket;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -27,109 +29,87 @@ import java.util.List;
  * I'm the one to ignite the darkened skies.
  */
 @Service
+@Slf4j
 public class MessageServiceImpl implements MessageService {
-
-    /**
-     * 每页数据条数
-     */
-    private static final int MESSAGE_NUMBER = 10;
-    private static final Logger logger = LoggerFactory.getLogger(MessageService.class);
 
     @Autowired
     private MessageDao messageDao;
     @Autowired
     private OrganizationDao organizationDao;
-    @Autowired
-    private UserDao userDao;
 
-    /**
-     * 获取用户收到的消息
-     *
-     * @param userId
-     * @param page
-     * @param userName
-     * @return
-     */
     @Override
-    public RequestResult<List<Message>> getReceiveMessage(int userId, int page, String userName) {
-        if (page < 0) {
-            throw new MessageException(StatEnum.PAGE_IS_ERROR);
+    public RequestResult publishMessage(Message message, String publisher) throws IOException {
+        List<Organization> organizations = organizationDao.getMyOrganization(message.getUserId());
+        if (organizations.isEmpty()) {
+            return new RequestResult(0, "您还未创建组织，发的公告没人看哦，请先创建组织");
         }
-        int start = page * MESSAGE_NUMBER;
-        int end = start + 10;
-        // 获得 MESSAGE_NUMBER 条记录
-        List<Message> messageList = messageDao.getReceiveMessageList(userId, start, MESSAGE_NUMBER);
-        List<Message> list = new ArrayList<>();
-        for (Message message : messageList) {
-            try {
-                list.add(replaceMessageName(userId, userName, message));
-            } catch (Exception e) {
-                // 不做处理，跳过该条消息
-                logger.warn("用户接收消息获取未知异常：" + e.getMessage());
-            }
+        List<Integer> organizationIds = new ArrayList<>();
+        for (Organization organization : organizations) {
+            organizationIds.add(organization.getOrganizationId());
         }
-        return new RequestResult<>(StatEnum.MESSAGE_LIST, list);
+        List<Integer> userIds = new ArrayList<>();
+        List<User> users = new ArrayList<>();
+        for (Organization organization : organizations) {
+            users.addAll(organizationDao.getOrganizationPeople(organization.getOrganizationId()));
+        }
+        if (users.isEmpty()) {
+            return new RequestResult(0, "您创建的组织还没有人加入，没必要发公告");
+        }
+        for (User user : users) {
+            userIds.add(user.getUserId());
+        }
+        message.setCreateTime(DateUtil.format(new Date()));
+        messageDao.insertMessage(message);
+        messageDao.insertMessageAndOrganization(message.getMessageId(), organizationIds);
+        messageDao.insertUserMessage(message.getMessageId(), userIds);
+        OnlineWebSocket.publishMessage(message, userIds, publisher);
+        log.info(publisher + "发布了一条公告");
+        return new RequestResult(StatEnum.MESSAGE_PUBLISH_SUCCESS);
     }
 
-    /**
-     * 获取用户发送的消息
-     *
-     * @param userId
-     * @param organId
-     * @param page
-     * @param userName
-     * @return
-     */
     @Override
-    public RequestResult<List<Message>> getSendMessage(int userId, int organId, int page, String userName) {
-        Organization organization = organizationDao.getById(organId);
-        if (organization.getTeacherId() != userId) {
-            // 用户不是组织的创建者
-            throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
-        }
-        if (page < 0) {
-            throw new MessageException(StatEnum.PAGE_IS_ERROR);
-        }
-        int start = page * MESSAGE_NUMBER;
-        int end = start + 10;
-        List<Message> messageList = messageDao.getSendMessageList(userId, organId, start, end);
-        List<Message> list = new ArrayList<>();
-        for (Message message : messageList) {
-            try {
-                list.add(replaceMessageName(userId, userName, message));
-            } catch (Exception e) {
-                logger.warn("用户发送消息获取未知异常：" + e.getMessage());
-            }
-        }
-        return new RequestResult<>(StatEnum.MESSAGE_LIST, list);
+    public RequestResult listMessage(int userId, int pageNo, int pageSize) {
+        PageHelper.startPage(pageNo, pageSize);
+        PageInfo<Message> messages = new PageInfo<>(messageDao.findMessageByUserId(userId));
+        return new RequestResult<>(StatEnum.LIST_MESSAGE_SUCCESS, messages);
     }
 
-    /**
-     * 将用户消息做用户名与用户id转换处理
-     *
-     * @param userId   用户ID
-     * @param username 用户名
-     * @param message  消息
-     * @return 消息
-     */
-    private Message replaceMessageName(int userId, String username, Message message) {
-        String sendName, receiveName;
-        try {
-            if (userId != message.getSendId()) {
-                // user 不是 发送者
-                sendName = userDao.selectById(message.getSendId()).getUserName();
-                receiveName = username;
-            } else {
-                sendName = username;
-                receiveName = userDao.selectById(message.getReceiveId()).getUserName();
-            }
-        } catch (NullPointerException e) {
-            throw new UserException(StatEnum.LOGIN_NOT_EXIT_USER);
+    @Override
+    public RequestResult deleteMessage(int messageId, int userId) {
+        if (messageDao.findByUserIdAndMessageId(userId, messageId) == null) {
+            throw new MessageException(StatEnum.NOT_SUCH_MESSAGE);
         }
-        String content = message.getContent();
-        content.replaceAll(String.valueOf(message.getSendId()), sendName);
-        content.replaceAll(String.valueOf(message.getReceiveId()), receiveName);
-        message.setContent(content);
-        return message;
+        int flag = messageDao.deleteMessageById(messageId);
+        if (flag == 1) {
+            messageDao.deleteMessageUserByMessageId(messageId);
+            messageDao.deleteMessageOrganizationByMessageId(messageId);
+        }
+        return new RequestResult(1, "删除公告成功");
+    }
+
+    @Override
+    public RequestResult studentShowMessage(int userId, int pageNum, int pageSize, int status) {
+        PageHelper.startPage(pageNum, pageSize);
+        PageInfo<Message> messages = null;
+        List<Integer> messageIds = messageDao.getAllMessageIdByUserId(userId);
+        if (messageIds.isEmpty()) {
+            throw new MessageException(StatEnum.MESSAGE_LIST_IS_NULL);
+        }
+        if (status == 1) {
+            messages = new PageInfo<>(messageDao.findHaveReadMessageExceptMessageIds(messageIds));
+        } else if (status == 0) {
+            messages = new PageInfo<>(messageDao.findUnreadMessage(messageIds));
+        }
+        return new RequestResult<>(StatEnum.LIST_MESSAGE_SUCCESS, messages);
+    }
+
+    @Override
+    public RequestResult changeMessageStatus(int userId, int messageId) {
+        Message message = messageDao.findByMessageId(messageId);
+        if (message == null) {
+            throw new MessageException(StatEnum.NOT_SUCH_MESSAGE);
+        }
+        messageDao.deleteMessageByUserIdAndMessageId(userId, messageId);
+        return new RequestResult(1, "标记成功");
     }
 }

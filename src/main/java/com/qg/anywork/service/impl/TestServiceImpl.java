@@ -3,6 +3,7 @@ package com.qg.anywork.service.impl;
 import com.qg.anywork.dao.OrganizationDao;
 import com.qg.anywork.dao.TestDao;
 import com.qg.anywork.dao.UserDao;
+import com.qg.anywork.domain.UserRepository;
 import com.qg.anywork.exception.organization.OrganizationException;
 import com.qg.anywork.model.bo.*;
 import com.qg.anywork.model.dto.RequestResult;
@@ -37,41 +38,44 @@ public class TestServiceImpl implements TestService {
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Override
-    public RequestResult<List<Testpaper>> getTestList(int organizationId, int userId) {
+    public RequestResult<List<TestPaper>> getTestList(int organizationId, int userId) {
         if (organizationDao.getById(organizationId) == null) {
             throw new OrganizationException(StatEnum.INVALID_ORGANIZATION);
         }
-        List<Testpaper> testpapers = testDao.getTestByOrganizationId(organizationId);
-        List<Testpaper> studentpapers = testDao.getMyTest(userId);
-        List<Testpaper> testpaperList = checkIfDo(testpapers, studentpapers);
-        return new RequestResult<>(StatEnum.GET_TEST_SUCCESS, testpaperList);
+        List<TestPaper> testPapers = testDao.getTestByOrganizationId(organizationId);
+        List<TestPaper> studentpapers = testDao.getMyTest(userId);
+        List<TestPaper> testPaperList = checkIfDo(testPapers, studentpapers);
+        return new RequestResult<>(StatEnum.GET_TEST_SUCCESS, testPaperList);
     }
 
 
     @Override
-    public RequestResult<List<Testpaper>> getPracticeList(int organizationId, int userId) {
+    public RequestResult<List<TestPaper>> getPracticeList(int organizationId, int userId) {
         if (organizationDao.getById(organizationId) == null) {
             throw new OrganizationException(StatEnum.INVALID_ORGANIZATION);
         }
-        List<Testpaper> practiceList = testDao.getPracticeByOrganizationId(organizationId);
-        List<Testpaper> studentpapers = testDao.getMyPractice(userId);
-        List<Testpaper> testpaperList = checkIfDo(practiceList, studentpapers);
-        return new RequestResult<>(StatEnum.GET_TEST_SUCCESS, testpaperList);
+        List<TestPaper> practiceList = testDao.getPracticeByOrganizationId(organizationId);
+        List<TestPaper> studentpapers = testDao.getMyPractice(userId);
+        List<TestPaper> testPaperList = checkIfDo(practiceList, studentpapers);
+        return new RequestResult<>(StatEnum.GET_TEST_SUCCESS, testPaperList);
     }
 
     /***
      * 检查是否有做
-     * @param testpapers
+     * @param testPapers
      * @param studentpapers
      * @return
      */
-    private List<Testpaper> checkIfDo(List<Testpaper> testpapers, List<Testpaper> studentpapers) {
-        List<Testpaper> testpapersList = new ArrayList<>();
-        for (Testpaper t : testpapers) {
+    private List<TestPaper> checkIfDo(List<TestPaper> testPapers, List<TestPaper> studentpapers) {
+        List<TestPaper> testpapersList = new ArrayList<>();
+        for (TestPaper t : testPapers) {
             int flag = 0;
             //没做的flag
-            for (Testpaper testpaper : studentpapers) {
+            for (TestPaper testpaper : studentpapers) {
                 if (t.getTestpaperId() == testpaper.getTestpaperId()) {
                     t.setChapterId(0);
                     flag = 1;
@@ -87,25 +91,25 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    public RequestResult<List<Testpaper>> getPracticeByOCId(int organizationId, int chapterId, int userId) {
+    public RequestResult<List<TestPaper>> getPracticeByOCId(int organizationId, int chapterId, int userId) {
         if (organizationDao.getById(organizationId) == null) {
             throw new OrganizationException(StatEnum.INVALID_ORGANIZATION);
         }
-        List<Testpaper> practiceList = testDao.getPracticeByOCId(organizationId, chapterId);
-        List<Testpaper> studentpapers = testDao.getMyPractice(userId);
-        List<Testpaper> testpaperList = checkIfDo(practiceList, studentpapers);
+        List<TestPaper> practiceList = testDao.getPracticeByOCId(organizationId, chapterId);
+        List<TestPaper> studentpapers = testDao.getMyPractice(userId);
+        List<TestPaper> testPaperList = checkIfDo(practiceList, studentpapers);
 
-        return new RequestResult<>(StatEnum.GET_TEST_SUCCESS, testpaperList);
+        return new RequestResult<>(StatEnum.GET_TEST_SUCCESS, testPaperList);
     }
 
     @Override
-    public RequestResult<List<Testpaper>> getMyPracticeList(int userId) {
+    public RequestResult<List<TestPaper>> getMyPracticeList(int userId) {
 
-        List<Testpaper> testpapers = testDao.getMyPractice(userId);
-        for (Testpaper t : testpapers) {
+        List<TestPaper> testPapers = testDao.getMyPractice(userId);
+        for (TestPaper t : testPapers) {
             t.setChapterId(0);
         }
-        return new RequestResult<>(StatEnum.GET_TEST_SUCCESS, testpapers);
+        return new RequestResult<>(StatEnum.GET_TEST_SUCCESS, testPapers);
     }
 
     @Override
@@ -114,8 +118,8 @@ public class TestServiceImpl implements TestService {
         List<CheckResult> practice = testDao.getUserPracticeByOrganizationId(userId, organizationId);
 
         List<CheckResult> checkResults = new ArrayList<>();
-        List<Testpaper> testpapers = testDao.getPracticeByOrganizationId(organizationId);
-        for (Testpaper t : testpapers) {
+        List<TestPaper> testPapers = testDao.getPracticeByOrganizationId(organizationId);
+        for (TestPaper t : testPapers) {
             int flag = 0;
             for (CheckResult c : practice) {
                 if (t.getTestpaperId() == c.getTestpaper().getTestpaperId()) {
@@ -131,7 +135,7 @@ public class TestServiceImpl implements TestService {
                 checkResult.setObject(0);
                 checkResult.setSubject(0);
                 checkResult.setStudentId(userId);
-                checkResult.setStudentName(userDao.selectById(userId).getUserName());
+                checkResult.setStudentName(userRepository.findByUserId(userId).getUserName());
                 checkResult.setIfCheck(0);
                 checkResult.setTestpaper(t);
                 checkResults.add(checkResult);
@@ -141,17 +145,17 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    public RequestResult<List<Testpaper>> getMyTestList(int userId) {
-        List<Testpaper> testpapers = testDao.getMyTest(userId);
-        for (Testpaper t : testpapers) {
+    public RequestResult<List<TestPaper>> getMyTestList(int userId) {
+        List<TestPaper> testPapers = testDao.getMyTest(userId);
+        for (TestPaper t : testPapers) {
             t.setChapterId(0);
         }
-        return new RequestResult<>(StatEnum.GET_TEST_SUCCESS, testpapers);
+        return new RequestResult<>(StatEnum.GET_TEST_SUCCESS, testPapers);
     }
 
     @Override
     public RequestResult<List<Question>> getQuestion(int testpaperId) {
-        Testpaper testpaper = testDao.getTestPaperByTestpaperId(testpaperId);
+        TestPaper testpaper = testDao.getTestPaperByTestpaperId(testpaperId);
         if (new Date().before(testpaper.getCreateTime()) && testpaper.getTestpaperType() == 1) {
             throw new TestException(StatEnum.EXAM_DID_NOT_START_YET);
         }
@@ -254,7 +258,7 @@ public class TestServiceImpl implements TestService {
     public RequestResult<StudentTestResult> submit(StudentPaper studentPaper) {
 
         // 获得对应试卷
-        Testpaper testpaper = testDao.getTestPaperByTestpaperId(studentPaper.getTestpaperId());
+        TestPaper testpaper = testDao.getTestPaperByTestpaperId(studentPaper.getTestpaperId());
 
         //是否已经做过该套题的标志
         boolean flag = testDao.isSubmit(testpaper.getTestpaperId(), studentPaper.getStudentId()) > 0;
@@ -300,7 +304,7 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    public void addTestpaper(Testpaper testpaper) {
+    public void addTestpaper(TestPaper testpaper) {
         testDao.addTestpaper(testpaper);
     }
 
@@ -324,8 +328,8 @@ public class TestServiceImpl implements TestService {
     public RequestResult<List<CheckResult>> getCheckResultByUser(int organizationId, int userId) {
         List<CheckResult> checkResultsByUser = testDao.getCheckResultByUser(organizationId, userId);
         List<CheckResult> checkResults = new ArrayList<CheckResult>();
-        List<Testpaper> testpapers = testDao.getTestByOrganizationId(organizationId);
-        for (Testpaper t : testpapers) {
+        List<TestPaper> testPapers = testDao.getTestByOrganizationId(organizationId);
+        for (TestPaper t : testPapers) {
             int flag = 0;
             for (CheckResult c : checkResultsByUser) {
                 if (t.getTestpaperId() == c.getTestpaper().getTestpaperId()) {
@@ -341,7 +345,7 @@ public class TestServiceImpl implements TestService {
                 checkResult.setObject(0);
                 checkResult.setSubject(0);
                 checkResult.setStudentId(userId);
-                checkResult.setStudentName(userDao.selectById(userId).getUserName());
+                checkResult.setStudentName(userRepository.findByUserId(userId).getUserName());
                 checkResult.setIfCheck(0);
                 checkResult.setTestpaper(t);
                 checkResults.add(checkResult);

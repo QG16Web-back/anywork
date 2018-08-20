@@ -1,6 +1,6 @@
 package com.qg.anywork.dao;
 
-import com.qg.anywork.model.po.Testpaper;
+import com.qg.anywork.model.po.TestPaper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -19,11 +19,11 @@ public interface TestpaperDao {
      * @param Testpaper
      * @return
      */
-    int insertTestpaper(@Param("Testpaper") Testpaper Testpaper);
+    int insertTestpaper(@Param("TestPaper") TestPaper Testpaper);
 
-    int updateTestpaper(@Param("Testpaper") Testpaper Testpaper);
+    int updateTestpaper(@Param("TestPaper") TestPaper Testpaper);
 
     int deleteTestpaper(@Param("TestpaperId") Integer TestpaperId);
 
-    Testpaper selectOne(@Param("TestpaperId") Integer TestpaperId);
+    TestPaper selectOne(@Param("TestpaperId") Integer TestpaperId);
 }
