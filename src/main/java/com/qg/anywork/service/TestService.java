@@ -1,8 +1,8 @@
 package com.qg.anywork.service;
 
-import com.qg.anywork.model.bo.TeacherSubmit;
 import com.qg.anywork.model.bo.StudentPaper;
 import com.qg.anywork.model.bo.StudentTestResult;
+import com.qg.anywork.model.bo.TeacherSubmit;
 import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.model.po.CheckResult;
 import com.qg.anywork.model.po.Question;
@@ -88,7 +88,7 @@ public interface TestService {
     /**
      * 增加一张试卷/练习
      *
-     * @param testpaper
+     * @param testpaper 试卷
      */
     void addTestpaper(TestPaper testpaper);
 

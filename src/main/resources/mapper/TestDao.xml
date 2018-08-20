@@ -23,6 +23,7 @@
             <result property="socre" column="socre"/>
             <result property="testpaperId" column="testpaper_id"/>
             <result property="other" column="other"/>
+            <result property="analysis" column="analysis"/>
         </association>
     </resultMap>
 

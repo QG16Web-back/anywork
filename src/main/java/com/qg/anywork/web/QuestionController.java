@@ -40,6 +40,10 @@ public class QuestionController {
     @Autowired
     private TestService testService;
 
+    public static void main(String[] args) {
+        System.out.println(DateUtil.longToDate(1503077978826L));
+    }
+
     /**
      * 用户上传并预览试卷/练习
      *
@@ -50,7 +54,7 @@ public class QuestionController {
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     @ResponseBody
     public RequestResult<List<Question>> excelUpload(HttpServletRequest request, @RequestParam("file") MultipartFile file) throws IOException {
-        User user = (User) request.getSession().getAttribute("user");
+//        User user = (User) request.getSession().getAttribute("user");
         if (null != file && !file.isEmpty()) {
             String filename = file.getOriginalFilename();
             assert filename != null;
@@ -63,7 +67,7 @@ public class QuestionController {
 //                    //读取文件
 //                    String path = request.getServletContext().getRealPath("/excel"+"/"+user.getUserId()+".xlsx");
 //                    System.out.println(path);
-                return questionService.addQuestionList(file.getInputStream(), user.getUserId());
+                return questionService.addQuestionList(file.getInputStream(), 41);
             }
         }
         return new RequestResult<>(StatEnum.FILE_UPLOAD_FAIL, null);
@@ -72,10 +76,15 @@ public class QuestionController {
     /**
      * 用户发布已经上传的试卷
      *
-     * @param request
-     * @param map
-     * @param organizationId
-     * @return
+     * @param request        request
+     * @param map            map
+     *                       testpaperTitle 试卷标题
+     *                       chapterId 章节ID
+     *                       createTime  开始时间
+     *                       endingTime  结束时间
+     *                       testpaperType 试卷类型
+     * @param organizationId 组织ID
+     * @return request result
      */
     @PostMapping("/{organizationId}/release")
     @ResponseBody
@@ -83,8 +92,6 @@ public class QuestionController {
         User user = (User) request.getSession().getAttribute("user");
         int testpaperId = 0;
         try {
-            //没有权限处理
-            // TODO: 2017/7/17 可以检查一下权限
             if (user.getMark() != 1) {
                 return new RequestResult<>(StatEnum.NOT_HAVE_POWER, 0);
             }
@@ -99,10 +106,10 @@ public class QuestionController {
             testpaper.setTestpaperType((int) map.get("testpaperType"));
             //将试卷插入数据库
             testService.addTestpaper(testpaper);
-            //获得试卷ID
+            // 获得试卷ID
             testpaperId = testpaper.getTestpaperId();
-            //插入数据库并获得总分
-            int socre = questionService.addTestpaper(user.getUserId(), testpaperId);
+            // 插入数据库并获得总分
+            int socre = questionService.addTestPaper(user.getUserId(), testpaperId);
             if (testService.updateTextpaper(testpaperId, socre)) {
                 //更新总分
                 return new RequestResult<>(StatEnum.TEST_RELEASE_SUCESS, testpaperId);
@@ -186,7 +193,6 @@ public class QuestionController {
         questionService.exportExcel(testpaperId, user.getUserId(), out);
         return new RequestResult<>(StatEnum.FILE_EXPORT_SUCCESS, testpaperId);
     }
-
 
     /**
      * 老师删除试卷

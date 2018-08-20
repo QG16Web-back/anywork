@@ -7,7 +7,7 @@
 
     <insert id="insertQuestion" parameterType="com.qg.anywork.model.po.Question" useGeneratedKeys="true"
             keyProperty="question.questionId">
-        INSERT INTO question (content, type, A, B, C, D, `key`, socre, testpaper_id, other)
+        INSERT INTO question (content, type, A, B, C, D, `key`, socre, testpaper_id, other, analysis)
         VALUES (#{question.content},
                 #{question.type},
                 #{question.A},
@@ -17,16 +17,17 @@
                 #{question.key},
                 #{question.socre},
                 #{question.testpaperId},
-                #{question.other})
+                #{question.other},
+                #{question.analysis})
     </insert>
 
     <insert id="insertAllQuestion" useGeneratedKeys="true" keyProperty="questionId" parameterType="java.util.ArrayList">
         INSERT INTO
-        question(type, A, B, C, D, `key`, socre, testpaper_id, other)
+        question(type, A, B, C, D, `key`, socre, testpaper_id, other, analysis)
         VALUES
         <foreach collection="questlist" item="question" index="index" separator=",">
             (#{question.type}, #{question.A}, #{question.B}, #{question.C}, #{question.D},
-            #{question.key}, #{question.socre}, #{question.testpaperId}, #{question.other})
+            #{question.key}, #{question.socre}, #{question.testpaperId}, #{question.other}, #{question.analysis})
         </foreach>
     </insert>
 

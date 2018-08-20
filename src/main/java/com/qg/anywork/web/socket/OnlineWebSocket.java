@@ -115,8 +115,10 @@ public class OnlineWebSocket {
     }
 
     @OnError
-    public void onError(Throwable error) {
-
+    public void onError() {
+        onlineMap.remove(userId);
+        subOnlineCount();
+        log.info("连接断开，当前人数为 " + getOnlineCount());
     }
 
     @OnMessage

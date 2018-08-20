@@ -42,7 +42,7 @@ public class ExcelUtil {
      */
     public static List<Question> getQuestionList(InputStream input) throws Exception {
         //选择题
-        Map<Integer, String> map1 = new HashMap<>(7);
+        Map<Integer, String> map1 = new HashMap<>(8);
         map1.put(1, "content");
         map1.put(2, "A");
         map1.put(3, "B");
@@ -50,17 +50,20 @@ public class ExcelUtil {
         map1.put(5, "D");
         map1.put(6, "key");
         map1.put(7, "socre");
+        map1.put(8, "analysis");
         //判断题、问答题、编程题、综合题
-        Map<Integer, String> map2 = new HashMap<>(3);
+        Map<Integer, String> map2 = new HashMap<>(4);
         map2.put(1, "content");
         map2.put(2, "key");
         map2.put(3, "socre");
-        //填空题、
-        Map<Integer, String> map3 = new HashMap<>(4);
+        map2.put(4, "analysis");
+        //填空题
+        Map<Integer, String> map3 = new HashMap<>(5);
         map3.put(1, "content");
         map3.put(2, "key");
         map3.put(3, "socre");
         map3.put(4, "other");
+        map3.put(5, "analysis");
 
         return new ExcelUtil().readQuest(input, map1, map2, map3, map2, map2, map2);
     }
@@ -272,7 +275,8 @@ public class ExcelUtil {
 
                                 String textString = (String) textValue;
                                 if (textString.contains("∏")) {
-                                    textString = textString.replaceAll("∏", "#");   // 替换# 方便输出
+                                    // 替换# 方便输出
+                                    textString = textString.replaceAll("∏", "#");
                                 }
                                 HSSFRichTextString richString = new HSSFRichTextString(textString);
                                 HSSFFont font3 = workbook.createFont();

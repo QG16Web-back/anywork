@@ -73,6 +73,8 @@ public class AnyworkApplicationTests {
         InputStream inputStream = new FileInputStream(new File("/home/ming/桌面/anywork/Anywork题库/第三章 最简单的C程序设计——顺序程序设计/3.2数据的表现形式及其运算.xlsx"));
         List<Question> questions = ExcelUtil.getQuestionList(inputStream);
         System.out.println(questions.size());
-        System.out.println(questions);
+        for (Question question : questions) {
+            System.out.println(question.getAnalysis());
+        }
     }
 }
