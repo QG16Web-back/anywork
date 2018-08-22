@@ -15,8 +15,10 @@ import java.util.List;
 @Mapper
 @Repository
 public interface ChapterDao {
+
     /***
      * 根据组织id获取章节列表
+     *
      * @param organizationId 组织id
      * @return List<Chapter> 返回章节列表
      */

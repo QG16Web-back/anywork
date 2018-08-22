@@ -51,5 +51,4 @@ public class ChapterServiceImpl implements ChapterService {
         chapterDao.deleteChapter(chapterId);
         return new RequestResult(1, "删除成功");
     }
-
 }

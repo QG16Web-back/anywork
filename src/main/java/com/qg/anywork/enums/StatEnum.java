@@ -81,7 +81,11 @@ public enum StatEnum {
     TEST_IS_NOT_EXIT(0, "试卷/练习不存在"),
     EXAM_DID_NOT_START_YET(0, "考试还未开始"),
     THE_EXAM_IS_OVER(0, "考试已经结束"),
-    EXAM_CANNOT_BE_SUBMITTED_REPEATEDLY(0, "考试无法重复提交"),
+    TEST_TIME_IS_OVER(0, "该试卷的最晚提交时间已过"),
+    EXAM_CANNOT_BE_SUBMITTED_REPEATEDLY(0, "试卷无法重复提交"),
+    TEST_LIST_IS_NULL(0, "没有对应的试卷"),
+    GET_SUCCESS(1, "获取成功"),
+    WRONG_QUESTION_LIST_IS_NULL(0, "错题列表为空"),
 
     /**
      * 组织板块
@@ -107,6 +111,7 @@ public enum StatEnum {
     GET_TEST_FAIL(0, "获取失败"),
     SUBMIT_TEST_SUCCESS(1, "提交成功"),
     SUBMIT_TEST_FAIL(0, "提交失败"),
+    SAVE_TEST_SUCCESS(1, "保存进度成功"),
 
     /**
      * 邮件模块
@@ -140,8 +145,7 @@ public enum StatEnum {
 
     NOT_SUCH_MESSAGE(0, "没有该公告"),
 
-    MESSAGE_LIST_IS_NULL(0, "公告列表为空")
-    ;
+    MESSAGE_LIST_IS_NULL(0, "公告列表为空");
 
 
     private int state;

@@ -27,6 +27,28 @@
         </association>
     </resultMap>
 
+    <resultMap id="wrongQuestions" type="com.qg.anywork.model.po.WrongQuestion">
+        <id property="wrongQuestionId" column="wrong_question_id"/>
+        <result property="studentId" column="student_id"/>
+        <result property="chapterId" column="chapter_id"/>
+        <result property="studentAnswer" column="student_answer"/>
+
+        <association property="question" javaType="com.qg.anywork.model.po.Question">
+            <id property="questionId" column="question_id"/>
+            <result property="content" column="content"/>
+            <result property="type" column="type"/>
+            <result property="A" column="A"/>
+            <result property="B" column="B"/>
+            <result property="C" column="C"/>
+            <result property="D" column="D"/>
+            <result property="key" column="key"/>
+            <result property="socre" column="socre"/>
+            <result property="testpaperId" column="testpaper_id"/>
+            <result property="other" column="other"/>
+            <result property="analysis" column="analysis"/>
+        </association>
+    </resultMap>
+
     <resultMap type="com.qg.anywork.model.po.CheckResult" id="checkResult">
         <result property="studentId" column="student_id"/>
         <result property="studentName" column="user_name"/>
@@ -110,7 +132,7 @@
     <select id="isSubmit" resultType="int">
         SELECT count(*)
         FROM test_result
-        WHERE test_paper_id = #{testpaperId}
+        WHERE test_paper_id = #{testPaperId}
           AND student_id = #{userId};
     </select>
 
@@ -171,7 +193,7 @@
     <select id="getQuestionByTestpaperId" resultType="com.qg.anywork.model.po.Question">
         SELECT *
         FROM question
-        WHERE testpaper_id = #{testpaperId}
+        WHERE testpaper_id = #{testPaperId}
     </select>
 
     <select id="getQuestionById" resultType="com.qg.anywork.model.po.Question">
@@ -180,13 +202,13 @@
         WHERE question_id = #{questionId}
     </select>
 
-    <insert id="addTestResult" parameterType="com.qg.anywork.model.bo.StudentTestResult"
+    <insert id="addTestResult" parameterType="com.qg.anywork.model.po.StudentTestResult"
             keyProperty="studentTestResultId">
         INSERT ignore INTO test_result (student_id, test_paper_id, socre)
         VALUE (#{testResult.studentId}, #{testResult.testpaperId}, #{testResult.socre})
     </insert>
 
-    <update id="updateTestResult" parameterType="com.qg.anywork.model.bo.StudentTestResult">
+    <update id="updateTestResult" parameterType="com.qg.anywork.model.po.StudentTestResult">
         UPDATE test_result
         <set>
             <if test="testResult.socre != null">
@@ -247,7 +269,7 @@
         WHERE testpaper_id = #{testpaperId}
     </update>
 
-    <select id="getTestResult" resultType="com.qg.anywork.model.bo.StudentTestResult">
+    <select id="getTestResult" resultType="com.qg.anywork.model.po.StudentTestResult">
         SELECT *
         FROM test_result
         WHERE test_paper_id = #{testpaperId}
@@ -259,7 +281,7 @@
         FROM student_answer s,
              question q
         WHERE s.student_id = #{userId}
-          AND s.question_id in (SELECT q.question_id FROM question WHERE q.testpaper_id = #{testpaperId})
+          AND s.question_id in (SELECT q.question_id FROM question WHERE q.testpaper_id = #{testPaperId})
     </select>
 
     <insert id="addCheckResult" parameterType="com.qg.anywork.model.po.CheckResult">
@@ -269,6 +291,14 @@
                 #{checkResult.subject},
                 #{checkResult.testpaper.testpaperId},
                 #{checkResult.studentId})
+    </insert>
+
+    <insert id="insertWrongQuestions">
+        INSERT INTO wrong_question(question_id, chapter_id, student_answer, student_id)
+        VALUES
+        <foreach collection="wrongQuestions" item="wrongQuestion" index="index" separator=",">
+            (#{wrongQuestion.question.questionId}, #{wrongQuestion.chapterId}, #{wrongQuestion.studentAnswer}, #{wrongQuestion.studentId})
+        </foreach>
     </insert>
 
     <select id="getCheckResultByUser" resultMap="checkResult">
@@ -310,7 +340,6 @@
           AND t.organization_id = #{organizationId}
           AND c.testpaper_id = t.testpaper_id
     </select>
-
     <update id="updateStudentAnswerSocre">
         UPDATE student_answer
         SET socre = #{socre}
@@ -332,5 +361,46 @@
         FROM test_paper
         WHERE testpaper_id = #{testpaperId}
     </delete>
+
+    <select id="findByOrganizationIdAndChapterIdAndTestPaperType"
+            resultType="com.qg.anywork.model.po.TestPaper">
+        SELECT *
+        from test_paper
+        where organization_id = #{organizationId}
+          and chapter_id = #{chapterId}
+          and testpaper_type = #{testPaperType}
+        order by create_time
+    </select>
+
+    <select id="findTestResultByTestPaperIdAndUserIdAndOrganizationId"
+            resultType="com.qg.anywork.model.po.StudentTestResult">
+        SELECT *
+        FROM test_result
+        WHERE test_paper_id = #{testPaperId}
+          AND student_id = #{userId}
+          AND organization_id = #{organizationId}
+    </select>
+
+    <select id="countQuestion" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        from question
+        where testpaper_id = #{testPaperId}
+    </select>
+
+    <select id="getStudentAnswerAnalysis" resultType="com.qg.anywork.model.po.StudentAnswerAnalysis">
+        SELECT s.student_id, s.student_answer, s.is_true, s.socre as getsocre, q.*
+        FROM student_answer s,
+             question q
+        WHERE s.student_id = #{userId}
+          AND s.question_id = #{questionId}
+    </select>
+
+    <select id="findWrongQuestionByStudentIdAndChapterId" resultType="com.qg.anywork.model.po.WrongQuestion">
+        SELECT w.student_id, w.chapter_id, w.student_answer, w.wrong_question_id, q.*
+        from wrong_question w,
+             question q
+        where w.student_id = #{studentId}
+          and w.chapter_id = #{chapterId}
+    </select>
 
 </mapper>

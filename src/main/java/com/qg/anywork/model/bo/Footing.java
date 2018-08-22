@@ -24,7 +24,7 @@ public class Footing implements Serializable {
     /**
      * 试卷ID
      */
-    private int textpaperId;
+    private int testPaperId;
 
     /**
      * 时间ID

@@ -1,6 +1,5 @@
-package com.qg.anywork.model.bo;
+package com.qg.anywork.model.po;
 
-import com.qg.anywork.model.po.StudentAnswerAnalysis;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -34,6 +33,11 @@ public class StudentTestResult implements Serializable {
     private int testpaperId;
 
     /**
+     * 组织ID
+     */
+    private int organizationId;
+
+    /**
      * 分数
      */
     private double socre;
@@ -42,4 +46,9 @@ public class StudentTestResult implements Serializable {
      * 具体题目分析
      */
     private List<StudentAnswerAnalysis> studentAnswerAnalysis;
+
+    public StudentTestResult(int studentId, int testpaperId) {
+        this.studentId = studentId;
+        this.testpaperId = testpaperId;
+    }
 }

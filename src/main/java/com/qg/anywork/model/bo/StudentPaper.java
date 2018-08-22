@@ -41,12 +41,17 @@ public class StudentPaper implements Serializable {
     private int testpaperId;
 
     /**
+     * 是否临时保存 1为临时保存，0为正常提交
+     */
+    private int temporarySave;
+
+    /**
      * 开始答题的时间
      */
-    private Date startTime;
+    private String startTime;
 
     /**
      * 答题结束的时间
      */
-    private Date endTime;
+    private String endTime;
 }

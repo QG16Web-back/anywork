@@ -69,8 +69,8 @@ public class DruidConfig {
     @Value("{spring.datasource.connectionProperties}")
     private String connectionProperties;
 
-    @Bean     //声明其为Bean实例
-    @Primary  //在同样的DataSource中，首先使用被标注的DataSource
+    @Bean
+    @Primary
     public DataSource dataSource() {
         DruidDataSource datasource = new DruidDataSource();
 

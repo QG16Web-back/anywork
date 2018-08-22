@@ -40,10 +40,6 @@ public class QuestionController {
     @Autowired
     private TestService testService;
 
-    public static void main(String[] args) {
-        System.out.println(DateUtil.longToDate(1503077978826L));
-    }
-
     /**
      * 用户上传并预览试卷/练习
      *
@@ -54,7 +50,7 @@ public class QuestionController {
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     @ResponseBody
     public RequestResult<List<Question>> excelUpload(HttpServletRequest request, @RequestParam("file") MultipartFile file) throws IOException {
-//        User user = (User) request.getSession().getAttribute("user");
+        User user = (User) request.getSession().getAttribute("user");
         if (null != file && !file.isEmpty()) {
             String filename = file.getOriginalFilename();
             assert filename != null;
@@ -67,7 +63,7 @@ public class QuestionController {
 //                    //读取文件
 //                    String path = request.getServletContext().getRealPath("/excel"+"/"+user.getUserId()+".xlsx");
 //                    System.out.println(path);
-                return questionService.addQuestionList(file.getInputStream(), 41);
+                return questionService.addQuestionList(file.getInputStream(), user.getUserId());
             }
         }
         return new RequestResult<>(StatEnum.FILE_UPLOAD_FAIL, null);

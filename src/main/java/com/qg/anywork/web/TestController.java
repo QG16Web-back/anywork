@@ -1,19 +1,18 @@
 package com.qg.anywork.web;
 
 import com.qg.anywork.enums.StatEnum;
+import com.qg.anywork.exception.common.ParamNotExistException;
 import com.qg.anywork.model.bo.StudentPaper;
-import com.qg.anywork.model.bo.StudentTestResult;
 import com.qg.anywork.model.dto.RequestResult;
-import com.qg.anywork.model.po.*;
+import com.qg.anywork.model.po.Chapter;
+import com.qg.anywork.model.po.StudentTestResult;
+import com.qg.anywork.model.po.User;
 import com.qg.anywork.service.ChapterService;
 import com.qg.anywork.service.TestService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -41,86 +40,75 @@ public class TestController {
     private ThreadPoolTaskExecutor executor;
 
     /***
-     * 获取试题集合
+     * 获取组织下的章节列表
      * @param map map
      *            organizationId 组织ID
-     * @return 试题列表
+     * @return 章节列表
      */
-    @RequestMapping(value = "/testList", method = RequestMethod.POST)
-    public RequestResult<List<TestPaper>> search(@RequestBody Map map, HttpServletRequest request) {
-        String organizationId = (String) map.get("organizationId");
-        if (organizationId == null || "".equals(organizationId)) {
-            return new RequestResult<>(StatEnum.REQUEST_ERROR);
+    @PostMapping("/chapter")
+    public RequestResult<List<Chapter>> getChapter(@RequestBody Map<String, Integer> map) {
+        if (!map.containsKey("organizationId")) {
+            throw new ParamNotExistException(StatEnum.PARAM_IS_NOT_EXIST);
         }
-        User user = (User) request.getSession().getAttribute("user");
-        return testService.getTestList(Integer.parseInt(organizationId), user.getUserId());
+        int organizationId = map.get("organizationId");
+        return chapterService.getByOrganizationId(organizationId);
     }
 
-
-    /***
-     * 根据组织id和章节id获取练习集合
-     * @param map map
-     *            organizationId 组织ID
-     *            chapterId      章节ID
+    /**
+     * 获取试卷概要列表，包括考试、预习题、复习题
+     *
+     * @param request request
+     * @param map     map
+     *                organizationId 组织ID
+     *                chapter 组织ID 如果是请求考试，这个字段为0
+     *                testPaperType 要哪种类型的试卷  1是考试，2是预习题，3是课后复习题
      * @return 试卷列表
      */
-    @RequestMapping(value = "/practiceListByChapter", method = RequestMethod.POST)
-    public RequestResult<List<TestPaper>> getPracticeByOCId(@RequestBody Map map, HttpServletRequest request) {
-        User user = (User) request.getSession().getAttribute("user");
-        int organizationId = (int) map.get("organizationId");
-        int chapterId = (int) map.get("chapterId");
-        return testService.getPracticeByOCId(organizationId, chapterId, user.getUserId());
-    }
-
-
-    /***
-     * 获取练习集合
-     * @param map map
-     *            organizationId 组织ID
-     * @return 练习
-     */
-    @RequestMapping(value = "/practiceList", method = RequestMethod.POST)
-    public RequestResult<List<TestPaper>> searchPractice(@RequestBody Map map, HttpServletRequest request) {
-        String organizationId = (String) map.get("organizationId");
-        if (organizationId == null || "".equals(organizationId)) {
-            return new RequestResult<>(StatEnum.REQUEST_ERROR);
+    @PostMapping("/list")
+    public RequestResult listTest(HttpServletRequest request, @RequestBody Map<String, Object> map) {
+        if (!map.containsKey("organizationId") || !map.containsKey("chapter") || !map.containsKey("testPaperType")) {
+            throw new ParamNotExistException(StatEnum.PARAM_IS_NOT_EXIST);
         }
         User user = (User) request.getSession().getAttribute("user");
-        return testService.getPracticeList(Integer.parseInt(organizationId), user.getUserId());
+        int organizationId = (int) map.get("organizationId");
+        int chapterId = (int) map.get("chapter");
+        int testPaperType = (int) map.get("testPaperType");
+        return testService.listTest(user.getUserId(), organizationId, chapterId, testPaperType);
     }
 
-    /***
-     * 获取我做过的练习列表
+    /**
+     * 获取已完成的试卷的结果
+     *
      * @param request request
-     * @return 练习卷
+     * @param map     map
+     *                testpaperId 试卷iD
+     * @return 试卷结果
      */
-    @RequestMapping(value = "/getMyPractice", method = RequestMethod.POST)
-    public RequestResult<List<TestPaper>> getMyPractice(HttpServletRequest request) {
+    @PostMapping("/done/detail")
+    public RequestResult getDoneTestDetail(HttpServletRequest request, @RequestBody Map<String, Integer> map) {
+        if (!map.containsKey("testpaperId")) {
+            throw new ParamNotExistException(StatEnum.PARAM_IS_NOT_EXIST);
+        }
         User user = (User) request.getSession().getAttribute("user");
-        return testService.getMyPracticeList(user.getUserId());
+        return testService.getDoneTestDetail(user.getUserId(), map.get("testpaperId"));
     }
 
-    /***
-     * 获取我做过的试卷列表
+    /**
+     * 获取详细的试题（完成一部分和还未做）
+     *
      * @param request request
-     * @return 试卷
+     * @param map     map
+     *                testpaperId 试卷ID
+     *                choice 对做一半的试卷的选择 1代表继续做，2代表重新做，如果是对于还未做的试卷，值为0
+     * @return 试卷结果
      */
-    @RequestMapping(value = "/getMyTest", method = RequestMethod.POST)
-    public RequestResult<List<TestPaper>> getMyTest(HttpServletRequest request) {
+    @PostMapping("/none/detail")
+    public RequestResult getNoneTestDetail(HttpServletRequest request, @RequestBody Map<String, Integer> map) {
+        if (!map.containsKey("testpaperId") || !map.containsKey("choice")) {
+            throw new ParamNotExistException(StatEnum.PARAM_IS_NOT_EXIST);
+        }
         User user = (User) request.getSession().getAttribute("user");
-        return testService.getMyTestList(user.getUserId());
-    }
-
-    /***
-     * 获取问题集合
-     * @param map map
-     *            testpaperId 试卷ID
-     * @return 试题
-     */
-    @RequestMapping(method = RequestMethod.POST)
-    public RequestResult<List<Question>> getQuestion(@RequestBody Map map) {
-        String testpaperId = (String) map.get("testpaperId");
-        return testService.getQuestion(Integer.parseInt(testpaperId));
+        return testService.getNoneTestDetail(user.getUserId(), map.get("testpaperId"), map.get("choice"));
     }
 
     /***
@@ -128,15 +116,13 @@ public class TestController {
      * @param studentPaper 学生答卷
      * @return 测试结果
      */
-    @RequestMapping(value = "/submit", method = RequestMethod.POST)
-    public RequestResult<StudentTestResult> submit(@RequestBody StudentPaper studentPaper, HttpServletRequest request) throws ExecutionException, InterruptedException {
+    @PostMapping("/submit")
+    public RequestResult submit(@RequestBody StudentPaper studentPaper) throws ExecutionException, InterruptedException {
         if (studentPaper == null) {
             return new RequestResult<>(StatEnum.REQUEST_ERROR);
         }
-        Future<RequestResult<StudentTestResult>> future = executor.submit(() -> testService.submit(studentPaper));
-        RequestResult<StudentTestResult> studentTestResult = future.get();
-        request.getSession().setAttribute("studentTestResult", studentTestResult.getData());
-        return studentTestResult;
+        Future<RequestResult<StudentTestResult>> future = executor.submit(() -> testService.submitTestPaper(studentPaper));
+        return future.get();
     }
 
     /***
@@ -146,33 +132,30 @@ public class TestController {
      * @return 详细的答题情况
      */
     @RequestMapping(value = "/detail", method = RequestMethod.POST)
-    public RequestResult<StudentAnswerAnalysis> detail(@RequestBody Map map, HttpServletRequest request) {
+    public RequestResult detail(@RequestBody Map map, HttpServletRequest request) {
+
         String questionId = (String) map.get("questionId");
         if (questionId == null || "".equals(questionId)) {
             return new RequestResult<>(StatEnum.REQUEST_ERROR);
         }
-
-        StudentTestResult studentTestResult = (StudentTestResult) request.getSession().getAttribute("studentTestResult");
-        List<StudentAnswerAnalysis> studentAnswerAnalysis = studentTestResult.getStudentAnswerAnalysis();
-
-        for (StudentAnswerAnalysis s : studentAnswerAnalysis) {
-            if (Integer.parseInt(questionId) == s.getQuestion().getQuestionId()) {
-                return new RequestResult<>(StatEnum.GET_TEST_SUCCESS, s);
-            }
-        }
-        return new RequestResult<>(StatEnum.GET_TEST_FAIL);
+        User user = (User) request.getSession().getAttribute("user");
+        return testService.getQuestionDetail(user.getUserId(), Integer.parseInt(questionId));
     }
 
-    /***
-     * 获取组织下的章节列表
+    /**
+     * 查看错题
+     *
      * @param map map
-     *            organizationId 组织ID
-     * @return 章节列表
+     *            chapterId 章节ID
+     * @return 错题
      */
-    @RequestMapping(value = "/chapter", method = RequestMethod.POST)
-    public RequestResult<List<Chapter>> getChapter(@RequestBody Map map) {
-        int organizationId = (int) map.get("organizationId");
-        return chapterService.getByOrganizationId(organizationId);
+    @PostMapping("/error/list")
+    public RequestResult listErrorQuestion(HttpServletRequest request, @RequestBody Map<String, Integer> map) {
+        if (!map.containsKey("chapterId")) {
+            throw new ParamNotExistException(StatEnum.PARAM_IS_NOT_EXIST);
+        }
+        User user = (User) request.getSession().getAttribute("user");
+        return testService.getWrongQuestionList(user.getUserId(), map.get("chapterId"));
     }
 
     /***

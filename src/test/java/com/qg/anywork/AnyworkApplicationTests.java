@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
@@ -68,13 +69,16 @@ public class AnyworkApplicationTests {
 //        }
 //    }
 
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
     @Test
-    public void getQuestion() throws Exception {
-        InputStream inputStream = new FileInputStream(new File("/home/ming/桌面/anywork/Anywork题库/第三章 最简单的C程序设计——顺序程序设计/3.2数据的表现形式及其运算.xlsx"));
-        List<Question> questions = ExcelUtil.getQuestionList(inputStream);
-        System.out.println(questions.size());
-        for (Question question : questions) {
-            System.out.println(question.getAnalysis());
-        }
+    public void testRedis() {
+        redisTemplate.opsForValue().set("stringValue", "String");
+        String stringValue = redisTemplate.opsForValue().get("stringValue");
+        System.out.println(stringValue);
+        redisTemplate.opsForValue().append("stringValue", " hello");
+        System.out.println(redisTemplate.opsForValue().get("stringValue"));
+        System.out.println(redisTemplate.delete("stringValue"));
     }
 }

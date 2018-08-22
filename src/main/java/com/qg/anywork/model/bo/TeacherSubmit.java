@@ -1,6 +1,5 @@
 package com.qg.anywork.model.bo;
 
-import com.qg.anywork.model.bo.TeacherJudge;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

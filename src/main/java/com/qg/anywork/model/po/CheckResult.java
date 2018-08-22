@@ -1,5 +1,6 @@
 package com.qg.anywork.model.po;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,6 +10,7 @@ import java.io.Serializable;
  * @author ming
  */
 @Data
+@Builder
 @NoArgsConstructor
 public class CheckResult implements Serializable {
 

@@ -49,7 +49,7 @@ public class TestPaper implements Serializable {
     private Date endingTime;
 
     /**
-     * 章节id，为练习卷添加章节  -1 没做过 0 做过
+     * 章节id
      */
     private int chapterId;
 
