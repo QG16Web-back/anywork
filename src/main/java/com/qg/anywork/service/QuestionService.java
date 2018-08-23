@@ -16,6 +16,13 @@ import java.util.List;
 public interface QuestionService {
 
     /**
+     * 通过excel文件读取问题列表
+     * @param input
+     * @return
+     */
+    List<Question> getQuestionList(InputStream input);
+
+    /**
      * 教师上传试卷并读取文件
      *
      * @param input  文件输入流
