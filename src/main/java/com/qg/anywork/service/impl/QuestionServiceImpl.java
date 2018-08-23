@@ -38,6 +38,17 @@ public class QuestionServiceImpl implements QuestionService {
     @Autowired
     private TestDao testDao;
 
+    @Override
+    public List<Question> getQuestionList(InputStream input) {
+
+        List<Question> list;
+        try {
+            list = ExcelUtil.getQuestionList(input);
+        } catch (Exception e) {
+            throw new ExcelReadException(StatEnum.FILE_EXPORT_FAIL);
+        }
+        return list;
+    }
 
     @Override
     public RequestResult<List<Question>> addQuestionList(InputStream input, int userId) {

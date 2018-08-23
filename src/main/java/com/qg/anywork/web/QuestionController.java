@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +43,79 @@ public class QuestionController {
 
     public static void main(String[] args) {
         System.out.println(DateUtil.longToDate(1503077978826L));
+    }
+
+
+    @PostMapping("/release")
+    public RequestResult addOrganization(@RequestPart("file") MultipartFile file,
+                                         @RequestParam("testpaperTitle") String testpaperTitle,
+                                         @RequestParam("chapterId") Integer chapterId,
+                                         @RequestParam("createTime") Long createTime,
+                                         @RequestParam("endingTime") Long endingTime,
+                                         @RequestParam("testpaperType") Integer testpaperType,
+                                         @RequestParam("organizationId") Integer organizationId,
+                                         HttpServletRequest request) throws IOException {
+        List<Question> questionList=new ArrayList<>();
+        if (null != file && !file.isEmpty()) {
+            String filename = file.getOriginalFilename();
+            assert filename != null;
+            if (filename.endsWith(".xlsx") || filename.endsWith(".xls")) {
+                questionList = questionService.getQuestionList(file.getInputStream());
+            }
+        }else {
+            return new RequestResult<>(0, "excel文件为空");
+        }
+        if (testpaperTitle == null || "".equals(testpaperTitle)) {
+            return new RequestResult<>(0, "试卷标题为空");
+        }
+        if (chapterId == null) {
+            return new RequestResult<>(0, "章节号为空");
+        }
+        if (createTime == null) {
+            return new RequestResult(0, "开始时间为空");
+        }
+        if (endingTime == null) {
+            return new RequestResult<>(0, "结束时间为空");
+        }
+        if (testpaperType == null) {
+            return new RequestResult(0, "试卷类型为空");
+        }
+        if (organizationId == null) {
+            return new RequestResult(0, "组组id为空");
+        }
+        User user = (User) request.getSession().getAttribute("user");
+        if (user.getMark() == 0) {
+            throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
+        }
+        int testpaperId = 0;
+        try {
+            TestPaper testpaper = new TestPaper();
+            testpaper.setAuthorId(user.getUserId());
+            testpaper.setOrganizationId(organizationId);
+            testpaper.setTestpaperTitle(testpaperTitle);
+            testpaper.setChapterId(chapterId);
+            testpaper.setCreateTime(DateUtil.longToDate(createTime));
+            testpaper.setEndingTime(DateUtil.longToDate(endingTime));
+            testpaper.setTestpaperType(testpaperType);
+            //将试卷插入数据库
+            testService.addTestpaper(testpaper);
+            // 获得试卷ID
+            testpaperId = testpaper.getTestpaperId();
+            // 插入数据库并获得总分
+            int socre = questionService.addTestpaper(user.getUserId(), testpaperId, questionList);
+            if (testService.updateTextpaper(testpaperId, socre)) {
+                //更新总分
+                return new RequestResult<>(StatEnum.TEST_RELEASE_SUCESS, testpaperId);
+            }
+                return new RequestResult<>(StatEnum.TEST_RELEASE_FAIL, 0);
+            } catch (Exception e) {
+                log.warn("未知异常: ", e);
+                if (testpaperId != 0) {
+                    //删除错误插
+                    questionService.deleteTestpaper(testpaperId);
+                }
+                return new RequestResult<>(StatEnum.DEFAULT_WRONG, 0);
+            }
     }
 
     /**
