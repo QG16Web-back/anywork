@@ -1,10 +1,11 @@
 package com.qg.anywork.web;
 
 import com.qg.anywork.enums.StatEnum;
+import com.qg.anywork.exception.common.ParamNotExistException;
 import com.qg.anywork.exception.testpaper.NotPowerException;
 import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.model.po.Question;
-import com.qg.anywork.model.po.Testpaper;
+import com.qg.anywork.model.po.TestPaper;
 import com.qg.anywork.model.po.User;
 import com.qg.anywork.service.QuestionService;
 import com.qg.anywork.service.TestService;
@@ -21,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +41,83 @@ public class QuestionController {
 
     @Autowired
     private TestService testService;
+
+    public static void main(String[] args) {
+        System.out.println(DateUtil.longToDate(1503077978826L));
+    }
+
+
+    @PostMapping("/release")
+    public RequestResult addOrganization(@RequestPart("file") MultipartFile file,
+                                         @RequestParam("testpaperTitle") String testpaperTitle,
+                                         @RequestParam("chapterId") Integer chapterId,
+                                         @RequestParam("createTime") Long createTime,
+                                         @RequestParam("endingTime") Long endingTime,
+                                         @RequestParam("testpaperType") Integer testpaperType,
+                                         @RequestParam("organizationId") Integer organizationId,
+                                         HttpServletRequest request) throws IOException {
+        List<Question> questionList=new ArrayList<>();
+        if (null != file && !file.isEmpty()) {
+            String filename = file.getOriginalFilename();
+            assert filename != null;
+            if (filename.endsWith(".xlsx") || filename.endsWith(".xls")) {
+                questionList = questionService.getQuestionList(file.getInputStream());
+            }
+        }else {
+            return new RequestResult<>(0, "excel文件为空");
+        }
+        if (testpaperTitle == null || "".equals(testpaperTitle)) {
+            return new RequestResult<>(0, "试卷标题为空");
+        }
+        if (chapterId == null) {
+            return new RequestResult<>(0, "章节号为空");
+        }
+        if (createTime == null) {
+            return new RequestResult(0, "开始时间为空");
+        }
+        if (endingTime == null) {
+            return new RequestResult<>(0, "结束时间为空");
+        }
+        if (testpaperType == null) {
+            return new RequestResult(0, "试卷类型为空");
+        }
+        if (organizationId == null) {
+            return new RequestResult(0, "组组id为空");
+        }
+        User user = (User) request.getSession().getAttribute("user");
+        if (user.getMark() == 0) {
+            throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
+        }
+        int testpaperId = 0;
+        try {
+            TestPaper testpaper = new TestPaper();
+            testpaper.setAuthorId(user.getUserId());
+            testpaper.setOrganizationId(organizationId);
+            testpaper.setTestpaperTitle(testpaperTitle);
+            testpaper.setChapterId(chapterId);
+            testpaper.setCreateTime(DateUtil.longToDate(createTime));
+            testpaper.setEndingTime(DateUtil.longToDate(endingTime));
+            testpaper.setTestpaperType(testpaperType);
+            //将试卷插入数据库
+            testService.addTestpaper(testpaper);
+            // 获得试卷ID
+            testpaperId = testpaper.getTestpaperId();
+            // 插入数据库并获得总分
+            int socre = questionService.addTestpaper(user.getUserId(), testpaperId, questionList);
+            if (testService.updateTextpaper(testpaperId, socre)) {
+                //更新总分
+                return new RequestResult<>(StatEnum.TEST_RELEASE_SUCESS, testpaperId);
+            }
+                return new RequestResult<>(StatEnum.TEST_RELEASE_FAIL, 0);
+            } catch (Exception e) {
+                log.warn("未知异常: ", e);
+                if (testpaperId != 0) {
+                    //删除错误插
+                    questionService.deleteTestpaper(testpaperId);
+                }
+                return new RequestResult<>(StatEnum.DEFAULT_WRONG, 0);
+            }
+    }
 
     /**
      * 用户上传并预览试卷/练习
@@ -72,24 +151,27 @@ public class QuestionController {
     /**
      * 用户发布已经上传的试卷
      *
-     * @param request
-     * @param map
-     * @param organizationId
-     * @return
+     * @param request        request
+     * @param map            map
+     *                       testpaperTitle 试卷标题
+     *                       chapterId 章节ID
+     *                       createTime  开始时间
+     *                       endingTime  结束时间
+     *                       testpaperType 试卷类型
+     * @param organizationId 组织ID
+     * @return request result
      */
-    @RequestMapping(value = "/{organizationId}/release", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    @PostMapping("/{organizationId}/release")
     @ResponseBody
     public RequestResult<Integer> releaseTestpaper(HttpServletRequest request, @RequestBody Map map, @PathVariable int organizationId) {
         User user = (User) request.getSession().getAttribute("user");
         int testpaperId = 0;
         try {
-            //没有权限处理
-            // TODO: 2017/7/17 可以检查一下权限
             if (user.getMark() != 1) {
                 return new RequestResult<>(StatEnum.NOT_HAVE_POWER, 0);
             }
 
-            Testpaper testpaper = new Testpaper();
+            TestPaper testpaper = new TestPaper();
             testpaper.setAuthorId(user.getUserId());
             testpaper.setOrganizationId(organizationId);
             testpaper.setTestpaperTitle((String) map.get("testpaperTitle"));
@@ -99,10 +181,10 @@ public class QuestionController {
             testpaper.setTestpaperType((int) map.get("testpaperType"));
             //将试卷插入数据库
             testService.addTestpaper(testpaper);
-            //获得试卷ID
+            // 获得试卷ID
             testpaperId = testpaper.getTestpaperId();
-            //插入数据库并获得总分
-            int socre = questionService.addTestpaper(user.getUserId(), testpaperId);
+            // 插入数据库并获得总分
+            int socre = questionService.addTestPaper(user.getUserId(), testpaperId);
             if (testService.updateTextpaper(testpaperId, socre)) {
                 //更新总分
                 return new RequestResult<>(StatEnum.TEST_RELEASE_SUCESS, testpaperId);
@@ -128,7 +210,7 @@ public class QuestionController {
      */
     @RequestMapping(value = "/{organizationId}/submit", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public RequestResult<Integer> submitTestpaper(HttpServletRequest request, @RequestBody Testpaper testpaper,
+    public RequestResult<Integer> submitTestpaper(HttpServletRequest request, @RequestBody TestPaper testpaper,
                                                   @PathVariable int organizationId) {
         User user = (User) request.getSession().getAttribute("user");
         int testpaperId = 0;
@@ -177,7 +259,7 @@ public class QuestionController {
         if (user == null) {
             return new RequestResult<>(StatEnum.USER_NOT_LOGIN, 0);
         }
-        Testpaper testpaper = questionService.findTestpaperById(testpaperId);
+        TestPaper testpaper = questionService.findTestpaperById(testpaperId);
         //权限验证
         if (user.getMark() != 1 || user.getUserId() != testpaper.getAuthorId()) {
             throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
@@ -186,7 +268,6 @@ public class QuestionController {
         questionService.exportExcel(testpaperId, user.getUserId(), out);
         return new RequestResult<>(StatEnum.FILE_EXPORT_SUCCESS, testpaperId);
     }
-
 
     /**
      * 老师删除试卷
@@ -213,11 +294,41 @@ public class QuestionController {
      * @param testpaperId 试卷Id
      */
     private void deleteTestpaper(int testpaperId, User user) {
-        Testpaper testpaper = questionService.findTestpaperById(testpaperId);
+        TestPaper testpaper = questionService.findTestpaperById(testpaperId);
         // 权限验证
         if (user.getMark() != 1 || user.getUserId() != testpaper.getAuthorId()) {
             throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
         }
         questionService.deleteTestpaper(testpaperId);
+    }
+
+    /**
+     * 收藏题目
+     */
+    @PostMapping("/collect")
+    public RequestResult collectQuestion(HttpServletRequest request, @RequestBody Map<String, Integer> map) {
+        if (!map.containsKey("questionId")) {
+            throw new ParamNotExistException(StatEnum.PARAM_IS_NOT_EXIST);
+        }
+        User user = (User) request.getSession().getAttribute("user");
+        return questionService.collectQuestion(user.getUserId(), map.get("questionId"));
+    }
+
+    /**
+     * 删除已收藏的题目
+     */
+    @PostMapping("/collect/delete")
+    public RequestResult deleteCollectionQuestion(HttpServletRequest request, @RequestBody Map<String, Integer> map) {
+        if (!map.containsKey("questionId")) {
+            throw new ParamNotExistException(StatEnum.PARAM_IS_NOT_EXIST);
+        }
+        User user = (User) request.getSession().getAttribute("user");
+        return questionService.deleteCollection(user.getUserId(), map.get("questionId"));
+    }
+
+    @PostMapping("/collect/list")
+    public RequestResult listCollectionQuestion(HttpServletRequest request) {
+        User user = (User) request.getSession().getAttribute("user");
+        return questionService.listCollectionQuestion(user.getUserId());
     }
 }

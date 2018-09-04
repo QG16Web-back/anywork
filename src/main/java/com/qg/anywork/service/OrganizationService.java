@@ -4,6 +4,7 @@ import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.model.po.Organization;
 import com.qg.anywork.model.po.User;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -46,7 +47,7 @@ public interface OrganizationService {
      * @param userId 用户ID
      * @return request result
      */
-    RequestResult<Organization> join(int organizationId, long token, int userId);
+    RequestResult<Organization> join(int organizationId, String  token, int userId);
 
     /***
      * 获取我的组织列表
@@ -66,6 +67,7 @@ public interface OrganizationService {
 
     /***
      * 创建组织
+     *
      * @param organization 组织
      * @return request result
      */
@@ -84,7 +86,7 @@ public interface OrganizationService {
      * @param userId 用户ID
      * @return request result
      */
-    RequestResult deleteOrganization(int organizationId, int userId);
+    RequestResult deleteOrganization(int organizationId, int userId) throws IOException;
 
     /***
      * 获取我创建过的组织列表

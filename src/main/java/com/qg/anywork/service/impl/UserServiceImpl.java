@@ -1,7 +1,6 @@
 package com.qg.anywork.service.impl;
 
 import com.qg.anywork.dao.RedisDao;
-import com.qg.anywork.dao.UserDao;
 import com.qg.anywork.domain.StudentRepository;
 import com.qg.anywork.domain.UserRepository;
 import com.qg.anywork.enums.StatEnum;
@@ -12,6 +11,7 @@ import com.qg.anywork.model.po.User;
 import com.qg.anywork.service.UserService;
 import com.qg.anywork.util.Encryption;
 import com.qg.anywork.util.ExcelUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -28,12 +28,10 @@ import java.util.List;
  * @author ming
  * I'm the one to ignite the darkened skies.
  */
+@Slf4j
 @Service
 @Scope("prototype")
 public class UserServiceImpl implements UserService {
-
-    @Autowired
-    private UserDao userDao;
 
     @Autowired
     private RedisDao redisDao;
@@ -68,12 +66,12 @@ public class UserServiceImpl implements UserService {
                 !user.getPassword().matches("\\w{6,15}")) {
             throw new FormatterFaultException(StatEnum.REGISTER_FORMAT_FAULT);
         } else {
-            if (null != userDao.selectByEmail(user.getEmail())) {
+            if (null != userRepository.findByEmail(user.getEmail())) {
                 throw new UserException(StatEnum.REGISTER_ALREADY_EXIST);
             }
             //格式正确，加密密码并存入数据库
             user.setPassword(Encryption.getMD5(user.getPassword()));
-            userDao.insertUser(user);
+            userRepository.save(user);
             int userId = user.getUserId();
             if (userId <= 0) {
                 throw new UserException(StatEnum.DEFAULT_WRONG);
@@ -100,24 +98,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public RequestResult<User> updateUser(User user) {
+    public RequestResult<User> updateUser(User user, String email, String phone) {
         if (user == null) {
             throw new FormatterFaultException(StatEnum.REGISTER_EMPTY_USER);
         }
-        if (!user.getEmail().matches("\\w+@\\w+(\\.\\w{2,3})*\\.\\w{2,3}")) {
+        if (email.matches("\\w+@\\w+(\\.\\w{2,3})*\\.\\w{2,3}")) {
             throw new FormatterFaultException(StatEnum.EMAIL_FORMAT_ERROR);
         }
-        if (!"".equals(user.getPhone()) || user.getPhone() != null) {
-            if (!user.getPhone().matches("^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\\d{8}$")) {
+        user.setEmail(email);
+        if (!"".equals(phone)) {
+            if (!phone.matches("^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\\d{8}$")) {
                 throw new FormatterFaultException(StatEnum.PHONE_FORMAT_ERROR);
             }
+            user.setPhone(phone);
         }
-        //置空密码
-        user.setPassword("");
-        userDao.updateUser(user);
-        //查找新的用户实体
-        User realUser = userDao.selectById(user.getUserId());
-        user.setPassword("");
+        int flag = userRepository.updateEmailAndPhoneOrderByUserId(user.getEmail(), user.getPhone(), user.getUserId());
+        if (flag == 0) {
+            throw new UserException(StatEnum.DEFAULT_WRONG);
+        }
+        log.info(user.getUserName() + "修改了个人信息: " + user.getPhone() + "  " + user.getEmail());
+        // 查找新的用户实体
+        User realUser = userRepository.findByUserId(user.getUserId());
+        realUser.setPassword("");
         return new RequestResult<>(StatEnum.INFORMATION_CHANGE_SUCCESS, realUser);
     }
 
@@ -130,8 +132,8 @@ public class UserServiceImpl implements UserService {
         if (!newPassword.matches("\\w{6,15}")) {
             throw new PasswordException(StatEnum.NEW_PASSWORD_FORMAT_ERROR);
         } else {
-            userRepository.updatePasswordByUserId(userId, Encryption.getMD5(newPassword));
-            return true;
+            int flag = userRepository.updatePasswordByUserId(userId, Encryption.getMD5(newPassword));
+            return flag == 1;
         }
     }
 
@@ -157,7 +159,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public RequestResult<User> findUserInfo(int userId) {
-        User user = userDao.selectById(userId);
+        User user = userRepository.findByUserId(userId);
         if (null == user) {
             throw new UserNotExitException(StatEnum.LOGIN_NOT_EXIT_USER);
         }

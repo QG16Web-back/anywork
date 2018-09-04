@@ -41,10 +41,12 @@ public interface UserService {
     /**
      * 更新用户信息
      *
-     * @param user user
+     * @param user  user
+     * @param email 邮箱
+     * @param phone 手机号码
      * @return 用户信息
      */
-    RequestResult<User> updateUser(User user);
+    RequestResult<User> updateUser(User user, String email, String phone);
 
     /**
      * 获得用户个人信息

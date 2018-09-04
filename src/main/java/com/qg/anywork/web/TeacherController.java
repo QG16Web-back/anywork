@@ -1,6 +1,6 @@
 package com.qg.anywork.web;
 
-import com.qg.anywork.model.bo.StudentTestResult;
+import com.qg.anywork.model.po.StudentTestResult;
 import com.qg.anywork.model.bo.TeacherSubmit;
 import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.model.po.CheckResult;

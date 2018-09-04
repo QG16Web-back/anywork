@@ -5,6 +5,7 @@ import com.qg.anywork.domain.UserRepository;
 import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.common.ParamEmptyException;
 import com.qg.anywork.exception.common.ParamNotExistException;
+import com.qg.anywork.exception.user.PasswordException;
 import com.qg.anywork.exception.user.UserException;
 import com.qg.anywork.exception.user.UserNotLoginException;
 import com.qg.anywork.exception.user.ValcodeWrongException;
@@ -22,13 +23,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -170,6 +167,8 @@ public class UserController {
         boolean flag = userService.modifyPassword(user.getUserId(), oldPassword, newPassword);
         if (flag) {
             user.setPassword(newPassword);
+        } else {
+            throw new PasswordException(StatEnum.PASSWORD_RESET_FAIL);
         }
         return new RequestResult<>(StatEnum.SUBMIT_TEST_SUCCESS, user);
     }
@@ -184,13 +183,10 @@ public class UserController {
     @RequestMapping(value = "/update", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public RequestResult<User> updateUser(HttpServletRequest request, @RequestBody Map<String, String> map) {
         User user = (User) request.getSession().getAttribute("user");
-        user.setPhone(map.get("phone"));
-
-        if (map.get("email") != null && !"".equals(map.get("email"))) {
-            user.setEmail(map.get("email"));
+        if (map.get("email") == null && "".equals(map.get("email"))) {
+            throw new ParamEmptyException(StatEnum.PARAM_IS_EMPTY);
         }
-        // TODO 2018/08/11 数据校验
-        RequestResult<User> result = userService.updateUser(user);
+        RequestResult<User> result = userService.updateUser(user, map.get("email"), map.get("phone"));
         request.getSession().setAttribute("user", result.getData());
         return result;
     }
@@ -281,42 +277,5 @@ public class UserController {
             log.info("用户验证码通过验证！");
         }
         return true;
-    }
-
-    /**
-     * 将用户信息存到cookie
-     *
-     * @param response response
-     * @param user     user
-     * @throws UnsupportedEncodingException UnsupportedEncodingException
-     */
-    private void setCookie(HttpServletResponse response, User user) throws UnsupportedEncodingException {
-        Cookie userNameCookie = new Cookie("userName", URLEncoder.encode(user.getUserName(), "utf-8"));
-        userNameCookie.setMaxAge(60 * 60 * 24);
-        userNameCookie.setPath("/");
-        response.addCookie(userNameCookie);
-        Cookie emailCookie = new Cookie("email", user.getEmail());
-        emailCookie.setMaxAge(60 * 60 * 24);
-        emailCookie.setPath("/");
-        response.addCookie(emailCookie);
-        Cookie phoneCookie = new Cookie("phone", user.getPhone());
-        phoneCookie.setMaxAge(60 * 60 * 24);
-        phoneCookie.setPath("/");
-        response.addCookie(phoneCookie);
-    }
-
-    /**
-     * 清空cookie
-     *
-     * @param request  request
-     * @param response response
-     */
-    private void clearCookie(HttpServletRequest request, HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            cookie.setMaxAge(0);
-            cookie.setPath("/");
-            response.addCookie(cookie);
-        }
     }
 }

@@ -23,6 +23,7 @@
             <result property="socre" column="socre"/>
             <result property="testpaperId" column="testpaper_id"/>
             <result property="other" column="other"/>
+            <result property="analysis" column="analysis"/>
         </association>
     </resultMap>
 
@@ -33,7 +34,7 @@
         <result property="object" column="object"/>
         <result property="subject" column="subject"/>
 
-        <association property="testpaper" javaType="com.qg.anywork.model.po.Testpaper">
+        <association property="testpaper" javaType="com.qg.anywork.model.po.TestPaper">
             <id property="testpaperId" column="testpaper_id"/>
             <result property="testpaperTitle" column="testpaper_title"/>
             <result property="createTime" column="create_time"/>
@@ -49,7 +50,7 @@
         <result property="object" column="socre"/>
         <result property="subject" column="subject"/>
 
-        <association property="testpaper" javaType="com.qg.anywork.model.po.Testpaper">
+        <association property="testpaper" javaType="com.qg.anywork.model.po.TestPaper">
             <id property="testpaperId" column="testpaper_id"/>
             <result property="testpaperTitle" column="testpaper_title"/>
             <result property="createTime" column="create_time"/>
@@ -59,9 +60,9 @@
     </resultMap>
 
     <!--目的：为Dao接口方法提供SQL语句-->
-    <select id="getTestByOrganizationId" resultType="com.qg.anywork.model.po.Testpaper">
+    <select id="getTestByOrganizationId" resultType="com.qg.anywork.model.po.TestPaper">
         SELECT *
-        FROM testpaper
+        FROM test_paper
         WHERE organization_id = #{organizationId}
           AND testpaper_type = 1
     </select>
@@ -79,7 +80,7 @@
                t.testpaper_score
         FROM test_result c,
              user u,
-             testpaper t
+             test_paper t
         WHERE c.student_id = #{userId}
           AND c.student_id = u.user_id
           AND t.organization_id = #{organizationId}
@@ -88,7 +89,7 @@
     </select>
 
 
-    <select id="getPracticeByOrganizationId" resultType="com.qg.anywork.model.po.Testpaper">
+    <select id="getPracticeByOrganizationId" resultType="com.qg.anywork.model.po.TestPaper">
         SELECT t.testpaper_id,
                t.testpaper_title,
                t.author_id,
@@ -99,7 +100,7 @@
                t.testpaper_score,
                t.testpaper_type,
                t.organization_id
-        FROM testpaper t,
+        FROM test_paper t,
              chapter c
         WHERE t.organization_id = #{organizationId}
           AND t.testpaper_type = 0
@@ -109,19 +110,19 @@
     <select id="isSubmit" resultType="int">
         SELECT count(*)
         FROM test_result
-        WHERE test_paper_id = #{testpaperId}
+        WHERE test_paper_id = #{testPaperId}
           AND student_id = #{userId};
     </select>
 
-    <select id="getPracticeByOCId" resultType="com.qg.anywork.model.po.Testpaper">
+    <select id="getPracticeByOCId" resultType="com.qg.anywork.model.po.TestPaper">
         SELECT *
-        FROM testpaper
+        FROM test_paper
         WHERE organization_id = #{organizationId}
           AND chapter_id = #{chapterId}
           AND testpaper_type = 0;
     </select>
 
-    <select id="getMyPractice" resultType="com.qg.anywork.model.po.Testpaper">
+    <select id="getMyPractice" resultType="com.qg.anywork.model.po.TestPaper">
         SELECT t.testpaper_id,
                t.testpaper_title,
                t.author_id,
@@ -132,7 +133,7 @@
                t.testpaper_score,
                t.testpaper_type,
                t.organization_id
-        FROM testpaper t,
+        FROM test_paper t,
              test_result r,
              chapter c
         WHERE t.testpaper_id = r.test_paper_id
@@ -141,7 +142,7 @@
           AND c.chapter_id = t.chapter_id;
     </select>
 
-    <select id="getMyTest" resultType="com.qg.anywork.model.po.Testpaper">
+    <select id="getMyTest" resultType="com.qg.anywork.model.po.TestPaper">
         SELECT t.testpaper_id,
                t.testpaper_title,
                t.author_id,
@@ -152,7 +153,7 @@
                t.testpaper_score,
                t.testpaper_type,
                t.organization_id
-        FROM testpaper t,
+        FROM test_paper t,
              test_result r,
              chapter c
         WHERE t.testpaper_id = r.test_paper_id
@@ -161,16 +162,16 @@
           AND c.chapter_id = t.chapter_id;
     </select>
 
-    <select id="getTestPaperByTestpaperId" resultType="com.qg.anywork.model.po.Testpaper">
+    <select id="getTestPaperByTestpaperId" resultType="com.qg.anywork.model.po.TestPaper">
         SELECT *
-        FROM testpaper
+        FROM test_paper
         WHERE testpaper_id = #{testpaperId};
     </select>
 
     <select id="getQuestionByTestpaperId" resultType="com.qg.anywork.model.po.Question">
         SELECT *
         FROM question
-        WHERE testpaper_id = #{testpaperId}
+        WHERE testpaper_id = #{testPaperId}
     </select>
 
     <select id="getQuestionById" resultType="com.qg.anywork.model.po.Question">
@@ -179,12 +180,13 @@
         WHERE question_id = #{questionId}
     </select>
 
-    <insert id="addTestResult" parameterType="com.qg.anywork.model.bo.StudentTestResult" keyProperty="studentTestResultId">
+    <insert id="addTestResult" parameterType="com.qg.anywork.model.po.StudentTestResult"
+            keyProperty="studentTestResultId">
         INSERT ignore INTO test_result (student_id, test_paper_id, socre)
         VALUE (#{testResult.studentId}, #{testResult.testpaperId}, #{testResult.socre})
     </insert>
 
-    <update id="updateTestResult" parameterType="com.qg.anywork.model.bo.StudentTestResult">
+    <update id="updateTestResult" parameterType="com.qg.anywork.model.po.StudentTestResult">
         UPDATE test_result
         <set>
             <if test="testResult.socre != null">
@@ -221,15 +223,15 @@
         #{studentAnswerAnalysis.question.questionId}
     </update>
 
-    <insert id="addTestpaper" parameterType="com.qg.anywork.model.po.Testpaper" useGeneratedKeys="true"
+    <insert id="addTestpaper" parameterType="com.qg.anywork.model.po.TestPaper" useGeneratedKeys="true"
             keyProperty="testpaper.testpaperId">
-        INSERT INTO testpaper (testpaper_title,
-                               author_id,
-                               create_time,
-                               ending_time,
-                               testpaper_type,
-                               organization_id,
-                               chapter_id)
+        INSERT INTO test_paper (testpaper_title,
+                                author_id,
+                                create_time,
+                                ending_time,
+                                testpaper_type,
+                                organization_id,
+                                chapter_id)
         VALUES (#{testpaper.testpaperTitle},
                 #{testpaper.authorId},
                 #{testpaper.createTime},
@@ -240,12 +242,12 @@
     </insert>
 
     <update id="updateSocreOfTestpaper">
-        UPDATE testpaper
+        UPDATE test_paper
         SET testpaper_score = #{score}
         WHERE testpaper_id = #{testpaperId}
     </update>
 
-    <select id="getTestResult" resultType="com.qg.anywork.model.bo.StudentTestResult">
+    <select id="getTestResult" resultType="com.qg.anywork.model.po.StudentTestResult">
         SELECT *
         FROM test_result
         WHERE test_paper_id = #{testpaperId}
@@ -257,7 +259,7 @@
         FROM student_answer s,
              question q
         WHERE s.student_id = #{userId}
-          AND s.question_id in (SELECT q.question_id FROM question WHERE q.testpaper_id = #{testpaperId})
+          AND s.question_id in (SELECT q.question_id FROM question WHERE q.testpaper_id = #{testPaperId})
     </select>
 
     <insert id="addCheckResult" parameterType="com.qg.anywork.model.po.CheckResult">
@@ -267,6 +269,14 @@
                 #{checkResult.subject},
                 #{checkResult.testpaper.testpaperId},
                 #{checkResult.studentId})
+    </insert>
+
+    <insert id="insertWrongQuestions">
+        INSERT INTO wrong_question(question_id, chapter_id, student_answer, student_id)
+        VALUES
+        <foreach collection="wrongQuestions" item="wrongQuestion" index="index" separator=",">
+            (#{wrongQuestion.question.questionId}, #{wrongQuestion.chapterId}, #{wrongQuestion.studentAnswer}, #{wrongQuestion.studentId})
+        </foreach>
     </insert>
 
     <select id="getCheckResultByUser" resultMap="checkResult">
@@ -282,7 +292,7 @@
                t.testpaper_score
         FROM check_result c,
              user u,
-             testpaper t
+             test_paper t
         WHERE c.student_id = #{userId}
           AND c.student_id = u.user_id
           AND t.organization_id = #{organizationId}
@@ -302,13 +312,12 @@
                t.testpaper_score
         FROM check_result c,
              user u,
-             testpaper t
+             test_paper t
         WHERE c.testpaper_id = #{testpaperId}
           AND c.student_id = u.user_id
           AND t.organization_id = #{organizationId}
           AND c.testpaper_id = t.testpaper_id
     </select>
-
     <update id="updateStudentAnswerSocre">
         UPDATE student_answer
         SET socre = #{socre}
@@ -327,8 +336,41 @@
 
     <delete id="deleteTestpaper">
         DELETE
-        FROM testpaper
+        FROM test_paper
         WHERE testpaper_id = #{testpaperId}
     </delete>
+
+    <select id="findByOrganizationIdAndChapterIdAndTestPaperType"
+            resultType="com.qg.anywork.model.po.TestPaper">
+        SELECT *
+        from test_paper
+        where organization_id = #{organizationId}
+          and chapter_id = #{chapterId}
+          and testpaper_type = #{testPaperType}
+        order by create_time
+    </select>
+
+    <select id="findTestResultByTestPaperIdAndUserIdAndOrganizationId"
+            resultType="com.qg.anywork.model.po.StudentTestResult">
+        SELECT *
+        FROM test_result
+        WHERE test_paper_id = #{testPaperId}
+          AND student_id = #{userId}
+          AND organization_id = #{organizationId}
+    </select>
+
+    <select id="countQuestion" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        from question
+        where testpaper_id = #{testPaperId}
+    </select>
+
+    <select id="getStudentAnswerAnalysis" resultType="com.qg.anywork.model.po.StudentAnswerAnalysis">
+        SELECT s.student_id, s.student_answer, s.is_true, s.socre as getsocre, q.*
+        FROM student_answer s,
+             question q
+        WHERE s.student_id = #{userId}
+          AND s.question_id = #{questionId}
+    </select>
 
 </mapper>

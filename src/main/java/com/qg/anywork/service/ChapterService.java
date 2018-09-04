@@ -13,6 +13,7 @@ public interface ChapterService {
 
     /***
      * 根据组织ID获取章节列表
+     *
      * @param organizationId 组织ID
      * @return 章节列表
      */

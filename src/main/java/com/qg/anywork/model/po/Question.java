@@ -70,4 +70,9 @@ public class Question  implements Serializable {
      * 填空题个数
      */
     private int other;
+
+    /**
+     * 解析
+     */
+    private String analysis;
 }

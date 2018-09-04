@@ -1,13 +1,13 @@
 package com.qg.anywork.util;
 
-import com.qg.anywork.model.bo.Message;
-import com.qg.anywork.model.po.Testpaper;
+import com.qg.anywork.model.po.Message;
+import com.qg.anywork.model.po.TestPaper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by FunriLy on 2017/10/4.
+ * @author FunriLy
+ * @date 2017/10/4
  * From small beginnings comes great things.
  */
 public class MessageUtil {
@@ -19,18 +19,19 @@ public class MessageUtil {
      * @param testpaper
      * @return
      */
-    public static List<Message> getTestPaperMessageList(List<Integer> useridList, Testpaper testpaper) {
-        List<Message> messageList = new ArrayList<>();
-        int authorId = testpaper.getAuthorId();
-        String typeName = testpaper.getTestpaperType() == 0 ? "练习" : "试卷";
-        String content = authorId + "发布了一套" + typeName
-                + ":《" + testpaper.getTestpaperTitle() + "》，结束时间为："
-                + DateUtil.format(testpaper.getEndingTime()) + ", 请尽快完成！";
-        for (int userid : useridList) {
-            Message message = new Message(authorId, userid, content, 1);
-            messageList.add(message);
-        }
-        return messageList;
+    public static List<Message> getTestPaperMessageList(List<Integer> useridList, TestPaper testpaper) {
+//        List<Message> messageList = new ArrayList<>();
+//        int authorId = testpaper.getAuthorId();
+//        String typeName = testpaper.getTestpaperType() == 0 ? "练习" : "试卷";
+//        String content = authorId + "发布了一套" + typeName
+//                + ":《" + testpaper.getTestpaperTitle() + "》，结束时间为："
+//                + DateUtil.format(testpaper.getEndingTime()) + ", 请尽快完成！";
+//        for (int userid : useridList) {
+//            Message message = new Message(authorId, userid, content, 1);
+//            messageList.add(message);
+//        }
+//        return messageList;
+        return null;
     }
 
     /**

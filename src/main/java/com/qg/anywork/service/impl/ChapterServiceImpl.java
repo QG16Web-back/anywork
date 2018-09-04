@@ -39,7 +39,7 @@ public class ChapterServiceImpl implements ChapterService {
         if (organizationDao.getById(chapter.getOrganizationId()) == null) {
             throw new OrganizationException(StatEnum.ORGANIZATION_NOT_EXIST);
         }
-        if (chapter.getChapterName().length() > 10) {
+        if (chapter.getChapterName().length() > 32) {
             throw new OrganizationException(StatEnum.CHAPTER_TOO_LONG);
         }
         chapterDao.addChapter(chapter);
@@ -51,5 +51,4 @@ public class ChapterServiceImpl implements ChapterService {
         chapterDao.deleteChapter(chapterId);
         return new RequestResult(1, "删除成功");
     }
-
 }

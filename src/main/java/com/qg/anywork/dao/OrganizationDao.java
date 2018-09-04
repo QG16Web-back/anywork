@@ -70,7 +70,6 @@ public interface OrganizationDao {
      */
     int getOrganizationCount(@Param("organizationId") int organizationId);
 
-
     /**
      * 根据组织名称查找组织
      *
@@ -100,6 +99,14 @@ public interface OrganizationDao {
      */
     int deleteOrganization(@Param("organizationId") int organizationId);
 
+    /**
+     * 删除该组织对应的所有成功关系记录
+     *
+     * @param organizationId 组织ID
+     * @return int
+     */
+    int deleteOrganizationUserRelation(@Param("organizationId") int organizationId);
+
     /***
      * 查看我创建过的组织
      * @param userId userId
@@ -113,6 +120,4 @@ public interface OrganizationDao {
      * @return User　List
      */
     List<User> getOrganizationPeople(@Param("organizationId") int organizationId);
-
-
 }

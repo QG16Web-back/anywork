@@ -81,7 +81,11 @@ public enum StatEnum {
     TEST_IS_NOT_EXIT(0, "试卷/练习不存在"),
     EXAM_DID_NOT_START_YET(0, "考试还未开始"),
     THE_EXAM_IS_OVER(0, "考试已经结束"),
-    EXAM_CANNOT_BE_SUBMITTED_REPEATEDLY(0, "考试无法重复提交"),
+    TEST_TIME_IS_OVER(0, "该试卷的最晚提交时间已过"),
+    EXAM_CANNOT_BE_SUBMITTED_REPEATEDLY(0, "试卷无法重复提交"),
+    TEST_LIST_IS_NULL(0, "没有对应的试卷"),
+    GET_SUCCESS(1, "获取成功"),
+    WRONG_QUESTION_LIST_IS_NULL(0, "错题列表为空"),
 
     /**
      * 组织板块
@@ -96,7 +100,9 @@ public enum StatEnum {
     USER_HAS_JOINED_THE_ORGANIZATION(0, "用户已加入该组织"),
     USER_HAS_NOT_JOINED_THE_ORGANIZATION(0, "用户未加入该组织"),
     THE_TOKEN_IS_ERROR(0, "口令错误"),
+    TOKEN_IS_NULL(0, "口令为空"),
     INVALID_ORGANIZATION(0, "无效的组织"),
+    MY_ORGANIZATION_IS_NULL(0, "您还未创建组织"),
 
     /***
      * 做题模块
@@ -105,6 +111,10 @@ public enum StatEnum {
     GET_TEST_FAIL(0, "获取失败"),
     SUBMIT_TEST_SUCCESS(1, "提交成功"),
     SUBMIT_TEST_FAIL(0, "提交失败"),
+    SAVE_TEST_SUCCESS(1, "保存进度成功"),
+    COLLECT_SUCCESS(1, "收藏成功"),
+    DELETE_COLLECTION_SUCCESS(1, "删除收藏成功"),
+    COLLECTION_LIST_IS_NULL(0, "收藏列表为空"),
 
     /**
      * 邮件模块
@@ -126,7 +136,20 @@ public enum StatEnum {
      */
     REDIS_CACHE_NOT_FOUND(0, "未找到相应的缓存文件"),
 
-    DATA_LIST_IS_NULL(0, "数据列表为空");
+    DATA_LIST_IS_NULL(0, "数据列表为空"),
+
+
+    /**
+     * 公告模块
+     */
+    MESSAGE_PUBLISH_SUCCESS(1, "公告发布成功"),
+
+    LIST_MESSAGE_SUCCESS(1, "获取公告列表成功"),
+
+    NOT_SUCH_MESSAGE(0, "没有该公告"),
+
+    MESSAGE_LIST_IS_NULL(0, "公告列表为空");
+
 
     private int state;
     private String stateInfo;

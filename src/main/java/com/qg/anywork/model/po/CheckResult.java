@@ -1,5 +1,6 @@
 package com.qg.anywork.model.po;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -45,5 +46,5 @@ public class CheckResult implements Serializable {
     /**
      * 相应的试卷类
      */
-    Testpaper testpaper;
+    TestPaper testpaper;
 }

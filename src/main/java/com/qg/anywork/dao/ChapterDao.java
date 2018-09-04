@@ -8,14 +8,17 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * Created by logan on 2017/7/11.
+ * @author logan
+ * @date 2017/7/11
  * 对于章节的数据库操作
  */
 @Mapper
 @Repository
 public interface ChapterDao {
+
     /***
      * 根据组织id获取章节列表
+     *
      * @param organizationId 组织id
      * @return List<Chapter> 返回章节列表
      */

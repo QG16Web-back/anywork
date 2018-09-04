@@ -10,7 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
  * @author ming
  * I'm the one to ignite the darkened skies.
  */
-@Configuration
+//@Configuration
 public class AnyWorkInterceptor extends WebMvcConfigurerAdapter {
 
     @Override
@@ -19,7 +19,9 @@ public class AnyWorkInterceptor extends WebMvcConfigurerAdapter {
                 .addPathPatterns("/**")
                 .excludePathPatterns("/utils/valcode", "/user/forget/new", "/utils/reset", "/user/forget", "/user/login",
                         "/user/register", "/html/login.html", "/html/newPassword.html", "/html/failure.html",
-                        "/html/success.html", "/static/**", "/picture/**", "favicon.ico");
+                        "/html/success.html", "/static/**", "/picture/**", "favicon.ico",
+                        "/message/publish"
+                );
         super.addInterceptors(registry);
     }
 }
