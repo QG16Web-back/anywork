@@ -18,7 +18,7 @@ public class ThreadPoolConfig {
     @Bean
     public ThreadPoolTaskExecutor defaultThreadPool() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(16);
+        executor.setCorePoolSize(5);
         executor.setMaxPoolSize(64);
         executor.setQueueCapacity(1024);
         executor.setThreadNamePrefix("anyWork_");

@@ -258,15 +258,6 @@ public interface TestDao {
      * @param wrongQuestions 错题列表
      * @return int
      */
-    int insertWrongQuestions(@Param("wrongQuestions") List<WrongQuestion> wrongQuestions);
+    int insertWrongQuestions(@Param("wrongQuestions") List<CollectionQuestion> wrongQuestions);
 
-    /**
-     * 获取错题列表
-     *
-     * @param studentId 学生ID
-     * @param chapterId 章节ID
-     * @return 错题列表
-     */
-    List<WrongQuestion> findWrongQuestionByStudentIdAndChapterId(@Param("studentId") Integer studentId,
-                                                                 @Param("chapterId") Integer chapterId);
 }

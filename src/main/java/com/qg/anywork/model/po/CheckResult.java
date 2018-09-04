@@ -10,7 +10,6 @@ import java.io.Serializable;
  * @author ming
  */
 @Data
-@Builder
 @NoArgsConstructor
 public class CheckResult implements Serializable {
 

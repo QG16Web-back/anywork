@@ -1,34 +1,27 @@
 package com.qg.anywork.model.po;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
  * Create by ming on 18-8-22 下午10:56
- * 错题实体类
+ * 收藏题实体类
  *
  * @author ming
  * I'm the one to ignite the darkened skies.
  */
 @Data
-@Builder
 @NoArgsConstructor
-public class WrongQuestion {
+public class CollectionQuestion {
     /**
-     * 错题ID
+     * ID
      */
-    private Integer wrongQuestionId;
-
-    /**
-     * 章节ID
-     */
-    private Integer chapterId;
+    private Integer collectionQuestionId;
 
     /**
      * 问题
      */
-    private Question question;
+    private Integer questionId;
 
     /**
      * 学生ID
@@ -36,9 +29,7 @@ public class WrongQuestion {
     private Integer studentId;
 
     /**
-     * 学生答案
+     * 收藏的时间
      */
-    private String studentAnswer;
-
-    private int isTrue;
+    private String collectionTime;
 }

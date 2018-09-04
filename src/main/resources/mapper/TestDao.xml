@@ -27,28 +27,6 @@
         </association>
     </resultMap>
 
-    <resultMap id="wrongQuestions" type="com.qg.anywork.model.po.WrongQuestion">
-        <id property="wrongQuestionId" column="wrong_question_id"/>
-        <result property="studentId" column="student_id"/>
-        <result property="chapterId" column="chapter_id"/>
-        <result property="studentAnswer" column="student_answer"/>
-
-        <association property="question" javaType="com.qg.anywork.model.po.Question">
-            <id property="questionId" column="question_id"/>
-            <result property="content" column="content"/>
-            <result property="type" column="type"/>
-            <result property="A" column="A"/>
-            <result property="B" column="B"/>
-            <result property="C" column="C"/>
-            <result property="D" column="D"/>
-            <result property="key" column="key"/>
-            <result property="socre" column="socre"/>
-            <result property="testpaperId" column="testpaper_id"/>
-            <result property="other" column="other"/>
-            <result property="analysis" column="analysis"/>
-        </association>
-    </resultMap>
-
     <resultMap type="com.qg.anywork.model.po.CheckResult" id="checkResult">
         <result property="studentId" column="student_id"/>
         <result property="studentName" column="user_name"/>
@@ -393,14 +371,6 @@
              question q
         WHERE s.student_id = #{userId}
           AND s.question_id = #{questionId}
-    </select>
-
-    <select id="findWrongQuestionByStudentIdAndChapterId" resultType="com.qg.anywork.model.po.WrongQuestion">
-        SELECT w.student_id, w.chapter_id, w.student_answer, w.wrong_question_id, q.*
-        from wrong_question w,
-             question q
-        where w.student_id = #{studentId}
-          and w.chapter_id = #{chapterId}
     </select>
 
 </mapper>

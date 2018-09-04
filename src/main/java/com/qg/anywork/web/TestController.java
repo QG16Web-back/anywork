@@ -142,21 +142,6 @@ public class TestController {
         return testService.getQuestionDetail(user.getUserId(), Integer.parseInt(questionId));
     }
 
-    /**
-     * 查看错题
-     *
-     * @param map map
-     *            chapterId 章节ID
-     * @return 错题
-     */
-    @PostMapping("/error/list")
-    public RequestResult listErrorQuestion(HttpServletRequest request, @RequestBody Map<String, Integer> map) {
-        if (!map.containsKey("chapterId")) {
-            throw new ParamNotExistException(StatEnum.PARAM_IS_NOT_EXIST);
-        }
-        User user = (User) request.getSession().getAttribute("user");
-        return testService.getWrongQuestionList(user.getUserId(), map.get("chapterId"));
-    }
 
     /***
      * 添加章节
