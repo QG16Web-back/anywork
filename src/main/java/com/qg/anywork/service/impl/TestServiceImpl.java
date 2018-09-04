@@ -375,31 +375,15 @@ public class TestServiceImpl implements TestService {
             }
             StudentTestResult studentTestResult = getTestResult(studentPaper);
             testDao.addTestResult(studentTestResult);
-            CheckResult checkResult = CheckResult.builder()
-                    .studentId(studentPaper.getStudentId())
-                    .ifCheck(0)
-                    .testpaper(testpaper)
-                    .object(studentTestResult.getSocre())
-                    .subject(0)
-                    .build();
+            CheckResult checkResult = new CheckResult();
+            checkResult.setIfCheck(0);
+            checkResult.setStudentId(studentPaper.getStudentId());
+            checkResult.setTestpaper(testpaper);
+            checkResult.setObject(studentTestResult.getSocre());
+            checkResult.setSubject(0);
             testDao.addCheckResult(checkResult);
-            List<WrongQuestion> wrongQuestions = new ArrayList<>();
             for (StudentAnswerAnalysis studentAnswerAnalysis : studentTestResult.getStudentAnswerAnalysis()) {
-                if (studentAnswerAnalysis.getIsTrue() == 0) {
-                    // 收集错题
-                    wrongQuestions.add(WrongQuestion.builder()
-                            .question(studentAnswerAnalysis.getQuestion())
-                            .chapterId(testpaper.getChapterId())
-                            .studentAnswer(studentAnswerAnalysis.getStudentAnswer())
-                            .studentId(studentPaper.getStudentId())
-                            .build());
-                } else if (studentAnswerAnalysis.getIsTrue() == 1) {
-                    testDao.addStudentAnswer(studentAnswerAnalysis);
-                }
-            }
-            if (wrongQuestions.size() > 0) {
-                // 插入错题
-                testDao.insertWrongQuestions(wrongQuestions);
+                testDao.addStudentAnswer(studentAnswerAnalysis);
             }
             return new RequestResult<>(StatEnum.SUBMIT_TEST_SUCCESS, studentTestResult);
         }
@@ -412,17 +396,10 @@ public class TestServiceImpl implements TestService {
         return new RequestResult<>(StatEnum.GET_SUCCESS, studentAnswerAnalysis);
     }
 
-    @Override
-    public RequestResult getWrongQuestionList(int userId, int chapterId) {
-        List<WrongQuestion> wrongQuestions = testDao.findWrongQuestionByStudentIdAndChapterId(userId, chapterId);
-        if (wrongQuestions.size() == 0) {
-            throw new TestException(StatEnum.WRONG_QUESTION_LIST_IS_NULL);
-        }
-        return new RequestResult<>(StatEnum.GET_SUCCESS, wrongQuestions);
-    }
-
     private StudentTestResult getTestResult(StudentPaper studentPaper) {
-        StudentTestResult studentTestResult = new StudentTestResult(studentPaper.getStudentId(), studentPaper.getTestpaperId());
+        StudentTestResult studentTestResult = new StudentTestResult();
+        studentTestResult.setTestpaperId(studentPaper.getTestpaperId());
+        studentTestResult.setStudentId(studentPaper.getStudentId());
         List<StudentAnswerAnalysis> studentAnswerAnalyses = new ArrayList<>();
         double score = 0L;
         List<StudentAnswer> studentAnswers = studentPaper.getStudentAnswer();
@@ -452,9 +429,9 @@ public class TestServiceImpl implements TestService {
                         int index;
                         int number = question.getOther();
                         double fillingScore = 0.0;
-                        //正确答案数组
+                        // 正确答案数组
                         String[] answer = question.getKey().split(split);
-                        //学生答案数组
+                        // 学生答案数组
                         String[] studentFillingAnswer = studentAnswer.getStudentAnswer().split(split);
                         for (index = 0; index < number; index++) {
                             if (answer[index].equals(studentFillingAnswer[index])) {

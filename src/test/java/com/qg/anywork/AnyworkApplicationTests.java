@@ -16,18 +16,18 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+//@RunWith(SpringRunner.class)
+//@SpringBootTest
 public class AnyworkApplicationTests {
 
     //    @Autowired
 //    private StudentRepository studentRepository;
-    @Autowired
-    private UserRepository userRepository;
-
-    @Test
-    public void contextLoads() {
-    }
+//    @Autowired
+//    private UserRepository userRepository;
+//
+//    @Test
+//    public void contextLoads() {
+//    }
 //
 //    @Test
 //    public void addUser() {
@@ -68,17 +68,4 @@ public class AnyworkApplicationTests {
 //            }
 //        }
 //    }
-
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
-
-    @Test
-    public void testRedis() {
-        redisTemplate.opsForValue().set("stringValue", "String");
-        String stringValue = redisTemplate.opsForValue().get("stringValue");
-        System.out.println(stringValue);
-        redisTemplate.opsForValue().append("stringValue", " hello");
-        System.out.println(redisTemplate.opsForValue().get("stringValue"));
-        System.out.println(redisTemplate.delete("stringValue"));
-    }
 }

@@ -46,9 +46,4 @@ public class StudentTestResult implements Serializable {
      * 具体题目分析
      */
     private List<StudentAnswerAnalysis> studentAnswerAnalysis;
-
-    public StudentTestResult(int studentId, int testpaperId) {
-        this.studentId = studentId;
-        this.testpaperId = testpaperId;
-    }
 }

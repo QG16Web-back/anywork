@@ -1,6 +1,7 @@
 package com.qg.anywork.web;
 
 import com.qg.anywork.enums.StatEnum;
+import com.qg.anywork.exception.common.ParamNotExistException;
 import com.qg.anywork.exception.testpaper.NotPowerException;
 import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.model.po.Question;
@@ -299,5 +300,35 @@ public class QuestionController {
             throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
         }
         questionService.deleteTestpaper(testpaperId);
+    }
+
+    /**
+     * 收藏题目
+     */
+    @PostMapping("/collect")
+    public RequestResult collectQuestion(HttpServletRequest request, @RequestBody Map<String, Integer> map) {
+        if (!map.containsKey("questionId")) {
+            throw new ParamNotExistException(StatEnum.PARAM_IS_NOT_EXIST);
+        }
+        User user = (User) request.getSession().getAttribute("user");
+        return questionService.collectQuestion(user.getUserId(), map.get("questionId"));
+    }
+
+    /**
+     * 删除已收藏的题目
+     */
+    @PostMapping("/collect/delete")
+    public RequestResult deleteCollectionQuestion(HttpServletRequest request, @RequestBody Map<String, Integer> map) {
+        if (!map.containsKey("questionId")) {
+            throw new ParamNotExistException(StatEnum.PARAM_IS_NOT_EXIST);
+        }
+        User user = (User) request.getSession().getAttribute("user");
+        return questionService.deleteCollection(user.getUserId(), map.get("questionId"));
+    }
+
+    @PostMapping("/collect/list")
+    public RequestResult listCollectionQuestion(HttpServletRequest request) {
+        User user = (User) request.getSession().getAttribute("user");
+        return questionService.listCollectionQuestion(user.getUserId());
     }
 }

@@ -1,5 +1,6 @@
 package com.qg.anywork.dao;
 
+import com.qg.anywork.model.po.CollectionQuestion;
 import com.qg.anywork.model.po.Question;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -38,4 +39,37 @@ public interface QuestionDao {
      * @return
      */
     int deleteQuestion(@Param("testpaperId") int testpaperId);
+
+    /**
+     * 收藏题目
+     *
+     * @param collectionQuestion collectionQuestion
+     * @return int
+     */
+    int collectQuestion(@Param("collectionQuestion") CollectionQuestion collectionQuestion);
+
+    /**
+     * 删除已收藏的题目
+     *
+     * @param studentId  学生ID
+     * @param questionId 问题ID
+     * @return int
+     */
+    int deleteCollection(@Param("studentId") Integer studentId, @Param("questionId") Integer questionId);
+
+    /**
+     * 根据id获取题目
+     *
+     * @param questionId id
+     * @return 题目
+     */
+    String findContentById(@Param("questionId") Integer questionId);
+
+    /**
+     * 根据学生ID获取收藏题目id列表
+     *
+     * @param studentId 学生ID
+     * @return id列表
+     */
+    List<Integer> findQuestionListByStudentId(@Param("studentId") Integer studentId);
 }

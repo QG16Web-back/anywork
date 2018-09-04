@@ -129,13 +129,4 @@ public interface TestService {
      * @return 详细信息
      */
     RequestResult getQuestionDetail(int userId, int questionId);
-
-    /**
-     * 按章节获取我的错题
-     *
-     * @param userId    学生ID
-     * @param chapterId 章节ID
-     * @return 错题列表
-     */
-    RequestResult getWrongQuestionList(int userId, int chapterId);
 }

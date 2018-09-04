@@ -112,6 +112,9 @@ public enum StatEnum {
     SUBMIT_TEST_SUCCESS(1, "提交成功"),
     SUBMIT_TEST_FAIL(0, "提交失败"),
     SAVE_TEST_SUCCESS(1, "保存进度成功"),
+    COLLECT_SUCCESS(1, "收藏成功"),
+    DELETE_COLLECTION_SUCCESS(1, "删除收藏成功"),
+    COLLECTION_LIST_IS_NULL(0, "收藏列表为空"),
 
     /**
      * 邮件模块
