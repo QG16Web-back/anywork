@@ -356,7 +356,6 @@
         FROM test_result
         WHERE test_paper_id = #{testPaperId}
           AND student_id = #{userId}
-          AND organization_id = #{organizationId}
     </select>
 
     <select id="countQuestion" resultType="java.lang.Integer">

@@ -43,6 +43,11 @@ public class StudentTestResult implements Serializable {
     private double socre;
 
     /**
+     * 答题结束时间
+     */
+    private String ending;
+
+    /**
      * 具体题目分析
      */
     private List<StudentAnswerAnalysis> studentAnswerAnalysis;

@@ -42,10 +42,6 @@ public class QuestionController {
     @Autowired
     private TestService testService;
 
-    public static void main(String[] args) {
-        System.out.println(DateUtil.longToDate(1503077978826L));
-    }
-
 
     @PostMapping("/release")
     public RequestResult addOrganization(@RequestPart("file") MultipartFile file,
@@ -56,14 +52,14 @@ public class QuestionController {
                                          @RequestParam("testpaperType") Integer testpaperType,
                                          @RequestParam("organizationId") Integer organizationId,
                                          HttpServletRequest request) throws IOException {
-        List<Question> questionList=new ArrayList<>();
+        List<Question> questionList = new ArrayList<>();
         if (null != file && !file.isEmpty()) {
             String filename = file.getOriginalFilename();
             assert filename != null;
             if (filename.endsWith(".xlsx") || filename.endsWith(".xls")) {
                 questionList = questionService.getQuestionList(file.getInputStream());
             }
-        }else {
+        } else {
             return new RequestResult<>(0, "excel文件为空");
         }
         if (testpaperTitle == null || "".equals(testpaperTitle)) {
@@ -108,15 +104,15 @@ public class QuestionController {
                 //更新总分
                 return new RequestResult<>(StatEnum.TEST_RELEASE_SUCESS, testpaperId);
             }
-                return new RequestResult<>(StatEnum.TEST_RELEASE_FAIL, 0);
-            } catch (Exception e) {
-                log.warn("未知异常: ", e);
-                if (testpaperId != 0) {
-                    //删除错误插
-                    questionService.deleteTestpaper(testpaperId);
-                }
-                return new RequestResult<>(StatEnum.DEFAULT_WRONG, 0);
+            return new RequestResult<>(StatEnum.TEST_RELEASE_FAIL, 0);
+        } catch (Exception e) {
+            log.warn("未知异常: ", e);
+            if (testpaperId != 0) {
+                //删除错误插
+                questionService.deleteTestpaper(testpaperId);
             }
+            return new RequestResult<>(StatEnum.DEFAULT_WRONG, 0);
+        }
     }
 
     /**
