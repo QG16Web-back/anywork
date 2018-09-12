@@ -15,6 +15,7 @@ import com.qg.anywork.model.po.User;
 import com.qg.anywork.service.MailService;
 import com.qg.anywork.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -213,6 +214,9 @@ public class UserController {
                 }
                 FileUtils.copyInputStreamToFile(file.getInputStream(),
                         new File(request.getServletContext().getRealPath("/picture/user/"), user.getUserId() + ".jpg"));
+
+                Thumbnails.of(request.getServletContext().getRealPath("/picture/user" + "/" + user.getUserId() + ".jpg"))
+                        .scale(0.4f).toFile(request.getServletContext().getRealPath("/picture/user" + "/" + user.getUserId() + ".jpg"));
                 log.info(user.getUserName() + "上传了头像");
             } else {
                 return new RequestResult<>(StatEnum.FILE_FORMAT_ERROR, null);

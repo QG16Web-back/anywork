@@ -273,7 +273,7 @@ public class TestServiceImpl implements TestService {
             StudentTestResult testResult = testDao.findTestResultByTestPaperIdAndUserIdAndOrganizationId(testPaper.getTestpaperId(),
                     userId, organizationId);
             if (testResult != null) {
-                // 这烦人呢试卷已完成
+                // 试卷已完成
                 map.put("status", 1);
                 map.put("score", testResult.getSocre());
                 map.put("totalQuestions", 0);
