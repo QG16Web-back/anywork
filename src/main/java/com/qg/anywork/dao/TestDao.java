@@ -250,7 +250,7 @@ public interface TestDao {
      * @param questionId 题目ID
      * @return 详细信息
      */
-    StudentAnswerAnalysis getStudentAnswerAnalysis(int userId, int questionId);
+    StudentAnswerAnalysis getStudentAnswerAnalysis(@Param("userId") int userId, @Param("question") int questionId);
 
     /**
      * 插入错题列表
