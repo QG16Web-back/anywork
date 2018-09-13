@@ -38,8 +38,8 @@ public class LeaderBoardController {
             throw new ParamNotExistException(StatEnum.PARAM_IS_NOT_EXIST);
         }
         int leaderBoardType = map.get("leaderboardType");
-//        User user = (User) request.getSession().getAttribute("user");
-        return leaderBoardService.showLeaderBoard(1988, leaderBoardType);
+        User user = (User) request.getSession().getAttribute("user");
+        return leaderBoardService.showLeaderBoard(user.getUserId(), leaderBoardType);
     }
 
     /**
