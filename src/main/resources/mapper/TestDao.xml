@@ -275,7 +275,8 @@
         INSERT INTO wrong_question(question_id, chapter_id, student_answer, student_id)
         VALUES
         <foreach collection="wrongQuestions" item="wrongQuestion" index="index" separator=",">
-            (#{wrongQuestion.question.questionId}, #{wrongQuestion.chapterId}, #{wrongQuestion.studentAnswer}, #{wrongQuestion.studentId})
+            (#{wrongQuestion.question.questionId}, #{wrongQuestion.chapterId}, #{wrongQuestion.studentAnswer},
+            #{wrongQuestion.studentId})
         </foreach>
     </insert>
 
@@ -370,6 +371,14 @@
              question q
         WHERE s.student_id = #{userId}
           AND s.question_id = #{questionId}
+    </select>
+    <select id="findStudentTestResultByUserIdAndTestPaperIds"
+            resultType="com.qg.anywork.model.po.StudentTestResult">
+        select * from test_result where student_id = #{userId} and
+        test_paper_id in
+        <foreach collection="testPaperIds" item="testPaperId" index="index" separator="," open="(" close=")">
+            #{testPaperId}
+        </foreach>
     </select>
 
 </mapper>

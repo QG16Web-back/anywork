@@ -5,13 +5,17 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
+import java.util.List;
+
 /**
- * Created by FunriLy on 2017/7/12.
+ * @author FunriLy
+ * @date 2017/7/12
  * From small beginnings comes great things.
  */
 @Mapper
 @Repository
-public interface TestpaperDao {
+public interface TestPaperDao {
 
     /**
      * 插入一张试卷简介
@@ -26,4 +30,13 @@ public interface TestpaperDao {
     int deleteTestpaper(@Param("TestpaperId") Integer TestpaperId);
 
     TestPaper selectOne(@Param("TestpaperId") Integer TestpaperId);
+
+    /**
+     * 根据组织查找试卷
+     *
+     * @param organizationId 组织ID
+     * @param createTime     创建时间
+     * @return 试卷
+     */
+    List<TestPaper> findTestPaperByOrganizationIdAndTime(@Param("organizationId") int organizationId, @Param("createTime") Timestamp createTime);
 }

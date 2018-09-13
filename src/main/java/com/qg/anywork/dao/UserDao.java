@@ -54,4 +54,20 @@ public interface UserDao {
      * @return
      */
     List<User> selectUserByIdList(List<Integer> userIdList);
+
+    /**
+     * 根据组织获取用户
+     *
+     * @param organizationId 组织ID
+     * @return User list
+     */
+    List<User> findUserByOrganizationId(@Param("organizationId") Integer organizationId);
+
+    /**
+     * 根据用户ID获取组织ID
+     *
+     * @param userId 用户ID
+     * @return 组织ID
+     */
+    int findOrganizationIdByUserId(@Param("userId") int userId);
 }

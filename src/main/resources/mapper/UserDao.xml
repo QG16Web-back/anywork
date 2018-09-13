@@ -22,4 +22,16 @@
         </set>
         WHERE user_id = #{user.userId}
     </update>
+    <select id="findUserByOrganizationId" resultType="com.qg.anywork.model.po.User">
+        SELECT u.*
+        from user u
+                 left join relation r on u.user_id = r.user_id
+        where r.organization_id = #{organizationId}
+    </select>
+    <select id="findOrganizationIdByUserId" resultType="java.lang.Integer">
+        select organization_id
+        from relation
+        where user_id = #{userId}
+    </select>
+
 </mapper>

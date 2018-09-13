@@ -3,8 +3,12 @@ package com.qg.anywork.web;
 import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.common.ParamNotExistException;
 import com.qg.anywork.model.dto.RequestResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import com.qg.anywork.model.po.User;
+import com.qg.anywork.service.LeaderBoardService;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.servlet4preview.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -16,25 +20,32 @@ import java.util.Map;
  * @author ming
  * I'm the one to ignite the darkened skies.
  */
+@RestController
+@RequestMapping("/leaderboard")
+@CrossOrigin
+@Slf4j
 public class LeaderBoardController {
+
+    @Autowired
+    private LeaderBoardService leaderBoardService;
 
     /**
      * 显示总的排行榜
      */
-    @PostMapping("/leaderboard/show")
-    public RequestResult showLeaderBoard(@RequestBody Map<String, Integer> map) {
+    @PostMapping("/show")
+    public RequestResult showLeaderBoard(HttpServletRequest request, @RequestBody Map<String, Integer> map) {
         if (!map.containsKey("leaderboardType")) {
             throw new ParamNotExistException(StatEnum.PARAM_IS_NOT_EXIST);
         }
-        int leaderboardType = map.get("leaderboardType");
-
-        return null;
+        int leaderBoardType = map.get("leaderboardType");
+//        User user = (User) request.getSession().getAttribute("user");
+        return leaderBoardService.showLeaderBoard(1988, leaderBoardType);
     }
 
     /**
      * 显示每个测试的排行榜
      */
-    @PostMapping("leaderboard/paper/show")
+    @PostMapping("/paper/show")
     public RequestResult showPaperLeaderBoard() {
         return null;
     }

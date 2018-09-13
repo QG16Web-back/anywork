@@ -250,7 +250,7 @@ public interface TestDao {
      * @param questionId 题目ID
      * @return 详细信息
      */
-    StudentAnswerAnalysis getStudentAnswerAnalysis(@Param("userId") int userId, @Param("question") int questionId);
+    StudentAnswerAnalysis getStudentAnswerAnalysis(@Param("userId") int userId, @Param("questionId") int questionId);
 
     /**
      * 插入错题列表
@@ -259,5 +259,15 @@ public interface TestDao {
      * @return int
      */
     int insertWrongQuestions(@Param("wrongQuestions") List<CollectionQuestion> wrongQuestions);
+
+
+    /**
+     * 获取学生的成绩结果
+     *
+     * @param userId       学生ID
+     * @param testPaperIds 试卷ID集合
+     * @return 学生结果
+     */
+    List<StudentTestResult> findStudentTestResultByUserIdAndTestPaperIds(@Param("userId") int userId, @Param("testPaperIds") List<Integer> testPaperIds);
 
 }
