@@ -228,12 +228,10 @@ public interface TestDao {
      *
      * @param testPaperId    试卷ID
      * @param userId         用户ID
-     * @param organizationId 组织ID
      * @return 测试结果
      */
     StudentTestResult findTestResultByTestPaperIdAndUserIdAndOrganizationId(@Param("testPaperId") int testPaperId,
-                                                                            @Param("userId") int userId,
-                                                                            @Param("organizationId") int organizationId);
+                                                                            @Param("userId") int userId);
 
     /**
      * 获取一张试卷的总题目数

@@ -26,7 +26,7 @@ public class MailUtil {
     /**
      * 服务器地址
      */
-    private final static String HOST = "10.21.56.107";
+    private final static String HOST = "192.168.199.55";
 
     /**
      * 登录URL

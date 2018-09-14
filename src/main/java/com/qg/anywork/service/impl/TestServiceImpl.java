@@ -271,7 +271,7 @@ public class TestServiceImpl implements TestService {
             map.put("timeStatus", timeStatus);
             // 判断是否
             StudentTestResult testResult = testDao.findTestResultByTestPaperIdAndUserIdAndOrganizationId(testPaper.getTestpaperId(),
-                    userId, organizationId);
+                    userId);
             if (testResult != null) {
                 // 试卷已完成
                 map.put("status", 1);

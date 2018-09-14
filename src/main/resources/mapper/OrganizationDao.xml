@@ -125,5 +125,10 @@
         WHERE r.organization_id = #{organizationId}
           AND u.user_id = r.user_id
     </select>
+    <select id="findOrganizationById" resultType="com.qg.anywork.model.po.Organization">
+        SELECT *
+        from organization
+        where teacher_id in (SELECT teacher_id from organization where organization_id = #{organizationId})
+    </select>
 
 </mapper>

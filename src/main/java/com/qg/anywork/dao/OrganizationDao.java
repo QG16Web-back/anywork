@@ -120,4 +120,12 @@ public interface OrganizationDao {
      * @return User　List
      */
     List<User> getOrganizationPeople(@Param("organizationId") int organizationId);
+
+    /**
+     * 获取与该组织同个创建人的全部组织
+     *
+     * @param organizationId 组织ID
+     * @return 组织集合
+     */
+    List<Organization> findOrganizationById(@Param("organizationId") int organizationId);
 }

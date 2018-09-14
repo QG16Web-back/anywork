@@ -5,6 +5,7 @@ import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.common.ParamException;
 import com.qg.anywork.model.dto.LeaderBoard;
 import com.qg.anywork.model.dto.RequestResult;
+import com.qg.anywork.model.po.Organization;
 import com.qg.anywork.model.po.StudentTestResult;
 import com.qg.anywork.model.po.TestPaper;
 import com.qg.anywork.model.po.User;
@@ -16,7 +17,9 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Create by ming on 18-9-13 下午12:56
@@ -27,9 +30,6 @@ import java.util.*;
 @Service
 @Slf4j
 public class LeaderBoardServiceImpl implements LeaderBoardService {
-
-    @Autowired
-    private LeaderBoardDao leaderBoardDao;
 
     @Autowired
     private UserDao userDao;
@@ -46,19 +46,66 @@ public class LeaderBoardServiceImpl implements LeaderBoardService {
     @Override
     public RequestResult showLeaderBoard(int userId, int leaderBoardType) {
         List<LeaderBoard> leaderBoards;
+        int organizationId = userDao.findOrganizationIdByUserId(userId);
         if (leaderBoardType == 1) {
-            leaderBoards = showLeaderBoardByOrganization(userId);
+            leaderBoards = showLeaderBoardByOrganization(organizationId);
         } else if (leaderBoardType == 2) {
-            leaderBoards = showLeaderBoardByTeacher(userId);
+            leaderBoards = showLeaderBoardByTeacher(organizationId);
         } else {
             throw new ParamException(StatEnum.ERROR_PARAM);
         }
         return new RequestResult<>(StatEnum.GET_SUCCESS, leaderBoards);
     }
 
-    private List<LeaderBoard> showLeaderBoardByOrganization(int userId) {
-        List<User> users;
+    @Override
+    public RequestResult showPaperLeaderBoard(int userId, int leaderBoardType, int testPaperId) {
+        List<LeaderBoard> leaderBoards;
         int organizationId = userDao.findOrganizationIdByUserId(userId);
+        if (leaderBoardType == 1) {
+            leaderBoards = showPaperLeaderBoardByOrganization(testPaperId, organizationId);
+        } else if (leaderBoardType == 2) {
+            leaderBoards = showPaperLeaderBoardByTeacher(testPaperId, organizationId);
+        } else {
+            throw new ParamException(StatEnum.ERROR_PARAM);
+        }
+        return new RequestResult<>(StatEnum.GET_SUCCESS, leaderBoards);
+    }
+
+    private List<LeaderBoard> showPaperLeaderBoardByOrganization(int testPaperId, int organizationId) {
+        List<User> users;
+        users = userDao.findUserByOrganizationId(organizationId);
+        String organizationName = organizationDao.getById(organizationId).getOrganizationName();
+        List<LeaderBoard> leaderBoards = new ArrayList<>();
+        for (User user : users) {
+            LeaderBoard leaderBoard = new LeaderBoard();
+            leaderBoard.setImagePath(user.getImagePath());
+            leaderBoard.setOrganizationName(organizationName);
+            leaderBoard.setStudentId(user.getStudentId());
+            leaderBoard.setUsername(user.getUserName());
+            StudentTestResult testResult = testDao.findTestResultByTestPaperIdAndUserIdAndOrganizationId(testPaperId, user.getUserId());
+            if (testResult == null) {
+                leaderBoard.setScore(0.0);
+            } else {
+                leaderBoard.setScore(testResult.getSocre());
+            }
+            leaderBoards.add(leaderBoard);
+        }
+        leaderBoards.sort((o1, o2) -> Double.compare(o2.getScore(), o1.getScore()));
+        return leaderBoards;
+    }
+
+    private List<LeaderBoard> showPaperLeaderBoardByTeacher(int testPaperId, int organizationId) {
+        List<Organization> organizations = organizationDao.findOrganizationById(organizationId);
+        List<LeaderBoard> leaderBoards = new ArrayList<>();
+        for (Organization organization : organizations) {
+            leaderBoards.addAll(showPaperLeaderBoardByOrganization(testPaperId, organization.getOrganizationId()));
+        }
+        leaderBoards.sort((o1, o2) -> Double.compare(o2.getScore(), o1.getScore()));
+        return leaderBoards;
+    }
+
+    private List<LeaderBoard> showLeaderBoardByOrganization(int organizationId) {
+        List<User> users;
         users = userDao.findUserByOrganizationId(organizationId);
         List<TestPaper> testPapers = testPaperDao.findTestPaperByOrganizationIdAndTime(organizationId,
                 Timestamp.valueOf(DateUtil.format(new Date())));
@@ -89,7 +136,13 @@ public class LeaderBoardServiceImpl implements LeaderBoardService {
         return leaderBoards;
     }
 
-    private List<LeaderBoard> showLeaderBoardByTeacher(int userId) {
-        return null;
+    private List<LeaderBoard> showLeaderBoardByTeacher(int organizationId) {
+        List<Organization> organizations = organizationDao.findOrganizationById(organizationId);
+        List<LeaderBoard> leaderBoards = new ArrayList<>();
+        for (Organization organization : organizations) {
+            leaderBoards.addAll(showLeaderBoardByOrganization(organization.getOrganizationId()));
+        }
+        leaderBoards.sort((o1, o2) -> Double.compare(o2.getScore(), o1.getScore()));
+        return leaderBoards;
     }
 }

@@ -46,7 +46,13 @@ public class LeaderBoardController {
      * 显示每个测试的排行榜
      */
     @PostMapping("/paper/show")
-    public RequestResult showPaperLeaderBoard() {
-        return null;
+    public RequestResult showPaperLeaderBoard(HttpServletRequest request, @RequestBody Map<String, Integer> map) {
+        if (!map.containsKey("leaderboardType") || !map.containsKey("testpaperId")) {
+            throw new ParamNotExistException(StatEnum.PARAM_IS_NOT_EXIST);
+        }
+        int leaderBoardType = map.get("leaderboardType");
+        int testPaperId = map.get("testpaperId");
+//        User user = (User) request.getSession().getAttribute("user");
+        return leaderBoardService.showPaperLeaderBoard(1988, leaderBoardType, testPaperId);
     }
 }

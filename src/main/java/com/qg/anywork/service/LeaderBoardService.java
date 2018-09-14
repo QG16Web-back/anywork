@@ -18,4 +18,14 @@ public interface LeaderBoardService {
      * @return 排行榜
      */
     RequestResult showLeaderBoard(int userId, int leaderBoardType);
+
+    /**
+     * 显示每个试卷的排行榜
+     *
+     * @param userId          用户ID
+     * @param leaderBoardType 排行榜类型，1为在班级排，2是按老师教的班排
+     * @param testPaperId     试卷ID
+     * @return 试卷排行榜
+     */
+    RequestResult showPaperLeaderBoard(int userId, int leaderBoardType, int testPaperId);
 }
