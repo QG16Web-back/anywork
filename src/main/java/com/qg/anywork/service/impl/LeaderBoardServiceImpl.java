@@ -29,6 +29,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
+@SuppressWarnings("unchecked")
 public class LeaderBoardServiceImpl implements LeaderBoardService {
 
     @Autowired
@@ -42,6 +43,9 @@ public class LeaderBoardServiceImpl implements LeaderBoardService {
 
     @Autowired
     private OrganizationDao organizationDao;
+
+    @Autowired
+    private LeaderBoardRedisDao leaderBoardRedisDao;
 
     @Override
     public RequestResult showLeaderBoard(int userId, int leaderBoardType) {
@@ -73,6 +77,11 @@ public class LeaderBoardServiceImpl implements LeaderBoardService {
 
     private List<LeaderBoard> showPaperLeaderBoardByOrganization(int testPaperId, int organizationId) {
         List<User> users;
+        String key = "showPaperLeaderBoardByOrganization" + "_" + testPaperId + "_" + organizationId;
+        List<LeaderBoard> redisLeaderBoards = (List<LeaderBoard>) leaderBoardRedisDao.getLeaderBoard(key);
+        if (redisLeaderBoards != null) {
+            return redisLeaderBoards;
+        }
         users = userDao.findUserByOrganizationId(organizationId);
         String organizationName = organizationDao.getById(organizationId).getOrganizationName();
         List<LeaderBoard> leaderBoards = new ArrayList<>();
@@ -91,20 +100,34 @@ public class LeaderBoardServiceImpl implements LeaderBoardService {
             leaderBoards.add(leaderBoard);
         }
         leaderBoards.sort((o1, o2) -> Double.compare(o2.getScore(), o1.getScore()));
+        // 存进缓存
+        leaderBoardRedisDao.setLeaderBoard(key, leaderBoards);
         return leaderBoards;
     }
 
     private List<LeaderBoard> showPaperLeaderBoardByTeacher(int testPaperId, int organizationId) {
+        String key = "showPaperLeaderBoardByTeacher" + "_" + testPaperId + "_" + organizationId;
+        List<LeaderBoard> redisLeaderBoards = (List<LeaderBoard>) leaderBoardRedisDao.getLeaderBoard(key);
+        if (redisLeaderBoards != null) {
+            return redisLeaderBoards;
+        }
         List<Organization> organizations = organizationDao.findOrganizationById(organizationId);
         List<LeaderBoard> leaderBoards = new ArrayList<>();
         for (Organization organization : organizations) {
             leaderBoards.addAll(showPaperLeaderBoardByOrganization(testPaperId, organization.getOrganizationId()));
         }
         leaderBoards.sort((o1, o2) -> Double.compare(o2.getScore(), o1.getScore()));
+        // 存进缓存
+        leaderBoardRedisDao.setLeaderBoard(key, leaderBoards);
         return leaderBoards;
     }
 
     private List<LeaderBoard> showLeaderBoardByOrganization(int organizationId) {
+        String key = "showLeaderBoardByOrganization" + "_" + organizationId;
+        List<LeaderBoard> redisLeaderBoards = (List<LeaderBoard>) leaderBoardRedisDao.getLeaderBoard(key);
+        if (redisLeaderBoards != null) {
+            return redisLeaderBoards;
+        }
         List<User> users;
         users = userDao.findUserByOrganizationId(organizationId);
         List<TestPaper> testPapers = testPaperDao.findTestPaperByOrganizationIdAndTime(organizationId,
@@ -133,16 +156,25 @@ public class LeaderBoardServiceImpl implements LeaderBoardService {
             leaderBoards.add(leaderBoard);
         }
         leaderBoards.sort((o1, o2) -> Double.compare(o2.getScore(), o1.getScore()));
+        // 存进缓存
+        leaderBoardRedisDao.setLeaderBoard(key, leaderBoards);
         return leaderBoards;
     }
 
     private List<LeaderBoard> showLeaderBoardByTeacher(int organizationId) {
+        String key = "showLeaderBoardByTeacher" + "_" + organizationId;
+        List<LeaderBoard> redisLeaderBoards = (List<LeaderBoard>) leaderBoardRedisDao.getLeaderBoard(key);
+        if (redisLeaderBoards != null) {
+            return redisLeaderBoards;
+        }
         List<Organization> organizations = organizationDao.findOrganizationById(organizationId);
         List<LeaderBoard> leaderBoards = new ArrayList<>();
         for (Organization organization : organizations) {
             leaderBoards.addAll(showLeaderBoardByOrganization(organization.getOrganizationId()));
         }
         leaderBoards.sort((o1, o2) -> Double.compare(o2.getScore(), o1.getScore()));
+        // 存进缓存
+        leaderBoardRedisDao.setLeaderBoard(key, leaderBoards);
         return leaderBoards;
     }
 }
