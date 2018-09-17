@@ -71,6 +71,10 @@ public class OrganizationServiceImpl implements OrganizationService {
         if (organizationDao.isJoin(organizationId, userId) > 0) {
             throw new OrganizationException(StatEnum.USER_HAS_JOINED_THE_ORGANIZATION);
         }
+        // 只能加入一个组织
+        if (organizationDao.findRelationByUserId(userId) == 1) {
+            throw new OrganizationException(StatEnum.CAN_ONLY_JOIN_ONE_ORGANIZATION);
+        }
         Organization organization = organizationDao.getById(organizationId);
         if (organization == null) {
             throw new OrganizationException(StatEnum.ORGANIZATION_NOT_EXIST);

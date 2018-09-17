@@ -130,5 +130,10 @@
         from organization
         where teacher_id in (SELECT teacher_id from organization where organization_id = #{organizationId})
     </select>
+    <select id="findRelationByUserId" resultType="java.lang.Integer">
+        select count(*)
+        from relation
+        where user_id = #{userId}
+    </select>
 
 </mapper>

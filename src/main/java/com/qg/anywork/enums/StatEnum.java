@@ -98,6 +98,7 @@ public enum StatEnum {
     CHAPTER_TOO_LONG(0, "章节名过长"),
     THE_NAME_IS_NULL(0, "搜索的组织名为空"),
     USER_HAS_JOINED_THE_ORGANIZATION(0, "用户已加入该组织"),
+    CAN_ONLY_JOIN_ONE_ORGANIZATION(0, "只能加入一个组织"),
     USER_HAS_NOT_JOINED_THE_ORGANIZATION(0, "用户未加入该组织"),
     THE_TOKEN_IS_ERROR(0, "口令错误"),
     TOKEN_IS_NULL(0, "口令为空"),

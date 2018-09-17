@@ -256,8 +256,8 @@
 
     <select id="getStudentAnswer" resultMap="studentAnswerAnalysis">
         SELECT s.student_id, s.student_answer, s.is_true, s.socre as getsocre, q.*
-        FROM student_answer s,
-             question q
+        FROM student_answer s
+                 right join question q on s.question_id = q.question_id
         WHERE s.student_id = #{userId}
           AND s.question_id in (SELECT q.question_id FROM question WHERE q.testpaper_id = #{testPaperId})
     </select>
@@ -269,15 +269,6 @@
                 #{checkResult.subject},
                 #{checkResult.testpaper.testpaperId},
                 #{checkResult.studentId})
-    </insert>
-
-    <insert id="insertWrongQuestions">
-        INSERT INTO wrong_question(question_id, chapter_id, student_answer, student_id)
-        VALUES
-        <foreach collection="wrongQuestions" item="wrongQuestion" index="index" separator=",">
-            (#{wrongQuestion.question.questionId}, #{wrongQuestion.chapterId}, #{wrongQuestion.studentAnswer},
-            #{wrongQuestion.studentId})
-        </foreach>
     </insert>
 
     <select id="getCheckResultByUser" resultMap="checkResult">
@@ -365,10 +356,10 @@
         where testpaper_id = #{testPaperId}
     </select>
 
-    <select id="getStudentAnswerAnalysis" resultType="com.qg.anywork.model.po.StudentAnswerAnalysis">
+    <select id="getStudentAnswerAnalysis" resultMap="studentAnswerAnalysis">
         SELECT s.student_id, s.student_answer, s.is_true, s.socre as getsocre, q.*
-        FROM student_answer s,
-             question q
+        FROM student_answer s
+                 right join question q on s.question_id = q.question_id
         WHERE s.student_id = #{userId}
           AND s.question_id = #{questionId}
     </select>
