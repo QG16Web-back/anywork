@@ -95,4 +95,11 @@
                  left join user u on m.user_id = u.user_id
         where message_id = #{messageId}
     </select>
+
+    <select id="findAllMessagesByOrganizationId" resultType="com.qg.anywork.model.po.Message">
+        select m.*
+        from message m
+                 left join organization_message om on om.message_id = m.message_id
+        where organization_id = #{organizationId}
+    </select>
 </mapper>

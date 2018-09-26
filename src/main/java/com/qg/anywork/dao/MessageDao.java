@@ -105,6 +105,14 @@ public interface MessageDao {
     Page<Message> findUnreadMessage(@Param("messageIds") List<Integer> messageIds);
 
     /**
+     * 获取全部公告
+     *
+     * @param organizationId 组织ID
+     * @return 全部公告
+     */
+    Page<Message> findAllMessagesByOrganizationId(@Param("organizationId") Integer organizationId);
+
+    /**
      * 根据用户ID获取公告ID列表
      *
      * @param userId 用户ID

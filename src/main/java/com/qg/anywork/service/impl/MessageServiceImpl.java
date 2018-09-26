@@ -1,10 +1,12 @@
 package com.qg.anywork.service.impl;
 
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.qg.anywork.dao.MessageDao;
 import com.qg.anywork.dao.OrganizationDao;
 import com.qg.anywork.enums.StatEnum;
+import com.qg.anywork.exception.common.ParamException;
 import com.qg.anywork.exception.message.MessageException;
 import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.model.po.Message;
@@ -96,9 +98,25 @@ public class MessageServiceImpl implements MessageService {
             throw new MessageException(StatEnum.MESSAGE_LIST_IS_NULL);
         }
         if (status == 1) {
+            // 获取已读公告
             messages = new PageInfo<>(messageDao.findHaveReadMessageExceptMessageIds(messageIds));
         } else if (status == 0) {
+            // 获取未读公告
             messages = new PageInfo<>(messageDao.findUnreadMessage(messageIds));
+        } else if (status == 2) {
+            // 获取全部公告
+            int organizationId = organizationDao.findOrganizationByUserId(userId);
+            Page<Message> allMessages = messageDao.findAllMessagesByOrganizationId(organizationId);
+            for (Message message : allMessages) {
+                if (messageIds.contains(message.getMessageId())) {
+                    message.setStatus(0);
+                } else {
+                    message.setStatus(1);
+                }
+            }
+            return new RequestResult<>(StatEnum.LIST_MESSAGE_SUCCESS, allMessages);
+        } else {
+            throw new ParamException(StatEnum.ERROR_PARAM);
         }
         return new RequestResult<>(StatEnum.LIST_MESSAGE_SUCCESS, messages);
     }

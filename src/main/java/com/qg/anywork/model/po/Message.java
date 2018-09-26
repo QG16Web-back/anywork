@@ -47,4 +47,9 @@ public class Message implements Serializable {
      * 发布人
      */
     private String publisher;
+
+    /**
+     * 公告是否已读，1为已读，0为未读
+     */
+    private Integer status;
 }

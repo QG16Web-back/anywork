@@ -136,4 +136,12 @@ public interface OrganizationDao {
      * @return 数量，0或1
      */
     int findRelationByUserId(@Param("userId") int userId);
+
+    /**
+     * 根据用户ID找组织ID
+     *
+     * @param userId 用户ID
+     * @return 组织ID
+     */
+    Integer findOrganizationByUserId(@Param("userId") int userId);
 }
