@@ -92,17 +92,25 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public RequestResult studentShowMessage(int userId, int pageNum, int pageSize, int status) {
         PageHelper.startPage(pageNum, pageSize);
-        PageInfo<Message> messages = null;
+        PageInfo<Message> messages;
         List<Integer> messageIds = messageDao.getAllMessageIdByUserId(userId);
         if (messageIds.isEmpty()) {
             throw new MessageException(StatEnum.MESSAGE_LIST_IS_NULL);
         }
         if (status == 1) {
             // 获取已读公告
-            messages = new PageInfo<>(messageDao.findHaveReadMessageExceptMessageIds(messageIds));
+            Page<Message> messagePage = messageDao.findHaveReadMessageExceptMessageIds(messageIds);
+            for (Message message : messagePage) {
+                message.setStatus(1);
+            }
+            messages = new PageInfo<>(messagePage);
         } else if (status == 0) {
             // 获取未读公告
-            messages = new PageInfo<>(messageDao.findUnreadMessage(messageIds));
+            Page<Message> messagePage = messageDao.findUnreadMessage(messageIds);
+            for (Message message : messagePage) {
+                message.setStatus(0);
+            }
+            messages = new PageInfo<>(messagePage);
         } else if (status == 2) {
             // 获取全部公告
             int organizationId = organizationDao.findOrganizationByUserId(userId);
@@ -114,7 +122,7 @@ public class MessageServiceImpl implements MessageService {
                     message.setStatus(1);
                 }
             }
-            return new RequestResult<>(StatEnum.LIST_MESSAGE_SUCCESS, allMessages);
+            return new RequestResult<>(StatEnum.LIST_MESSAGE_SUCCESS, new PageInfo<>(allMessages));
         } else {
             throw new ParamException(StatEnum.ERROR_PARAM);
         }
