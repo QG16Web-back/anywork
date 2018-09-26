@@ -47,7 +47,7 @@ public interface OrganizationService {
      * @param userId 用户ID
      * @return request result
      */
-    RequestResult<Organization> join(int organizationId, String  token, int userId);
+    RequestResult<Organization> join(int organizationId, String token, int userId);
 
     /***
      * 获取我的组织列表
@@ -85,6 +85,7 @@ public interface OrganizationService {
      * @param organizationId 组织ID
      * @param userId 用户ID
      * @return request result
+     * @throws IOException ioException
      */
     RequestResult deleteOrganization(int organizationId, int userId) throws IOException;
 

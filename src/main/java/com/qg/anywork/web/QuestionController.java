@@ -130,14 +130,6 @@ public class QuestionController {
             String filename = file.getOriginalFilename();
             assert filename != null;
             if (filename.endsWith(".xlsx") || filename.endsWith(".xls")) {
-//                    //文件上传
-//                    FileUtils.copyInputStreamToFile(file.getInputStream(),
-//                            new File(request.getServletContext().getRealPath("/excel"), user.getUserId() +".xlsx"));
-//
-//
-//                    //读取文件
-//                    String path = request.getServletContext().getRealPath("/excel"+"/"+user.getUserId()+".xlsx");
-//                    System.out.println(path);
                 return questionService.addQuestionList(file.getInputStream(), user.getUserId());
             }
         }

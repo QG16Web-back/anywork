@@ -188,7 +188,7 @@ public class ExcelUtil {
                     j++;
 
                     //将类型转化为带数字的字母类型
-                    if (fieldName.equals("type")) {
+                    if ("type".equals(fieldName)) {
                         switch (String.valueOf((int) value)) {
                             case "1":
                                 value = "A" + (A_num++);
@@ -261,7 +261,7 @@ public class ExcelUtil {
                     // 如果不是图片数据，就利用正则表达式判断textValue是否全部由数字组成
                     if (textValue != null) {
                         Pattern p = Pattern.compile("^//d+(//.//d+)?$");
-                        Matcher matcher = null;
+                        Matcher matcher;
                         if (textValue instanceof String) {
                             matcher = p.matcher((String) textValue);
                         } else {

@@ -75,7 +75,7 @@ public class MessageController {
     @PostMapping("/change")
     public RequestResult changeMessageStatus(HttpServletRequest request, @RequestBody Map<String, Integer> map) {
         User user = (User) request.getSession().getAttribute("user");
-        if (!map.containsKey("message_id")) {
+        if (!map.containsKey("messageId")) {
             throw new ParamNotExistException(StatEnum.PARAM_IS_NOT_EXIST);
         }
         return messageService.changeMessageStatus(user.getUserId(), map.get("messageId"));
