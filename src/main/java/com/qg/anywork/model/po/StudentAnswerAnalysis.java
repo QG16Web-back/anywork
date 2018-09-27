@@ -42,4 +42,9 @@ public class StudentAnswerAnalysis implements Serializable {
      * 得分情况
      */
     private double socre;
+
+    /**
+     * 是否收藏的状态，１为已收藏，０为未收藏
+     */
+    private Integer collectionStatus;
 }

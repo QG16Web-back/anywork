@@ -1,6 +1,7 @@
 package com.qg.anywork.service.impl;
 
 import com.qg.anywork.dao.OrganizationDao;
+import com.qg.anywork.dao.QuestionDao;
 import com.qg.anywork.dao.QuestionRedisDao;
 import com.qg.anywork.dao.TestDao;
 import com.qg.anywork.domain.UserRepository;
@@ -46,6 +47,9 @@ public class TestServiceImpl implements TestService {
 
     @Autowired
     private QuestionRedisDao questionRedisDao;
+
+    @Autowired
+    private QuestionDao questionDao;
 
     /***
      * 检查是否有做
@@ -309,6 +313,13 @@ public class TestServiceImpl implements TestService {
         map.put("testpaperId", testPaperId);
         map.put("socre", testResult.getSocre());
         List<StudentAnswerAnalysis> studentAnswerAnalyses = testDao.getStudentAnswer(testPaperId, userId);
+        for (StudentAnswerAnalysis studentAnswerAnalysis : studentAnswerAnalyses) {
+            if (questionDao.checkQuestionIfCollected(userId, studentAnswerAnalysis.getQuestion().getQuestionId()) == 0) {
+                studentAnswerAnalysis.setCollectionStatus(0);
+            } else {
+                studentAnswerAnalysis.setCollectionStatus(1);
+            }
+        }
         map.put("studentAnswerAnalysis", studentAnswerAnalyses);
         return new RequestResult<>(StatEnum.GET_SUCCESS, map);
     }
@@ -383,6 +394,7 @@ public class TestServiceImpl implements TestService {
             checkResult.setSubject(0);
             testDao.addCheckResult(checkResult);
             for (StudentAnswerAnalysis studentAnswerAnalysis : studentTestResult.getStudentAnswerAnalysis()) {
+                studentAnswerAnalysis.setCollectionStatus(0);
                 testDao.addStudentAnswer(studentAnswerAnalysis);
             }
             return new RequestResult<>(StatEnum.SUBMIT_TEST_SUCCESS, studentTestResult);
@@ -393,6 +405,11 @@ public class TestServiceImpl implements TestService {
     @Override
     public RequestResult getQuestionDetail(int userId, int questionId) {
         StudentAnswerAnalysis studentAnswerAnalysis = testDao.getStudentAnswerAnalysis(userId, questionId);
+        if (questionDao.checkQuestionIfCollected(userId, questionId) == 0) {
+            studentAnswerAnalysis.setCollectionStatus(0);
+        } else {
+            studentAnswerAnalysis.setCollectionStatus(1);
+        }
         return new RequestResult<>(StatEnum.GET_SUCCESS, studentAnswerAnalysis);
     }
 

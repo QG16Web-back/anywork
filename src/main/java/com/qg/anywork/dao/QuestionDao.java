@@ -9,7 +9,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * Created by FunriLy on 2017/7/12.
+ * @author FunriLy
+ * @date 2017/7/12
  * From small beginnings comes great things.
  */
 @Mapper
@@ -56,6 +57,15 @@ public interface QuestionDao {
      * @return int
      */
     int deleteCollection(@Param("studentId") Integer studentId, @Param("questionId") Integer questionId);
+
+    /**
+     * 检查该题是否已经收藏
+     *
+     * @param studentId  　学生ＩＤ
+     * @param questionId 　问题ＩＤ
+     * @return 影响的行数
+     */
+    int checkQuestionIfCollected(@Param("studentId") Integer studentId, @Param("questionId") Integer questionId);
 
     /**
      * 根据id获取题目

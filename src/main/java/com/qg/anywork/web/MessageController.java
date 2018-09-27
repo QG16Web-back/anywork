@@ -37,6 +37,10 @@ public class MessageController {
         if (user.getMark() != 1) {
             throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
         }
+//        User user = new User();
+//        user.setUserId(1996);
+//        user.setMark(1);
+//        user.setUserName("伍峻贤");
         message.setUserId(user.getUserId());
         return messageService.publishMessage(message, user.getUserName());
     }
