@@ -294,6 +294,7 @@ public class QuestionController {
      * 收藏题目
      */
     @PostMapping("/collect")
+    @ResponseBody
     public RequestResult collectQuestion(HttpServletRequest request, @RequestBody Map<String, Integer> map) {
         if (!map.containsKey("questionId")) {
             throw new ParamNotExistException(StatEnum.PARAM_IS_NOT_EXIST);
@@ -306,6 +307,7 @@ public class QuestionController {
      * 删除已收藏的题目
      */
     @PostMapping("/collect/delete")
+    @ResponseBody
     public RequestResult deleteCollectionQuestion(HttpServletRequest request, @RequestBody Map<String, Integer> map) {
         if (!map.containsKey("questionId")) {
             throw new ParamNotExistException(StatEnum.PARAM_IS_NOT_EXIST);
@@ -315,6 +317,7 @@ public class QuestionController {
     }
 
     @PostMapping("/collect/list")
+    @ResponseBody
     public RequestResult listCollectionQuestion(HttpServletRequest request) {
         User user = (User) request.getSession().getAttribute("user");
         return questionService.listCollectionQuestion(user.getUserId());

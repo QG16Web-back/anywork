@@ -50,6 +50,15 @@ public interface QuestionDao {
     int collectQuestion(@Param("collectionQuestion") CollectionQuestion collectionQuestion);
 
     /**
+     * 根据用户ID和问题ID查找数量
+     *
+     * @param userId     用户ID
+     * @param questionId 问题ID
+     * @return 数量
+     */
+    int findCollectedQuestion(@Param("userId") Integer userId, @Param("questionId") Integer questionId);
+
+    /**
      * 删除已收藏的题目
      *
      * @param studentId  学生ID

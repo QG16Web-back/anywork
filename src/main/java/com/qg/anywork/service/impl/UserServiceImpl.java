@@ -102,7 +102,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new FormatterFaultException(StatEnum.REGISTER_EMPTY_USER);
         }
-        if (email.matches("\\w+@\\w+(\\.\\w{2,3})*\\.\\w{2,3}")) {
+        if (!email.matches("\\w+@\\w+(\\.\\w{2,3})*\\.\\w{2,3}")) {
             throw new FormatterFaultException(StatEnum.EMAIL_FORMAT_ERROR);
         }
         user.setEmail(email);

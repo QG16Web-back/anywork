@@ -65,4 +65,10 @@
         where student_id = #{studentId}
           and question_id = #{questionId}
     </select>
+    <select id="findCollectedQuestion" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        from collection_question
+        where student_id = #{userId}
+          and question_id = #{questionId}
+    </select>
 </mapper>

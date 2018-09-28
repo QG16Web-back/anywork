@@ -20,7 +20,10 @@ import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Create by ming on 18-8-5 下午10:19
@@ -151,11 +154,16 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public RequestResult collectQuestion(int userId, int questionId) {
-        CollectionQuestion collectionQuestion = new CollectionQuestion();
-        collectionQuestion.setQuestionId(questionId);
-        collectionQuestion.setStudentId(userId);
-        collectionQuestion.setCollectionTime(DateUtil.format(new Date()));
-        questionDao.collectQuestion(collectionQuestion);
+        synchronized (this) {
+            if (questionDao.findCollectedQuestion(userId, questionId) == 1) {
+                throw new QuestionException(StatEnum.DO_NOT_COLLECT_AGIAN);
+            }
+            CollectionQuestion collectionQuestion = new CollectionQuestion();
+            collectionQuestion.setQuestionId(questionId);
+            collectionQuestion.setStudentId(userId);
+            collectionQuestion.setCollectionTime(DateUtil.format(new Date()));
+            questionDao.collectQuestion(collectionQuestion);
+        }
         return new RequestResult(StatEnum.COLLECT_SUCCESS);
     }
 
