@@ -135,7 +135,7 @@ public class TestController {
     @RequestMapping(value = "/detail", method = RequestMethod.POST)
     public RequestResult detail(@RequestBody Map map, HttpServletRequest request) {
 
-        String questionId = (String) map.get("questionId");
+        String questionId = String.valueOf(map.get("questionId"));
         if (questionId == null || "".equals(questionId)) {
             return new RequestResult<>(StatEnum.REQUEST_ERROR);
         }

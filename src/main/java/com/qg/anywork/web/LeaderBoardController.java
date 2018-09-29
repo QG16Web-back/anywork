@@ -6,10 +6,10 @@ import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.model.po.User;
 import com.qg.anywork.service.LeaderBoardService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
