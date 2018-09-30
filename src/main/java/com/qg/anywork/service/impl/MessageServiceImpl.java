@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -91,30 +91,43 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public RequestResult studentShowMessage(int userId, int pageNum, int pageSize, int status) {
-        PageHelper.startPage(pageNum, pageSize);
         PageInfo<Message> messages;
-        List<Integer> messageIds = messageDao.getAllMessageIdByUserId(userId);
-        if (messageIds.isEmpty()) {
-            throw new MessageException(StatEnum.MESSAGE_LIST_IS_NULL);
-        }
+        // 获取组织
+        int organizationId = organizationDao.findOrganizationByUserId(userId);
+        PageHelper.startPage(pageNum, pageSize);
+        // 此查询必须是第一个，不然会失效
+
         if (status == 1) {
             // 获取已读公告
-            Page<Message> messagePage = messageDao.findHaveReadMessageExceptMessageIds(messageIds);
-            for (Message message : messagePage) {
+            List<Message> haveReadMessages = messageDao.findHaveReadMessageExceptMessageIds(userId, organizationId);
+            if (haveReadMessages.size() == 0) {
+                // 公告列表为空
+                throw new MessageException(StatEnum.MESSAGE_LIST_IS_NULL);
+            }
+            for (Message message : haveReadMessages) {
                 message.setStatus(1);
             }
-            messages = new PageInfo<>(messagePage);
+            messages = new PageInfo<>(haveReadMessages);
         } else if (status == 0) {
             // 获取未读公告
-            Page<Message> messagePage = messageDao.findUnreadMessage(messageIds);
-            for (Message message : messagePage) {
+            List<Message> unreadMessages = messageDao.findUnreadMessage(userId);
+            if (unreadMessages.size() == 0) {
+                // 公告列表为空
+                throw new MessageException(StatEnum.MESSAGE_LIST_IS_NULL);
+            }
+            for (Message message : unreadMessages) {
                 message.setStatus(0);
             }
-            messages = new PageInfo<>(messagePage);
+            messages = new PageInfo<>(unreadMessages);
         } else if (status == 2) {
             // 获取全部公告
-            int organizationId = organizationDao.findOrganizationByUserId(userId);
-            Page<Message> allMessages = messageDao.findAllMessagesByOrganizationId(organizationId);
+            List<Message> allMessages = messageDao.findAllMessagesByOrganizationId(organizationId);
+            if (allMessages.size() == 0) {
+                // 公告列表为空
+                throw new MessageException(StatEnum.MESSAGE_LIST_IS_NULL);
+            }
+            // 获取未读公告ID
+            List<Integer> messageIds = messageDao.findMessageIdsByStudentId(userId);
             for (Message message : allMessages) {
                 if (messageIds.contains(message.getMessageId())) {
                     message.setStatus(0);

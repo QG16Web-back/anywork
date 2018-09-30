@@ -46,7 +46,6 @@ public class MailUtil {
     @Autowired
     private JavaMailSender javaMailSender;
 
-
     @Value("${spring.mail.username}")
     private String from;
 

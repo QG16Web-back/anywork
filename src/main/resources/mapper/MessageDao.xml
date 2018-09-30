@@ -63,30 +63,20 @@
           and message_id = #{messageId}
     </select>
 
-    <select id="getAllMessageIdByUserId" resultType="java.lang.Integer">
-        SELECT message_id
-        from user_message
-        where user_id = #{userId}
-    </select>
-
     <select id="findHaveReadMessageExceptMessageIds" resultType="com.qg.anywork.model.po.Message">
-        SELECT message_id, title, content, create_time, u.user_name as publisher
+        select m.*, u.user_name as publisher
         from message m
-        left join user u on m.user_id = u.user_id
-        where m.message_id not in
-        <foreach open="(" collection="messageIds" item="messageId" index="" separator="," close=")">
-            #{messageId}
-        </foreach>
+                 left join user u on m.user_id = u.user_id
+                 left join organization_message om on om.message_id = m.message_id
+        where organization_id = #{organizationId}
+          and m.message_id not in (SELECT message_id from user_message where user_id = #{userId})
     </select>
 
     <select id="findUnreadMessage" resultType="com.qg.anywork.model.po.Message">
-        SELECT message_id, title, content, create_time, u.user_name as publisher
+        select m.*, u.user_name as publisher
         from message m
-        left join user u on m.user_id = u.user_id
-        where m.message_id in
-        <foreach open="(" collection="messageIds" item="messageId" index="" separator="," close=")">
-            #{messageId}
-        </foreach>
+                 left join user u on m.user_id = u.user_id
+        where m.message_id in (SELECT message_id from user_message where user_id = #{userId})
     </select>
 
     <select id="findByMessageId" resultType="com.qg.anywork.model.po.Message">
@@ -97,9 +87,16 @@
     </select>
 
     <select id="findAllMessagesByOrganizationId" resultType="com.qg.anywork.model.po.Message">
-        select m.*
+        select m.*, u.user_name as publisher
         from message m
                  left join organization_message om on om.message_id = m.message_id
+                 left join user u on m.user_id = u.user_id
         where organization_id = #{organizationId}
+    </select>
+
+    <select id="findMessageIdsByStudentId" resultType="java.lang.Integer">
+        SELECT message_id
+        from user_message
+        where user_id = #{userId}
     </select>
 </mapper>

@@ -70,6 +70,8 @@ public class MessageController {
     @PostMapping("/show")
     public RequestResult studentShowMessage(HttpServletRequest request, @RequestBody Map<String, Integer> map) {
         User user = (User) request.getSession().getAttribute("user");
+//        User user = new User();
+//        user.setUserId(1988);
         if (!map.containsKey("pageNum") || !map.containsKey("pageSize") || !map.containsKey("status")) {
             throw new ParamNotExistException(StatEnum.PARAM_IS_NOT_EXIST);
         }

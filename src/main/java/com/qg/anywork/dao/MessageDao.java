@@ -90,19 +90,19 @@ public interface MessageDao {
 
     /**
      * 查看已读公告
-     *
-     * @param messageIds 公告ID集合
+     * @param userId userId
+     * @param organizationId 组织Id
      * @return 已读公告
      */
-    Page<Message> findHaveReadMessageExceptMessageIds(@Param("messageIds") List<Integer> messageIds);
+    List<Message> findHaveReadMessageExceptMessageIds(@Param("userId") Integer userId, @Param("organizationId") Integer organizationId);
 
     /**
      * 查看未读公告
      *
-     * @param messageIds 公告ID集合
+     * @param userId userId
      * @return 未读公告
      */
-    Page<Message> findUnreadMessage(@Param("messageIds") List<Integer> messageIds);
+    List<Message> findUnreadMessage(@Param("userId") Integer userId);
 
     /**
      * 获取全部公告
@@ -110,15 +110,15 @@ public interface MessageDao {
      * @param organizationId 组织ID
      * @return 全部公告
      */
-    Page<Message> findAllMessagesByOrganizationId(@Param("organizationId") Integer organizationId);
+    List<Message> findAllMessagesByOrganizationId(@Param("organizationId") Integer organizationId);
 
     /**
-     * 根据用户ID获取公告ID列表
+     * 学生根据userId查找未读公告ID
      *
-     * @param userId 用户ID
-     * @return 公告ID列表
+     * @param userId 用户ＩＤ
+     * @return 未读公告ID
      */
-    List<Integer> getAllMessageIdByUserId(@Param("userId") Integer userId);
+    List<Integer> findMessageIdsByStudentId(@Param("userId") Integer userId);
 
     /**
      * 根据公告ID查找公告
