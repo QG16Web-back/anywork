@@ -44,4 +44,12 @@ public interface ChapterDao {
      * @return
      */
     int updateChapter(@Param("chapter") Chapter chapter);
+
+    /**
+     * 查找组织ID
+     *
+     * @param chapterId 章节ID
+     * @return int
+     */
+    int getOrganizationIdByChapterId(@Param("chapterId") Integer chapterId);
 }

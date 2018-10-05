@@ -32,4 +32,13 @@ public interface ChapterService {
      * @return Request result
      */
     RequestResult deleteChapter(int chapterId);
+
+    /**
+     * 修改章节信息
+     *
+     * @param chapterId   章节ID
+     * @param chapterName 章节名称
+     * @return result
+     */
+    RequestResult updateChapter(int chapterId, String chapterName);
 }

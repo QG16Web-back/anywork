@@ -20,6 +20,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Create by ming on 18-9-13 下午12:56
@@ -73,6 +74,44 @@ public class LeaderBoardServiceImpl implements LeaderBoardService {
             throw new ParamException(StatEnum.ERROR_PARAM);
         }
         return new RequestResult<>(StatEnum.GET_SUCCESS, leaderBoards);
+    }
+
+    @Override
+    public RequestResult teacherShowAllOrganizationsLeaderBoard(int teacherId, int testPaperId) {
+        List<Organization> organizations = organizationDao.getMyOrganization(teacherId);
+        // 要返回的map
+        ConcurrentHashMap<String, Object> concurrentHashMap = new ConcurrentHashMap<>(2);
+        // 组织List
+        List<Object> organizationList = new ArrayList<>();
+        for (Organization organization : organizations) {
+            ConcurrentHashMap<String, Object> subMap = new ConcurrentHashMap<>(2);
+            subMap.put("organizationId", organization.getOrganizationId());
+            subMap.put("organizationName", organization.getOrganizationName());
+            organizationList.add(subMap);
+        }
+        concurrentHashMap.put("organizations", organizationList);
+
+        String key = "teacherShowAllOrganizationsLeaderBoard" + "_" + teacherId;
+        List<LeaderBoard> redisLeaderBoards = (List<LeaderBoard>) leaderBoardRedisDao.getLeaderBoard(key);
+        if (redisLeaderBoards != null) {
+            concurrentHashMap.put("leaderboards", redisLeaderBoards);
+            return new RequestResult(StatEnum.GET_SUCCESS, concurrentHashMap);
+        }
+
+        List<LeaderBoard> leaderBoards = new ArrayList<>();
+        for (Organization organization : organizations) {
+            leaderBoards.addAll(showLeaderBoardByOrganization(organization.getOrganizationId()));
+        }
+        leaderBoards.sort((o1, o2) -> Double.compare(o2.getScore(), o1.getScore()));
+        // 存进缓存
+        leaderBoardRedisDao.setLeaderBoard(key, leaderBoards);
+        concurrentHashMap.put("leaderboards", leaderBoards);
+        return new RequestResult(StatEnum.GET_SUCCESS, concurrentHashMap);
+    }
+
+    @Override
+    public RequestResult teacherShowOneOrganizationsLeaderBoard(int testPaperId, int organizationId) {
+        return new RequestResult(StatEnum.GET_SUCCESS, showPaperLeaderBoardByOrganization(testPaperId, organizationId));
     }
 
     private List<LeaderBoard> showPaperLeaderBoardByOrganization(int testPaperId, int organizationId) {

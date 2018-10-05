@@ -51,4 +51,17 @@ public class ChapterServiceImpl implements ChapterService {
         chapterDao.deleteChapter(chapterId);
         return new RequestResult(1, "删除成功");
     }
+
+    @Override
+    public RequestResult updateChapter(int chapterId, String chapterName) {
+        if (chapterName.length() > 32) {
+            throw new OrganizationException(StatEnum.CHAPTER_TOO_LONG);
+        }
+        Chapter chapter = new Chapter();
+        chapter.setChapterId(chapterId);
+        chapter.setChapterName(chapterName);
+        chapterDao.updateChapter(chapter);
+        chapter.setOrganizationId(chapterDao.getOrganizationIdByChapterId(chapterId));
+        return new RequestResult<>(1, "修改成功", chapter);
+    }
 }

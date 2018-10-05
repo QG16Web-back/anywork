@@ -1,4 +1,4 @@
-package com.qg.anywork.web;
+package com.qg.anywork.web.controller;
 
 import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.common.ParamNotExistException;

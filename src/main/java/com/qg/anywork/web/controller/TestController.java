@@ -1,4 +1,4 @@
-package com.qg.anywork.web;
+package com.qg.anywork.web.controller;
 
 import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.common.ParamNotExistException;
@@ -172,5 +172,14 @@ public class TestController {
             return new RequestResult(0, "无此权限");
         }
         return chapterService.deleteChapter(chapterId);
+    }
+
+    @PostMapping("/chapter/update")
+    public RequestResult updateChapter(@RequestBody Map<String, Object> map, HttpServletRequest request) {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user.getMark() == 0) {
+            return new RequestResult<>(0, "无此权限");
+        }
+        return chapterService.updateChapter((int) map.get("chapterId"), map.get("chapterName").toString());
     }
 }

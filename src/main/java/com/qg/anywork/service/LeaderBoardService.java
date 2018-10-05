@@ -28,4 +28,22 @@ public interface LeaderBoardService {
      * @return 试卷排行榜
      */
     RequestResult showPaperLeaderBoard(int userId, int leaderBoardType, int testPaperId);
+
+    /**
+     * 老师查看一套所有组织的排行榜
+     *
+     * @param teacherId   老师ID
+     * @param testPaperId 试卷ID
+     * @return 排行榜
+     */
+    RequestResult teacherShowAllOrganizationsLeaderBoard(int teacherId, int testPaperId);
+
+    /**
+     * 老师查看一套某个组织的排行榜
+     *
+     * @param testPaperId    试卷ID
+     * @param organizationId 组织ID
+     * @return 排行榜
+     */
+    RequestResult teacherShowOneOrganizationsLeaderBoard(int testPaperId, int organizationId);
 }

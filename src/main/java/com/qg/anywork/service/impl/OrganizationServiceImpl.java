@@ -139,6 +139,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         int flag = organizationDao.deleteOrganization(organizationId);
 
         if (flag == 1) {
+            // 删除关联
             List<User> users = organizationDao.getOrganizationPeople(organizationId);
             organizationDao.deleteOrganizationUserRelation(organizationId);
             if (!users.isEmpty()) {

@@ -10,6 +10,11 @@
         FROM chapter
         WHERE organization_id = #{organizationId}
     </select>
+    <select id="getOrganizationIdByChapterId" resultType="java.lang.Integer">
+        select organization_id
+        from chapter
+        where chapter_id = #{chapterId}
+    </select>
 
     <insert id="addChapter" parameterType="com.qg.anywork.model.po.Chapter" useGeneratedKeys="true"
             keyProperty="chapter.chapterId">

@@ -1,4 +1,4 @@
-package com.qg.anywork.web;
+package com.qg.anywork.web.controller;
 
 import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.organization.OrganizationException;
@@ -149,7 +149,9 @@ public class OrganizationController {
         if (file != null && !file.isEmpty()) {
             String filename = file.getOriginalFilename();
             assert filename != null;
-            if (!(filename.endsWith(".jpg") || filename.endsWith(".JPG") || filename.endsWith(".png") || filename.endsWith(".PNG"))) {
+            if (!(filename.endsWith(".jpg") || filename.endsWith(".JPG")
+                    || filename.endsWith(".png") || filename.endsWith(".PNG")
+                    || filename.endsWith(".jpeg") || filename.endsWith(".JPEG"))) {
                 return new RequestResult<>(0, "上传的头像格式不支持");
             }
             String photoName = o.getOrganizationName() + ".jpg";

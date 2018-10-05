@@ -22,7 +22,7 @@ public class Question  implements Serializable {
     private int questionId;
 
     /**
-     * 题目类型  1-选择题 2-判断题 3-填空题 4-问答题 5-编程题 6-综合题
+     * 题目类型  1-选择题 2-判断题 3-填空题 4-问答题
      */
     private int type;
 

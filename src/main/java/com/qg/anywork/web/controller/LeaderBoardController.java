@@ -1,4 +1,4 @@
-package com.qg.anywork.web;
+package com.qg.anywork.web.controller;
 
 import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.common.ParamNotExistException;
@@ -54,5 +54,25 @@ public class LeaderBoardController {
         int testPaperId = map.get("testpaperId");
         User user = (User) request.getSession().getAttribute("user");
         return leaderBoardService.showPaperLeaderBoard(user.getUserId(), leaderBoardType, testPaperId);
+    }
+
+    @PostMapping("/teacher/show")
+    public RequestResult teacherShowAllOrganizationsLeaderBoard(HttpServletRequest request, @RequestBody Map<String, Integer> map) {
+        if (!map.containsKey("testpaperId")) {
+            throw new ParamNotExistException(StatEnum.PARAM_IS_NOT_EXIST);
+        }
+        int testPaperId = map.get("testpaperId");
+        User user = (User) request.getSession().getAttribute("user");
+        return leaderBoardService.teacherShowAllOrganizationsLeaderBoard(user.getUserId(), testPaperId);
+    }
+
+    @PostMapping("/teacher/show/{organizationId}")
+    public RequestResult teacherShowOneOrganizationsLeaderBoard(@PathVariable int organizationId,
+                                                                @RequestBody Map<String, Integer> map) {
+        if (!map.containsKey("testpaperId")) {
+            throw new ParamNotExistException(StatEnum.PARAM_IS_NOT_EXIST);
+        }
+        int testPaperId = map.get("testpaperId");
+        return leaderBoardService.teacherShowOneOrganizationsLeaderBoard(testPaperId, organizationId);
     }
 }
