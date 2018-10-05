@@ -10,15 +10,17 @@ import java.io.OutputStream;
 import java.util.List;
 
 /**
- * Created by FunriLy on 2017/7/13.
+ * @author FunriLy
+ * @date 2017/7/13
  * From small beginnings comes great things.
  */
 public interface QuestionService {
 
     /**
      * 通过excel文件读取问题列表
-     * @param input
-     * @return
+     *
+     * @param input 输入流
+     * @return 问题列表
      */
     List<Question> getQuestionList(InputStream input);
 

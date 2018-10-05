@@ -68,12 +68,13 @@ public enum StatEnum {
     FILE_NOT_EXIT(0, "文件不存在"),
     FILE_EXPORT_SUCCESS(1, "Excel文件导出成功"),
     FILE_EXPORT_FAIL(0, "Excel文件导出失败"),
+    FILE_PARSE_FAIL(0, "Excel文件解析失败"),
 
 
     /**
      * 试卷、练习板块
      */
-    TEST_RELEASE_SUCESS(1, "发布试卷/练习成功"),
+    TEST_RELEASE_SUCESS(1, "发布成功"),
     TEST_RELEASE_FAIL(0, "发布试卷/练习失败"),
     NOT_HAVE_POWER(0, "没有相应的权限"),
     DELETE_TEST_SUCCESS(1, "删除试卷/练习成功"),
@@ -86,6 +87,7 @@ public enum StatEnum {
     TEST_LIST_IS_NULL(0, "没有对应的试卷"),
     GET_SUCCESS(1, "获取成功"),
     WRONG_QUESTION_LIST_IS_NULL(0, "错题列表为空"),
+    TEST_PAPER_TIME_ERROR(0, "试卷时间有错误"),
 
     /**
      * 组织板块

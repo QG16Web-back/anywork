@@ -20,18 +20,18 @@ public interface QuestionDao {
     /**
      * 插入题目
      *
-     * @param question
-     * @return
+     * @param question 题目实体
+     * @return int
      */
     int insertQuestion(@Param("question") Question question);
 
     /**
      * 批量插入问题
      *
-     * @param questlist
-     * @return
+     * @param questionList 问题集合
+     * @return int
      */
-    int insertAllQuestion(List<Question> questlist);
+    int insertAllQuestion(@Param("questionList") List<Question> questionList);
 
     /**
      * 根据试卷id删除所有的题目

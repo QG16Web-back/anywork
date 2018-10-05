@@ -141,7 +141,7 @@ public class TestServiceImpl implements TestService {
 
     @Override
     public boolean updateTextpaper(int testpaperId, int socre) {
-        return testDao.updateSocreOfTestpaper(testpaperId, socre) == 1;
+        return testDao.updateScoreOfTestPaper(testpaperId, socre) == 1;
     }
 
     @Override

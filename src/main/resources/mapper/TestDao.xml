@@ -241,7 +241,7 @@
                 #{testpaper.chapterId})
     </insert>
 
-    <update id="updateSocreOfTestpaper">
+    <update id="updateScoreOfTestPaper">
         UPDATE test_paper
         SET testpaper_score = #{score}
         WHERE testpaper_id = #{testpaperId}

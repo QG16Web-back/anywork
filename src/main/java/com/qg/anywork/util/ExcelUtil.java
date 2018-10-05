@@ -33,6 +33,8 @@ public class ExcelUtil {
 
     private static final ExcelUtil UTIL = new ExcelUtil();
 
+    private static Pattern NUMBER_PATTERN = Pattern.compile("^//d+(//.//d+)?$");
+
     /**
      * 读取解析Excel文件流
      *
@@ -65,7 +67,7 @@ public class ExcelUtil {
         map3.put(4, "other");
         map3.put(5, "analysis");
 
-        return new ExcelUtil().readQuest(input, map1, map2, map3, map2, map2, map2);
+        return new ExcelUtil().readQuest(input, map1, map2, map3, map2);
     }
 
     /**
@@ -260,12 +262,11 @@ public class ExcelUtil {
 
                     // 如果不是图片数据，就利用正则表达式判断textValue是否全部由数字组成
                     if (textValue != null) {
-                        Pattern p = Pattern.compile("^//d+(//.//d+)?$");
                         Matcher matcher;
                         if (textValue instanceof String) {
-                            matcher = p.matcher((String) textValue);
+                            matcher = NUMBER_PATTERN.matcher((String) textValue);
                         } else {
-                            matcher = p.matcher(String.valueOf(textValue));
+                            matcher = NUMBER_PATTERN.matcher(String.valueOf(textValue));
                         }
                         if (matcher.matches()) {
                             // 是数字当作double处理
@@ -341,8 +342,6 @@ public class ExcelUtil {
      * @param map2  判断题
      * @param map3  填空题
      * @param map4  问答题
-     * @param map5  编程题
-     * @param map6  综合题
      * @return 试卷问题列表
      * @throws Exception Exception
      */
@@ -351,18 +350,14 @@ public class ExcelUtil {
                                          Map<Integer, String> map1,                      //选择题
                                          Map<Integer, String> map2,                      //判断题
                                          Map<Integer, String> map3,                      //填空题
-                                         Map<Integer, String> map4,                      //问答题
-                                         Map<Integer, String> map5,                      //编程题
-                                         Map<Integer, String> map6) throws Exception {   //综合题
-
+                                         Map<Integer, String> map4                       //问答题
+    ) throws Exception {
         List<Question> questionList = new ArrayList<>();
-
         try {
             Workbook wb = WorkbookFactory.create(input);
             Sheet sheet = wb.getSheetAt(0);
             Field field;
             Class tempClazz = Question.class;
-
             //从第二行开始读取
             for (int i = 2; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
@@ -393,12 +388,6 @@ public class ExcelUtil {
                 } else if (status.startsWith("D")) {
                     //问答题
                     map = map4;
-                } else if (status.startsWith("E")) {
-                    //编程题
-                    map = map5;
-                } else if (status.startsWith("F")) {
-                    //综合题
-                    map = map6;
                 } else {
                     //未知信息
                     continue;
@@ -415,7 +404,6 @@ public class ExcelUtil {
                     } catch (NullPointerException e) {
                         break;
                     }
-
                     field.setAccessible(true);
                     //获得单元格对象
                     Cell realCell = row.getCell(j);
@@ -430,7 +418,6 @@ public class ExcelUtil {
                 if (null == question.getContent()) {
                     continue;
                 }
-
                 if (status.startsWith("A")) {
                     question.setType(1);
                 } else if (status.startsWith("B")) {
@@ -441,12 +428,7 @@ public class ExcelUtil {
                     question.setKey(question.getKey().replaceAll("#", "∏"));
                 } else if (status.startsWith("D")) {
                     question.setType(4);
-                } else if (status.startsWith("E")) {
-                    question.setType(5);
-                } else if (status.startsWith("F")) {
-                    question.setType(6);
                 }
-
                 questionList.add(question);
             }
         } finally {
@@ -463,20 +445,17 @@ public class ExcelUtil {
 
     private <T> T addingT(Field field, T t, Cell cell) throws IllegalArgumentException, IllegalAccessException {
         switch (cell.getCellType()) {
-            //字符串
+            // 字符串
             case Cell.CELL_TYPE_STRING:
                 field.set(t, cell.getStringCellValue());
                 break;
-            //Boolean对象
+            // Boolean对象
             case Cell.CELL_TYPE_BOOLEAN:
                 field.set(t, cell.getBooleanCellValue());
                 break;
-
             case Cell.CELL_TYPE_NUMERIC:
-
                 //是否是日期格式
                 if (DateUtil.isCellDateFormatted(cell)) {
-                    //DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
                     field.set(t, cell.getDateCellValue());
                 } else {
                     //读取为数字
@@ -508,7 +487,6 @@ public class ExcelUtil {
             default:
                 break;
         }
-
         return t;
     }
 

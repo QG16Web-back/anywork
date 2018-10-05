@@ -1,12 +1,18 @@
 package com.qg.anywork.web.controller;
 
+import com.qg.anywork.enums.StatEnum;
+import com.qg.anywork.exception.question.ExcelReadException;
+import com.qg.anywork.exception.testpaper.NotPowerException;
 import com.qg.anywork.model.dto.RequestResult;
+import com.qg.anywork.model.po.User;
+import com.qg.anywork.service.PaperService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
+import java.text.ParseException;
 import java.util.Map;
 
 /**
@@ -21,6 +27,9 @@ import java.util.Map;
 @Slf4j
 @RequestMapping("/paper")
 public class PaperController {
+
+    @Autowired
+    private PaperService paperService;
 
     /**
      * 发布试卷
@@ -37,11 +46,42 @@ public class PaperController {
     public RequestResult publishPaper(@RequestPart("file") MultipartFile file,
                                       @RequestParam("testpaperTitle") String testpaperTitle,
                                       @RequestParam("chapterId") Integer chapterId,
-                                      @RequestParam("createTime") Long createTime,
-                                      @RequestParam("endingTime") Long endingTime,
+                                      @RequestParam("createTime") String createTime,
+                                      @RequestParam("endingTime") String endingTime,
                                       @RequestParam("testpaperType") Integer testpaperType,
-                                      HttpServletRequest request) throws IOException {
-        return new RequestResult(0, "还没做");
+                                      HttpServletRequest request) throws Exception {
+        if (null != file && !file.isEmpty()) {
+            String filename = file.getOriginalFilename();
+            assert filename != null;
+            if (!(filename.endsWith(".xlsx") || filename.endsWith(".xls"))) {
+                throw new ExcelReadException(StatEnum.FILE_FORMAT_ERROR);
+            }
+        } else {
+            return new RequestResult<>(0, "excel文件为空");
+        }
+        if (testpaperTitle == null || "".equals(testpaperTitle)) {
+            return new RequestResult<>(0, "试卷标题为空");
+        }
+        if (chapterId == null) {
+            return new RequestResult<>(0, "章节号为空");
+        }
+        if (createTime == null) {
+            return new RequestResult(0, "开始时间为空");
+        }
+        if (endingTime == null) {
+            return new RequestResult<>(0, "结束时间为空");
+        }
+        if (testpaperType == null) {
+            return new RequestResult(0, "试卷类型为空");
+        }
+//        User user = new User();
+//        user.setUserId(41);
+//        user.setMark(1);
+        User user = (User) request.getSession().getAttribute("user");
+        if (user.getMark() == 0) {
+            throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
+        }
+        return paperService.addTestPaper(file.getInputStream(), testpaperTitle, chapterId, createTime, endingTime, testpaperType, user);
     }
 
     /**
@@ -56,8 +96,13 @@ public class PaperController {
      *                endingTime 结束时间
      */
     @PostMapping("/update")
-    public RequestResult updatePaperInfo(HttpServletRequest request, Map<String, Object> map) {
-        return new RequestResult(0, "还没做");
+    public RequestResult updatePaperInfo(HttpServletRequest request, Map<String, Object> map) throws ParseException {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user.getMark() != 1) {
+            throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
+        }
+        return paperService.updateTestPaperInfo((int) map.get("testpaperId"), map.get("testPaperTitle").toString(),
+                (int) map.get("testPaperType"), map.get("createTime").toString(), map.get("endingTime").toString());
     }
 
     /**

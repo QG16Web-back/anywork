@@ -143,11 +143,11 @@ public interface TestDao {
     /**
      * 更新一张试卷/练习的分数
      *
-     * @param testpaperId 试卷
+     * @param testPaperId 试卷
      * @param score       分数
      * @return 1为添加成功 0为添加失败
      */
-    int updateSocreOfTestpaper(@Param("testpaperId") int testpaperId, @Param("score") int score);
+    int updateScoreOfTestPaper(@Param("testPaperId") int testPaperId, @Param("score") int score);
 
     /***
      * 获取 学生在组织下完成过的试卷概要列表

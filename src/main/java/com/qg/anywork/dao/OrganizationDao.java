@@ -114,6 +114,14 @@ public interface OrganizationDao {
      */
     List<Organization> getMyOrganization(@Param("userId") int userId);
 
+    /**
+     * 查找我创建的所有组织的ID
+     *
+     * @param userId 教师ID
+     * @return 组织ID集合
+     */
+    List<Integer> getMyOrganizationIds(@Param("userId") Integer userId);
+
     /***
      * 获得该组织下的成员列表
      * @param organizationId 组织ID

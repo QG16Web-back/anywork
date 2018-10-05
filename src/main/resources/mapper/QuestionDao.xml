@@ -25,7 +25,7 @@
         INSERT INTO
         question(type, A, B, C, D, `key`, socre, testpaper_id, other, analysis)
         VALUES
-        <foreach collection="questlist" item="question" index="index" separator=",">
+        <foreach collection="questionList" item="question" index="index" separator=",">
             (#{question.type}, #{question.A}, #{question.B}, #{question.C}, #{question.D},
             #{question.key}, #{question.socre}, #{question.testpaperId}, #{question.other}, #{question.analysis})
         </foreach>

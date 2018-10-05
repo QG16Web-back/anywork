@@ -45,12 +45,11 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public List<Question> getQuestionList(InputStream input) {
-
         List<Question> list;
         try {
             list = ExcelUtil.getQuestionList(input);
         } catch (Exception e) {
-            throw new ExcelReadException(StatEnum.FILE_EXPORT_FAIL);
+            throw new ExcelReadException(StatEnum.FILE_PARSE_FAIL);
         }
         return list;
     }

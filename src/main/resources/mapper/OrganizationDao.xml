@@ -140,5 +140,10 @@
         from relation
         where user_id = #{userId}
     </select>
+    <select id="getMyOrganizationIds" resultType="java.lang.Integer">
+        SELECT o.organization_id
+        FROM organization o
+        WHERE o.teacher_id = #{userId}
+    </select>
 
 </mapper>
