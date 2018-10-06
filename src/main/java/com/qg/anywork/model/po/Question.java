@@ -14,7 +14,7 @@ import java.io.Serializable;
  */
 @Data
 @NoArgsConstructor
-public class Question  implements Serializable {
+public class Question implements Serializable {
 
     /**
      * 问题id
@@ -75,4 +75,10 @@ public class Question  implements Serializable {
      * 解析
      */
     private String analysis;
+
+    /**
+     * 错误率
+     */
+    private double errorRate;
+
 }

@@ -145,5 +145,12 @@
         FROM organization o
         WHERE o.teacher_id = #{userId}
     </select>
+    <select id="getUserIdsByOrganizationId" resultType="java.lang.Integer">
+        SELECT u.user_id
+        FROM user u,
+             relation r
+        WHERE r.organization_id = #{organizationId}
+          AND u.user_id = r.user_id
+    </select>
 
 </mapper>

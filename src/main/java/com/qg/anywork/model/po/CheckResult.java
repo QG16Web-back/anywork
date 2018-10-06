@@ -1,6 +1,5 @@
 package com.qg.anywork.model.po;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -22,6 +21,11 @@ public class CheckResult implements Serializable {
      * 学生姓名
      */
     String studentName;
+
+    /**
+     * 组织名称
+     */
+    String organizationName;
 
     /**
      * 是否评卷

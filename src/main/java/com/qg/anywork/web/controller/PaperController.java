@@ -3,6 +3,7 @@ package com.qg.anywork.web.controller;
 import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.question.ExcelReadException;
 import com.qg.anywork.exception.testpaper.NotPowerException;
+import com.qg.anywork.model.bo.TeacherSubmit;
 import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.model.po.User;
 import com.qg.anywork.service.PaperService;
@@ -28,8 +29,12 @@ import java.util.Map;
 @RequestMapping("/paper")
 public class PaperController {
 
+    private final PaperService paperService;
+
     @Autowired
-    private PaperService paperService;
+    public PaperController(PaperService paperService) {
+        this.paperService = paperService;
+    }
 
     /**
      * 发布试卷
@@ -74,9 +79,6 @@ public class PaperController {
         if (testpaperType == null) {
             return new RequestResult(0, "试卷类型为空");
         }
-//        User user = new User();
-//        user.setUserId(41);
-//        user.setMark(1);
         User user = (User) request.getSession().getAttribute("user");
         if (user.getMark() == 0) {
             throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
@@ -96,7 +98,7 @@ public class PaperController {
      *                endingTime 结束时间
      */
     @PostMapping("/update")
-    public RequestResult updatePaperInfo(HttpServletRequest request, Map<String, Object> map) throws ParseException {
+    public RequestResult updatePaperInfo(HttpServletRequest request, @RequestBody Map<String, Object> map) throws ParseException {
         User user = (User) request.getSession().getAttribute("user");
         if (user.getMark() != 1) {
             throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
@@ -112,8 +114,12 @@ public class PaperController {
      * @param map     map
      */
     @PostMapping("delete")
-    public RequestResult deleteTestPaper(HttpServletRequest request, Map<String, Integer> map) {
-        return new RequestResult(0, "还没做");
+    public RequestResult deleteTestPaper(HttpServletRequest request, @RequestBody Map<String, Integer> map) {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user.getMark() != 1) {
+            throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
+        }
+        return paperService.deleteTestPaper(map.get("testpaperId"));
     }
 
     /**
@@ -124,8 +130,12 @@ public class PaperController {
      *                testpaperId 试卷ID
      */
     @PostMapping("/show")
-    public RequestResult showTestPaper(HttpServletRequest request, Map<String, Integer> map) {
-        return new RequestResult(0, "还没做");
+    public RequestResult showTestPaper(HttpServletRequest request, @RequestBody Map<String, Integer> map) {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user.getMark() != 1) {
+            throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
+        }
+        return paperService.showTestPaper(map.get("testpaperId"));
     }
 
     /**
@@ -137,8 +147,12 @@ public class PaperController {
      *                organizationId 组织ID，分析以组织为单位，如果想看全部班的情况，此字段为0
      */
     @PostMapping("/analyse")
-    public RequestResult analyseTestPaper(HttpServletRequest request, Map<String, Integer> map) {
-        return new RequestResult(0, "还没做");
+    public RequestResult analyseTestPaper(HttpServletRequest request, @RequestBody Map<String, Integer> map) {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user.getMark() != 1) {
+            throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
+        }
+        return paperService.analyseTestPaper(map.get("testpaperId"), map.get("organizationId"), user.getUserId());
     }
 
     /**
@@ -149,7 +163,11 @@ public class PaperController {
      */
     @PostMapping("/{organizationId}/list")
     public RequestResult listTestPaper(HttpServletRequest request, @PathVariable("organizationId") int organizationId) {
-        return new RequestResult(0, "还没做");
+        User user = (User) request.getSession().getAttribute("user");
+        if (user.getMark() != 1) {
+            throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
+        }
+        return paperService.listTestPaper(organizationId);
     }
 
     /**
@@ -161,8 +179,12 @@ public class PaperController {
      *                organizationId 组织ID，如果要查看自己创建的全部组织的情况，该字段为0
      */
     @PostMapping("/student/list")
-    public RequestResult listStudentDoneDetail(HttpServletRequest request, Map<String, Integer> map) {
-        return new RequestResult(0, "还没做");
+    public RequestResult listStudentDoneDetail(HttpServletRequest request, @RequestBody Map<String, Integer> map) {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user.getMark() != 1) {
+            throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
+        }
+        return paperService.listStudentDoneDetail(map.get("testpaperId"), map.get("organizationId"), user);
     }
 
     /**
@@ -174,8 +196,12 @@ public class PaperController {
      *                studentId 学生id
      */
     @PostMapping("/student/testDetail")
-    public RequestResult showStudentTestDetail(HttpServletRequest request, Map<String, Integer> map) {
-        return new RequestResult(0, "还没做");
+    public RequestResult showStudentTestDetail(HttpServletRequest request, @RequestBody Map<String, Integer> map) {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user.getMark() != 1) {
+            throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
+        }
+        return paperService.showStudentTestDetail(map.get("testpaperId"), map.get("studentId"));
     }
 
     /**
@@ -187,21 +213,23 @@ public class PaperController {
      *                studentId 学生id
      */
     @PostMapping("/student/subject")
-    public RequestResult getStudentSubjectAnswer(HttpServletRequest request, Map<String, Integer> map) {
-        return new RequestResult(0, "还没做");
+    public RequestResult getStudentSubjectAnswer(HttpServletRequest request, @RequestBody Map<String, Integer> map) {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user.getMark() != 1) {
+            throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
+        }
+        return paperService.getStudentSubjectAnswer(map.get("testpaperId"), map.get("studentId"));
     }
 
     /**
      * 教师评卷
-     *
-     * @param request 请求
-     * @param map     map
-     *                testpaperId 试卷id
-     *                studentId 学生id
-     *                teacherJudge 评分数组
      */
     @PostMapping("/teacher/judge")
-    public RequestResult teacherJudgeSubjectAnswer(HttpServletRequest request, Map<String, Object> map) {
-        return new RequestResult(0, "还没做");
+    public RequestResult teacherJudgeSubjectAnswer(HttpServletRequest request, @RequestBody TeacherSubmit teacherSubmit) {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user.getMark() != 1) {
+            throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
+        }
+        return paperService.teacherJudgeSubjectAnswer(teacherSubmit);
     }
 }

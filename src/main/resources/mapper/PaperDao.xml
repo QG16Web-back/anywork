@@ -45,6 +45,16 @@
         </set>
         where testpaper_id = #{testPaper.testpaperId}
     </update>
+    <delete id="deleteTestPaperOrganizationRelation">
+        DELETE
+        from test_paper_organization
+        where test_paper_id = #{testPaperId}
+    </delete>
+    <delete id="deleteTestPaper">
+        DELETE
+        from test_paper
+        where testpaper_id = #{testPaperId}
+    </delete>
 
     <resultMap id="testPaperMap" type="com.qg.anywork.model.po.TestPaper">
         <id property="testpaperId" column="testpaper_id"/>
@@ -64,7 +74,7 @@
             <result property="D" column="D"/>
             <result property="key" column="key"/>
             <result property="socre" column="socre"/>
-            <result property="testpaperId" column="testpaper_id"/>
+            <result property="testpaperId" column="question_testpaper_id"/>
             <result property="other" column="other"/>
             <result property="analysis" column="analysis"/>
         </collection>
@@ -87,10 +97,45 @@
                q.key,
                q.analysis,
                q.socre,
-               q.testpaper_id,
+               q.testpaper_id as question_testpaper_id,
                q.other
         from test_paper t
                  left join question q on q.testpaper_id = t.testpaper_id
         where t.testpaper_id = #{testPaperId}
+    </select>
+    <select id="listTestPaperByOrganizationId" resultType="com.qg.anywork.model.po.TestPaper">
+        SELECT t.*
+        from test_paper_organization tpo
+                 left join test_paper t on t.testpaper_id = tpo.test_paper_id
+        where tpo.organization_id = #{organizationId}
+        order by t.create_time
+    </select>
+    <select id="findTestPaperMainInfoById" resultType="com.qg.anywork.model.po.TestPaper">
+        SELECT *
+        from test_paper
+        where testpaper_id = #{testPaperId}
+    </select>
+
+    <select id="findTestPaperByOrganizationIdAndTime" resultType="com.qg.anywork.model.po.TestPaper">
+        select *
+        from test_paper
+        where organization_id = #{organizationId}
+          and create_time &lt; #{createTime}
+    </select>
+    <select id="getAverageScore" resultType="java.lang.Double">
+        SELECT AVG(socre)
+        from test_result where test_paper_id = #{testPaperId} and
+        student_id in
+        <foreach collection="userIds" item="userId" separator="," index="index" close=")" open="(">
+            #{userId}
+        </foreach>
+    </select>
+    <select id="getQuestionCorrectNumber" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        from student_answer where question_id = #{questionId}
+        and is_true = 1 and student_id in
+        <foreach collection="userIds" item="userId" separator="," index="index" close=")" open="(">
+            #{userId}
+        </foreach>
     </select>
 </mapper>

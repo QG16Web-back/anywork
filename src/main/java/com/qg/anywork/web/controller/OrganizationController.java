@@ -4,12 +4,9 @@ import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.organization.OrganizationException;
 import com.qg.anywork.exception.testpaper.NotPowerException;
 import com.qg.anywork.model.dto.RequestResult;
-import com.qg.anywork.model.po.CheckResult;
 import com.qg.anywork.model.po.Organization;
-import com.qg.anywork.model.po.StudentTestResult;
 import com.qg.anywork.model.po.User;
 import com.qg.anywork.service.OrganizationService;
-import com.qg.anywork.service.TestService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +32,6 @@ public class OrganizationController {
 
     @Autowired
     private OrganizationService organizationService;
-
-    @Autowired
-    private TestService testService;
 
     /***
      * 根据组织关键字模糊查找
@@ -259,45 +253,5 @@ public class OrganizationController {
     public RequestResult<List<User>> getStudentOfOrganization(@RequestBody Map map) {
         int organizationId = (int) map.get("organizationId");
         return organizationService.getOrganizationPeople(organizationId);
-    }
-
-    /***
-     * 获取试卷详情
-     * @param map map
-     *            organizationId 组织ID
-     *            userId 用户ID
-     * @return 试卷详情
-     */
-    @RequestMapping(value = "/studentTestDetail", method = RequestMethod.POST)
-    public RequestResult<StudentTestResult> getDetail(@RequestBody Map map) {
-        int testpaperId = (int) map.get("testpaperId");
-        int userId = (int) map.get("userId");
-        return testService.getDetail(testpaperId, userId);
-    }
-
-    /***
-     * 获取组织下某学生的考试列表
-     * @param map map
-     * @return 学生的考试列表
-     */
-    @RequestMapping(value = "/studentTest", method = RequestMethod.POST)
-    public RequestResult<List<CheckResult>> studentTest(@RequestBody Map map) {
-        int userId = (int) map.get("userId");
-        int organizationId = (int) map.get("organizationId");
-        return testService.getCheckResultByUser(organizationId, userId);
-    }
-
-    /***
-     * 获取组织下某学生的考试列表
-     * @param map map
-     *            organizationId 组织ID
-     *            userId 用户ID
-     * @return 试卷列表
-     */
-    @RequestMapping(value = "/studentPracetice", method = RequestMethod.POST)
-    public RequestResult<List<CheckResult>> studentPracetice(@RequestBody Map map) {
-        int userId = (int) map.get("userId");
-        int organizationId = (int) map.get("organizationId");
-        return testService.getPraceticeByOrganizationId(userId, organizationId);
     }
 }

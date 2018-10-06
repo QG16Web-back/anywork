@@ -68,7 +68,11 @@ public class TestPaper implements Serializable {
      */
     private int testpaperType;
 
-    // TODO 为了让老师上传试卷时可以获得题目
+    /**
+     * 平均分
+     */
+    private double averageScore;
+
     /**
      * 试卷下的所有题目
      */

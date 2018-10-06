@@ -130,6 +130,14 @@ public interface OrganizationDao {
     List<User> getOrganizationPeople(@Param("organizationId") int organizationId);
 
     /**
+     * 根据组织ID获取学生ID集合
+     *
+     * @param organizationId 组织ID
+     * @return 学生ID集合
+     */
+    List<Integer> getUserIdsByOrganizationId(@Param("organizationId") int organizationId);
+
+    /**
      * 获取与该组织同个创建人的全部组织
      *
      * @param organizationId 组织ID

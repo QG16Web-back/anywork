@@ -59,107 +59,11 @@
         </association>
     </resultMap>
 
-    <!--目的：为Dao接口方法提供SQL语句-->
-    <select id="getTestByOrganizationId" resultType="com.qg.anywork.model.po.TestPaper">
-        SELECT *
-        FROM test_paper
-        WHERE organization_id = #{organizationId}
-          AND testpaper_type = 1
-    </select>
-
-    <select id="getUserPracticeByOrganizationId" resultMap="PracticeCheckResult">
-        SELECT c.student_id,
-               u.user_name,
-               0,
-               c.socre,
-               0,
-               t.testpaper_id,
-               t.testpaper_title,
-               t.create_time,
-               t.ending_time,
-               t.testpaper_score
-        FROM test_result c,
-             user u,
-             test_paper t
-        WHERE c.student_id = #{userId}
-          AND c.student_id = u.user_id
-          AND t.organization_id = #{organizationId}
-          AND c.test_paper_id = t.testpaper_id
-          And t.testpaper_type = 0
-    </select>
-
-
-    <select id="getPracticeByOrganizationId" resultType="com.qg.anywork.model.po.TestPaper">
-        SELECT t.testpaper_id,
-               t.testpaper_title,
-               t.author_id,
-               t.create_time,
-               t.ending_time,
-               t.chapter_id,
-               c.chapter_name,
-               t.testpaper_score,
-               t.testpaper_type,
-               t.organization_id
-        FROM test_paper t,
-             chapter c
-        WHERE t.organization_id = #{organizationId}
-          AND t.testpaper_type = 0
-          AND c.chapter_id = t.chapter_id
-    </select>
-
     <select id="isSubmit" resultType="int">
         SELECT count(*)
         FROM test_result
         WHERE test_paper_id = #{testPaperId}
           AND student_id = #{userId};
-    </select>
-
-    <select id="getPracticeByOCId" resultType="com.qg.anywork.model.po.TestPaper">
-        SELECT *
-        FROM test_paper
-        WHERE organization_id = #{organizationId}
-          AND chapter_id = #{chapterId}
-          AND testpaper_type = 0;
-    </select>
-
-    <select id="getMyPractice" resultType="com.qg.anywork.model.po.TestPaper">
-        SELECT t.testpaper_id,
-               t.testpaper_title,
-               t.author_id,
-               t.create_time,
-               t.ending_time,
-               t.chapter_id,
-               c.chapter_name,
-               t.testpaper_score,
-               t.testpaper_type,
-               t.organization_id
-        FROM test_paper t,
-             test_result r,
-             chapter c
-        WHERE t.testpaper_id = r.test_paper_id
-          AND r.student_id = #{userId}
-          AND t.testpaper_type = 0
-          AND c.chapter_id = t.chapter_id;
-    </select>
-
-    <select id="getMyTest" resultType="com.qg.anywork.model.po.TestPaper">
-        SELECT t.testpaper_id,
-               t.testpaper_title,
-               t.author_id,
-               t.create_time,
-               t.ending_time,
-               t.chapter_id,
-               c.chapter_name,
-               t.testpaper_score,
-               t.testpaper_type,
-               t.organization_id
-        FROM test_paper t,
-             test_result r,
-             chapter c
-        WHERE t.testpaper_id = r.test_paper_id
-          AND r.student_id = #{userId}
-          AND t.testpaper_type = 1
-          AND c.chapter_id = t.chapter_id;
     </select>
 
     <select id="getTestPaperByTestpaperId" resultType="com.qg.anywork.model.po.TestPaper">
@@ -206,51 +110,10 @@
                #{studentAnswerAnalysis.socre})
     </insert>
 
-    <update id="updateStudentAnswer" parameterType="com.qg.anywork.model.po.StudentAnswerAnalysis">
-        UPDATE student_answer
-        <set>
-            <if test="studentAnswerAnalysis.studentAnswer != null">
-                student_answer = #{studentAnswerAnalysis.studentAnswer},
-            </if>
-            <if test="studentAnswerAnalysis.isTrue != null ">
-                is_true = #{studentAnswerAnalysis.isTrue},
-            </if>
-            <if test="studentAnswerAnalysis.socre != null ">
-                socre = #{studentAnswerAnalysis.socre},
-            </if>
-        </set>
-        WHERE student_id = #{studentAnswerAnalysis.studentId} AND question_id =
-        #{studentAnswerAnalysis.question.questionId}
-    </update>
-
-    <insert id="addTestpaper" parameterType="com.qg.anywork.model.po.TestPaper" useGeneratedKeys="true"
-            keyProperty="testpaper.testpaperId">
-        INSERT INTO test_paper (testpaper_title,
-                                author_id,
-                                create_time,
-                                ending_time,
-                                testpaper_type,
-                                organization_id,
-                                chapter_id)
-        VALUES (#{testpaper.testpaperTitle},
-                #{testpaper.authorId},
-                #{testpaper.createTime},
-                #{testpaper.endingTime},
-                #{testpaper.testpaperType},
-                #{testpaper.organizationId},
-                #{testpaper.chapterId})
-    </insert>
-
-    <update id="updateScoreOfTestPaper">
-        UPDATE test_paper
-        SET testpaper_score = #{score}
-        WHERE testpaper_id = #{testpaperId}
-    </update>
-
     <select id="getTestResult" resultType="com.qg.anywork.model.po.StudentTestResult">
         SELECT *
         FROM test_result
-        WHERE test_paper_id = #{testpaperId}
+        WHERE test_paper_id = #{testPaperId}
           AND student_id = #{userId}
     </select>
 
@@ -270,26 +133,6 @@
                 #{checkResult.testpaper.testpaperId},
                 #{checkResult.studentId})
     </insert>
-
-    <select id="getCheckResultByUser" resultMap="checkResult">
-        SELECT c.student_id,
-               u.user_name,
-               c.if_check,
-               c.object,
-               c.subject,
-               t.testpaper_id,
-               t.testpaper_title,
-               t.create_time,
-               t.ending_time,
-               t.testpaper_score
-        FROM check_result c,
-             user u,
-             test_paper t
-        WHERE c.student_id = #{userId}
-          AND c.student_id = u.user_id
-          AND t.organization_id = #{organizationId}
-          AND c.testpaper_id = t.testpaper_id
-    </select>
 
     <select id="getCheckResultByTestpaperId" resultMap="checkResult">
         SELECT c.student_id,
@@ -320,17 +163,10 @@
     <update id="updateCheckResult">
         UPDATE check_result
         SET subject  = #{subject},
-            object   = #{object},
             if_check = 1
         WHERE student_id = #{studentId}
-          AND testpaper_id = #{testpaperId}
+          AND testpaper_id = #{testPaperId}
     </update>
-
-    <delete id="deleteTestpaper">
-        DELETE
-        FROM test_paper
-        WHERE testpaper_id = #{testpaperId}
-    </delete>
 
     <select id="findByOrganizationIdAndChapterIdAndTestPaperType"
             resultType="com.qg.anywork.model.po.TestPaper">
@@ -370,6 +206,14 @@
         <foreach collection="testPaperIds" item="testPaperId" index="index" separator="," open="(" close=")">
             #{testPaperId}
         </foreach>
+    </select>
+    <select id="getStudentSubjectAnswer" resultType="com.qg.anywork.model.po.StudentAnswerAnalysis">
+        SELECT s.student_id, s.student_answer, s.is_true, s.socre as getsocre, q.*
+        FROM student_answer s
+                 right join question q on s.question_id = q.question_id
+        WHERE s.student_id = #{userId}
+          AND s.question_id in (SELECT q.question_id FROM question WHERE q.testpaper_id = #{testPaperId}
+                                                                     and q.type = 4)
     </select>
 
 </mapper>

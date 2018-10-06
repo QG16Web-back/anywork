@@ -37,7 +37,7 @@ public class LeaderBoardServiceImpl implements LeaderBoardService {
     private UserDao userDao;
 
     @Autowired
-    private TestPaperDao testPaperDao;
+    private PaperDao paperDao;
 
     @Autowired
     private TestDao testDao;
@@ -169,7 +169,7 @@ public class LeaderBoardServiceImpl implements LeaderBoardService {
         }
         List<User> users;
         users = userDao.findUserByOrganizationId(organizationId);
-        List<TestPaper> testPapers = testPaperDao.findTestPaperByOrganizationIdAndTime(organizationId,
+        List<TestPaper> testPapers = paperDao.findTestPaperByOrganizationIdAndTime(organizationId,
                 Timestamp.valueOf(DateUtil.format(new Date())));
         List<Integer> testPaperIds = new ArrayList<>();
 

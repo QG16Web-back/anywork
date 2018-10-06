@@ -43,7 +43,7 @@ public class ExcelUtil {
      * @throws Exception Exception
      */
     public static List<Question> getQuestionList(InputStream input) throws Exception {
-        //选择题
+        // 选择题
         Map<Integer, String> map1 = new HashMap<>(8);
         map1.put(1, "content");
         map1.put(2, "A");
@@ -53,13 +53,13 @@ public class ExcelUtil {
         map1.put(6, "key");
         map1.put(7, "socre");
         map1.put(8, "analysis");
-        //判断题、问答题、编程题、综合题
+        // 判断题、问答题、编程题、综合题
         Map<Integer, String> map2 = new HashMap<>(4);
         map2.put(1, "content");
         map2.put(2, "key");
         map2.put(3, "socre");
         map2.put(4, "analysis");
-        //填空题
+        // 填空题
         Map<Integer, String> map3 = new HashMap<>(5);
         map3.put(1, "content");
         map3.put(2, "key");

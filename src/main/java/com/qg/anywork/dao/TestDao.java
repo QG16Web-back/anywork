@@ -17,54 +17,6 @@ import java.util.List;
 public interface TestDao {
 
     /***
-     * 获取组织下的考试列表
-     * @param organizationId 组织id
-     * @return List<TestPaper> 返回该组织的考试列表
-     */
-    List<TestPaper> getTestByOrganizationId(@Param("organizationId") int organizationId);
-
-    /***
-     * 获取组织下的练习列表
-     * @param organizationId 组织id
-     * @return List<TestPaper> 返回该组织的练习列表
-     */
-    List<TestPaper> getPracticeByOrganizationId(@Param("organizationId") int organizationId);
-
-    /***
-     * 根据组织id和章id获取练习
-     * @param organizationId 组织id
-     * @param chapterId 章节id
-     * @return List<TestPaper> 返回该组织某章节下的练习列表
-     * TODO 名字未查出
-     */
-    List<TestPaper> getPracticeByOCId(@Param("organizationId") int organizationId, @Param("chapterId") int chapterId);
-
-    /**
-     * 获取
-     *
-     * @param userId         用户ID
-     * @param organizationId 组织ID
-     * @return list
-     */
-    List<CheckResult> getUserPracticeByOrganizationId(@Param("userId") int userId, @Param("organizationId") int organizationId);
-
-    /**
-     * 获得我的练习卷集合
-     *
-     * @param userId 用户ID
-     * @return 练习卷集合
-     */
-    List<TestPaper> getMyPractice(@Param("userId") int userId);
-
-    /**
-     * 获得我的考试集合
-     *
-     * @param userId 用户ID
-     * @return 考试卷集合
-     */
-    List<TestPaper> getMyTest(@Param("userId") int userId);
-
-    /***
      * 根据试卷id获取试卷信息
      * @param testpaperId 试卷id
      * @return TestPaper 返回问卷对象
@@ -118,52 +70,12 @@ public interface TestDao {
     int addStudentAnswer(@Param("studentAnswerAnalysis") StudentAnswerAnalysis studentAnswerAnalysis);
 
     /***
-     * 更新学生的答案
-     * @param studentAnswerAnalysis
-     * @return
-     */
-    int updateStudentAnswer(@Param("studentAnswerAnalysis") StudentAnswerAnalysis studentAnswerAnalysis);
-
-    /**
-     * 插入一张试卷，返回主键
-     *
-     * @param testpaper 试卷
-     * @return 1为添加成功 0为添加失败
-     */
-    int addTestpaper(@Param("testpaper") TestPaper testpaper);
-
-    /**
-     * 删除一张试卷
-     *
-     * @param testpaperId
-     * @return
-     */
-    int deleteTestpaper(@Param("testpaperId") int testpaperId);
-
-    /**
-     * 更新一张试卷/练习的分数
-     *
-     * @param testPaperId 试卷
-     * @param score       分数
-     * @return 1为添加成功 0为添加失败
-     */
-    int updateScoreOfTestPaper(@Param("testPaperId") int testPaperId, @Param("score") int score);
-
-    /***
-     * 获取 学生在组织下完成过的试卷概要列表
-     * @param organizationId
-     * @param userId
-     * @return
-     */
-    List<CheckResult> getCheckResultByUser(@Param("organizationId") int organizationId, @Param("userId") int userId);
-
-    /***
      * 获得考试结果
-     * @param testpaperId
-     * @param userId
-     * @return
+     * @param testPaperId 试卷ID
+     * @param userId 学生ID
+     * @return 试卷结果
      */
-    StudentTestResult getTestResult(@Param("testpaperId") int testpaperId, @Param("userId") int userId);
+    StudentTestResult getTestResult(@Param("testPaperId") int testPaperId, @Param("userId") int userId);
 
     /***
      * 获得详细学生试卷详情
@@ -173,6 +85,15 @@ public interface TestDao {
      * @return 试卷详情集合
      */
     List<StudentAnswerAnalysis> getStudentAnswer(@Param("testPaperId") int testPaperId, @Param("userId") int userId);
+
+    /**
+     * 获取简答题的详情
+     *
+     * @param testPaperId 试卷ID
+     * @param userId      学生ID
+     * @return 简答题
+     */
+    List<StudentAnswerAnalysis> getStudentSubjectAnswer(@Param("testPaperId") int testPaperId, @Param("userId") int userId);
 
     /**
      * 获取某套题组织内成员的完成情况
@@ -202,14 +123,12 @@ public interface TestDao {
 
     /***
      * 更新批改详情
-     * @param subject
-     * @param object
-     * @param testpaperId
-     * @param studentId
-     * @return
+     * @param subject 主观题分数
+     * @param testPaperId 试卷ID
+     * @param studentId 学生ID
+     * @return int
      */
-    int updateCheckResult(@Param("subject") double subject, @Param("object") double object, @Param("testpaperId") int testpaperId, @Param("studentId") int studentId);
-
+    int updateCheckResult(@Param("subject") double subject, @Param("testPaperId") int testPaperId, @Param("studentId") int studentId);
 
     /**
      * 根据组织ID、章节Id与试卷类型获取试卷
@@ -226,8 +145,8 @@ public interface TestDao {
     /**
      * 根据试卷ID，用户ID和组织ID获取测试结果
      *
-     * @param testPaperId    试卷ID
-     * @param userId         用户ID
+     * @param testPaperId 试卷ID
+     * @param userId      用户ID
      * @return 测试结果
      */
     StudentTestResult findTestResultByTestPaperIdAndUserIdAndOrganizationId(@Param("testPaperId") int testPaperId,
@@ -249,15 +168,6 @@ public interface TestDao {
      * @return 详细信息
      */
     StudentAnswerAnalysis getStudentAnswerAnalysis(@Param("userId") int userId, @Param("questionId") int questionId);
-
-    /**
-     * 插入错题列表
-     *
-     * @param wrongQuestions 错题列表
-     * @return int
-     */
-    int insertWrongQuestions(@Param("wrongQuestions") List<CollectionQuestion> wrongQuestions);
-
 
     /**
      * 获取学生的成绩结果

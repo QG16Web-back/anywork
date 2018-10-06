@@ -1,5 +1,6 @@
 package com.qg.anywork.service;
 
+import com.qg.anywork.model.bo.TeacherSubmit;
 import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.model.po.User;
 
@@ -43,4 +44,75 @@ public interface PaperService {
      */
     RequestResult updateTestPaperInfo(Integer testPaperId, String testPaperTitle, Integer testPaperType,
                                       String createTime, String endingTime) throws ParseException;
+
+    /**
+     * 删除试卷
+     *
+     * @param testPaperId 试卷ID
+     * @return result
+     */
+    RequestResult deleteTestPaper(Integer testPaperId);
+
+    /**
+     * 查看试卷
+     *
+     * @param testPaperId 试卷ID
+     * @return result
+     */
+    RequestResult showTestPaper(Integer testPaperId);
+
+
+    /**
+     * 试卷分析
+     *
+     * @param testPaperId    试卷ID
+     * @param organizationId 组织ID
+     * @param userId         教师ID
+     * @return result
+     */
+    RequestResult analyseTestPaper(Integer testPaperId, Integer organizationId, Integer userId);
+
+    /**
+     * 列出该组织的所有试卷
+     *
+     * @param organizationId 组织ID
+     * @return result
+     */
+    RequestResult listTestPaper(Integer organizationId);
+
+    /**
+     * 老师查看某套试题中的学生完成情况列表
+     *
+     * @param testPaperId    试卷ID
+     * @param organizationId 组织ID
+     * @param user           教师
+     * @return result
+     */
+    RequestResult listStudentDoneDetail(Integer testPaperId, Integer organizationId, User user);
+
+    /**
+     * 具体查看某学生完成过的某套试题
+     *
+     * @param testPaperId 试卷ID
+     * @param studentId   学生ID
+     * @return result
+     */
+    RequestResult showStudentTestDetail(Integer testPaperId, Integer studentId);
+
+    /**
+     * 获取学生简答题答案进行评卷
+     *
+     * @param testPaperId 试卷ID
+     * @param studentId   学生ID
+     * @return result
+     */
+    RequestResult getStudentSubjectAnswer(Integer testPaperId, Integer studentId);
+
+    /**
+     * 老师评卷
+     *
+     * @param teacherSubmit 提交的评卷信息
+     * @return result
+     */
+    RequestResult teacherJudgeSubjectAnswer(TeacherSubmit teacherSubmit);
 }

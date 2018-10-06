@@ -36,10 +36,10 @@ public interface QuestionDao {
     /**
      * 根据试卷id删除所有的题目
      *
-     * @param testpaperId
-     * @return
+     * @param testPaperId 试卷ID
+     * @return int
      */
-    int deleteQuestion(@Param("testpaperId") int testpaperId);
+    int deleteQuestion(@Param("testPaperId") int testPaperId);
 
     /**
      * 收藏题目

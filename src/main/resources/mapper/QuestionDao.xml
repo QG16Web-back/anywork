@@ -23,11 +23,12 @@
 
     <insert id="insertAllQuestion" useGeneratedKeys="true" keyProperty="questionId" parameterType="java.util.ArrayList">
         INSERT INTO
-        question(type, A, B, C, D, `key`, socre, testpaper_id, other, analysis)
+        question(type, A, B, C, D, `key`, socre, testpaper_id, other, analysis, content)
         VALUES
         <foreach collection="questionList" item="question" index="index" separator=",">
             (#{question.type}, #{question.A}, #{question.B}, #{question.C}, #{question.D},
-            #{question.key}, #{question.socre}, #{question.testpaperId}, #{question.other}, #{question.analysis})
+            #{question.key}, #{question.socre}, #{question.testpaperId}, #{question.other}, #{question.analysis},
+            #{question.content})
         </foreach>
     </insert>
 
@@ -40,7 +41,7 @@
     <delete id="deleteQuestion">
         DELETE
         FROM question
-        WHERE testpaper_id = #{testpaperId}
+        WHERE testpaper_id = #{testPaperId}
     </delete>
     <delete id="deleteCollection">
         DELETE

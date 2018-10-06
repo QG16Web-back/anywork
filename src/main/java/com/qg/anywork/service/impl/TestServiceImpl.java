@@ -1,18 +1,13 @@
 package com.qg.anywork.service.impl;
 
-import com.qg.anywork.dao.OrganizationDao;
 import com.qg.anywork.dao.QuestionDao;
 import com.qg.anywork.dao.QuestionRedisDao;
 import com.qg.anywork.dao.TestDao;
-import com.qg.anywork.domain.UserRepository;
 import com.qg.anywork.enums.StatEnum;
-import com.qg.anywork.exception.organization.OrganizationException;
 import com.qg.anywork.exception.test.TestException;
 import com.qg.anywork.exception.testpaper.TestPaperException;
 import com.qg.anywork.model.bo.StudentAnswer;
 import com.qg.anywork.model.bo.StudentPaper;
-import com.qg.anywork.model.bo.TeacherJudge;
-import com.qg.anywork.model.bo.TeacherSubmit;
 import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.model.po.*;
 import com.qg.anywork.service.TestService;
@@ -39,212 +34,12 @@ public class TestServiceImpl implements TestService {
 
     @Autowired
     private TestDao testDao;
-    @Autowired
-    private OrganizationDao organizationDao;
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Autowired
     private QuestionRedisDao questionRedisDao;
 
     @Autowired
     private QuestionDao questionDao;
-
-    /***
-     * 检查是否有做
-     * @param testPapers
-     * @param studentpapers
-     * @return
-     */
-    private List<TestPaper> checkIfDo(List<TestPaper> testPapers, List<TestPaper> studentpapers) {
-        List<TestPaper> testpapersList = new ArrayList<>();
-        for (TestPaper t : testPapers) {
-            int flag = 0;
-            //没做的flag
-            for (TestPaper testpaper : studentpapers) {
-                if (t.getTestpaperId() == testpaper.getTestpaperId()) {
-                    t.setChapterId(0);
-                    flag = 1;
-                }
-            }
-            if (flag == 0) {
-                t.setChapterId(-1);
-            }
-            testpapersList.add(t);
-        }
-
-        return testpapersList;
-    }
-
-    @Override
-    public RequestResult<List<TestPaper>> getPracticeByOCId(int organizationId, int chapterId, int userId) {
-        if (organizationDao.getById(organizationId) == null) {
-            throw new OrganizationException(StatEnum.INVALID_ORGANIZATION);
-        }
-        List<TestPaper> practiceList = testDao.getPracticeByOCId(organizationId, chapterId);
-        List<TestPaper> studentpapers = testDao.getMyPractice(userId);
-        List<TestPaper> testPaperList = checkIfDo(practiceList, studentpapers);
-
-        return new RequestResult<>(StatEnum.GET_TEST_SUCCESS, testPaperList);
-    }
-
-    @Override
-    public RequestResult<List<CheckResult>> getPraceticeByOrganizationId(int userId, int organizationId) {
-
-        List<CheckResult> practice = testDao.getUserPracticeByOrganizationId(userId, organizationId);
-
-        List<CheckResult> checkResults = new ArrayList<>();
-        List<TestPaper> testPapers = testDao.getPracticeByOrganizationId(organizationId);
-        for (TestPaper t : testPapers) {
-            int flag = 0;
-            for (CheckResult c : practice) {
-                if (t.getTestpaperId() == c.getTestpaper().getTestpaperId()) {
-                    c.setIfAttend(1);
-                    checkResults.add(c);
-                    flag = 1;
-                    break;
-                }
-            }
-            if (flag == 0) {
-                CheckResult checkResult = new CheckResult();
-                checkResult.setIfAttend(0);
-                checkResult.setObject(0);
-                checkResult.setSubject(0);
-                checkResult.setStudentId(userId);
-                checkResult.setStudentName(userRepository.findByUserId(userId).getUserName());
-                checkResult.setIfCheck(0);
-                checkResult.setTestpaper(t);
-                checkResults.add(checkResult);
-            }
-        }
-        return new RequestResult<>(1, "获取成功", checkResults);
-    }
-
-    @Override
-    public RequestResult<List<Question>> getQuestion(int testpaperId) {
-        TestPaper testpaper = testDao.getTestPaperByTestpaperId(testpaperId);
-        if (new Date().before(testpaper.getCreateTime()) && testpaper.getTestpaperType() == 1) {
-            throw new TestException(StatEnum.EXAM_DID_NOT_START_YET);
-        }
-        List<Question> questions = testDao.getQuestionByTestpaperId(testpaperId);
-        for (Question question : questions) {
-            question.setKey(null);
-        }
-        return new RequestResult<>(StatEnum.GET_TEST_SUCCESS, questions);
-    }
-
-    @Override
-    public void addTestpaper(TestPaper testpaper) {
-        testDao.addTestpaper(testpaper);
-    }
-
-    @Override
-    public boolean updateTextpaper(int testpaperId, int socre) {
-        return testDao.updateScoreOfTestPaper(testpaperId, socre) == 1;
-    }
-
-    @Override
-    public RequestResult<StudentTestResult> getDetail(int testpaperId, int userId) {
-        StudentTestResult studentTestResult = testDao.getTestResult(testpaperId, userId);
-        if (studentTestResult == null) {
-            return new RequestResult<>(0, "没有此记录");
-        }
-        List<StudentAnswerAnalysis> studentAnswerAnalysis = testDao.getStudentAnswer(testpaperId, userId);
-        studentTestResult.setStudentAnswerAnalysis(studentAnswerAnalysis);
-        return new RequestResult<>(1, "成功", studentTestResult);
-    }
-
-    @Override
-    public RequestResult<List<CheckResult>> getCheckResultByUser(int organizationId, int userId) {
-        List<CheckResult> checkResultsByUser = testDao.getCheckResultByUser(organizationId, userId);
-        List<CheckResult> checkResults = new ArrayList<CheckResult>();
-        List<TestPaper> testPapers = testDao.getTestByOrganizationId(organizationId);
-        for (TestPaper t : testPapers) {
-            int flag = 0;
-            for (CheckResult c : checkResultsByUser) {
-                if (t.getTestpaperId() == c.getTestpaper().getTestpaperId()) {
-                    c.setIfAttend(1);
-                    checkResults.add(c);
-                    flag = 1;
-                    break;
-                }
-            }
-            if (flag == 0) {
-                CheckResult checkResult = new CheckResult();
-                checkResult.setIfAttend(0);
-                checkResult.setObject(0);
-                checkResult.setSubject(0);
-                checkResult.setStudentId(userId);
-                checkResult.setStudentName(userRepository.findByUserId(userId).getUserName());
-                checkResult.setIfCheck(0);
-                checkResult.setTestpaper(t);
-                checkResults.add(checkResult);
-            }
-        }
-
-        return new RequestResult<>(1, "获取成功", checkResults);
-    }
-
-    @Override
-    public RequestResult<List<CheckResult>> getCheckResultByTestpaperId(int organizationId, int testpaperId) {
-        List<CheckResult> checkResultsByTest = testDao.getCheckResultByTestpaperId(organizationId, testpaperId);
-        List<CheckResult> checkResults = new ArrayList<CheckResult>();
-        List<User> users = organizationDao.getOrganizationPeople(organizationId);
-        for (User u : users) {
-            int flag = 0;
-            for (CheckResult c : checkResultsByTest) {
-                if (c.getStudentId() == u.getUserId()) {
-                    c.setIfAttend(1);
-                    checkResults.add(c);
-                    flag = 1;
-                    break;
-                }
-            }
-            if (flag == 0) {
-                CheckResult checkResult = new CheckResult();
-                checkResult.setIfAttend(0);
-                checkResult.setObject(0);
-                checkResult.setSubject(0);
-                checkResult.setStudentId(u.getUserId());
-                checkResult.setStudentName(u.getUserName());
-                checkResult.setIfCheck(0);
-                checkResult.setTestpaper(testDao.getTestPaperByTestpaperId(testpaperId));
-                checkResults.add(checkResult);
-            }
-        }
-        return new RequestResult<>(1, "获取成功", checkResults);
-    }
-
-    @Override
-    public void updateStudentTest(TeacherSubmit teacherSubmit) {
-        List<TeacherJudge> teacherJudges = teacherSubmit.getTeacherJudge();
-        double subject = 0;
-        double object = 0;
-        for (TeacherJudge t : teacherJudges) {
-            int type = testDao.getQuestionById(t.getQuestionId()).getType();
-            if (type == 4 || type == 6 || type == 5) {
-                subject += t.getSocre();
-            } else {
-                object += t.getSocre();
-            }
-            //更新studentAnswer
-            testDao.updateStudentAnswerSocre(t.getSocre(), teacherSubmit.getStudentId(), t.getQuestionId());
-        }
-        //更新checkResult
-        testDao.updateCheckResult(subject, object, teacherSubmit.getTestpaperId(), teacherSubmit.getStudentId());
-
-        //更新testResult
-        StudentTestResult s = new StudentTestResult();
-        s.setSocre(object);
-        s.setStudentId(teacherSubmit.getStudentId());
-        s.setTestpaperId(teacherSubmit.getTestpaperId());
-        testDao.updateTestResult(s);
-
-        StudentTestResult studentTestResult = testDao.getTestResult(teacherSubmit.getTestpaperId(), teacherSubmit.getStudentId());
-        studentTestResult.setSocre(studentTestResult.getSocre() + subject);
-        testDao.updateTestResult(studentTestResult);
-    }
 
     @Override
     @SuppressWarnings("unchecked")
