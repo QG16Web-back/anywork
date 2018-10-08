@@ -24,8 +24,12 @@ import java.util.List;
 @Service
 public class QuestionServiceImpl implements QuestionService {
 
+    private final QuestionDao questionDao;
+
     @Autowired
-    private QuestionDao questionDao;
+    public QuestionServiceImpl(QuestionDao questionDao) {
+        this.questionDao = questionDao;
+    }
 
     @Override
     public RequestResult collectQuestion(int userId, int questionId) {

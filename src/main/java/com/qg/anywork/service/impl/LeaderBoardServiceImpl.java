@@ -33,20 +33,26 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings("unchecked")
 public class LeaderBoardServiceImpl implements LeaderBoardService {
 
-    @Autowired
-    private UserDao userDao;
+    private final UserDao userDao;
+
+    private final PaperDao paperDao;
+
+    private final TestDao testDao;
+
+    private final OrganizationDao organizationDao;
+
+    private final LeaderBoardRedisDao leaderBoardRedisDao;
+
 
     @Autowired
-    private PaperDao paperDao;
-
-    @Autowired
-    private TestDao testDao;
-
-    @Autowired
-    private OrganizationDao organizationDao;
-
-    @Autowired
-    private LeaderBoardRedisDao leaderBoardRedisDao;
+    public LeaderBoardServiceImpl(UserDao userDao, PaperDao paperDao, TestDao testDao,
+                                  OrganizationDao organizationDao, LeaderBoardRedisDao leaderBoardRedisDao) {
+        this.userDao = userDao;
+        this.paperDao = paperDao;
+        this.testDao = testDao;
+        this.organizationDao = organizationDao;
+        this.leaderBoardRedisDao = leaderBoardRedisDao;
+    }
 
     @Override
     public RequestResult showLeaderBoard(int userId, int leaderBoardType) {

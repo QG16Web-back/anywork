@@ -119,7 +119,7 @@
     </delete>
 
     <select id="getOrganizationPeople" parameterType="int" resultType="com.qg.anywork.model.po.User">
-        SELECT u.user_id, u.user_name, u.email, u.phone, u.mark, u.student_id
+        SELECT u.user_id, u.user_name, u.email, u.phone, u.mark, u.student_id, u.image_path
         FROM user u,
              relation r
         WHERE r.organization_id = #{organizationId}
