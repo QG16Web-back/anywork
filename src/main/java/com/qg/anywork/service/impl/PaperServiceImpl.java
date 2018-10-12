@@ -59,7 +59,7 @@ public class PaperServiceImpl implements PaperService {
     @Override
     public RequestResult addTestPaper(InputStream inputStream, String testPaperTitle, Integer chapterId,
                                       String createTime, String endingTime, Integer testPaperType, User user) throws Exception {
-        if (DateUtil.parse(createTime).after(DateUtil.parse(endingTime)) || DateUtil.parse(createTime).after(new Date())) {
+        if (DateUtil.parse(createTime).after(DateUtil.parse(endingTime)) || DateUtil.parse(createTime).before(new Date())) {
             // 开始时间比结束时间晚
             throw new TestPaperTimeException(StatEnum.TEST_PAPER_TIME_ERROR);
         }
