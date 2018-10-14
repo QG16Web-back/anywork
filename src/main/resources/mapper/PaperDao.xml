@@ -123,7 +123,7 @@
           and create_time &lt; #{createTime}
     </select>
     <select id="getAverageScore" resultType="java.lang.Double">
-        SELECT AVG(socre)
+        SELECT IFNULL(AVG(socre), 0.0)
         from test_result where test_paper_id = #{testPaperId} and
         student_id in
         <foreach collection="userIds" item="userId" separator="," index="index" close=")" open="(">
