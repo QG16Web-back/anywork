@@ -103,8 +103,8 @@ public class PaperController {
         if (user.getMark() != 1) {
             throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
         }
-        return paperService.updateTestPaperInfo((int) map.get("testpaperId"), map.get("testPaperTitle").toString(),
-                (int) map.get("testPaperType"), map.get("createTime").toString(), map.get("endingTime").toString());
+        return paperService.updateTestPaperInfo((int) map.get("testpaperId"), map.get("testpaperTitle").toString(),
+                (int) map.get("testpaperType"), map.get("createTime").toString(), map.get("endingTime").toString());
     }
 
     /**
