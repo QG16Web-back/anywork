@@ -170,9 +170,10 @@
 
     <select id="findByOrganizationIdAndChapterIdAndTestPaperType"
             resultType="com.qg.anywork.model.po.TestPaper">
-        SELECT *
-        from test_paper
-        where organization_id = #{organizationId}
+        SELECT ts.*
+        from test_paper ts
+                 left join test_paper_organization tso on ts.testpaper_id = tso.test_paper_id
+        where tso.organization_id = #{organizationId}
           and chapter_id = #{chapterId}
           and testpaper_type = #{testPaperType}
         order by create_time
