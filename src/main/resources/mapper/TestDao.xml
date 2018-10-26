@@ -145,13 +145,13 @@
                t.create_time,
                t.ending_time,
                t.testpaper_score
-        FROM check_result c,
-             user u,
-             test_paper t
+        FROM check_result c
+                 left join test_paper t on t.testpaper_id = c.testpaper_id
+                 left join user u on c.student_id = u.user_id,
+             test_paper_organization tso
         WHERE c.testpaper_id = #{testpaperId}
-          AND c.student_id = u.user_id
-          AND t.organization_id = #{organizationId}
-          AND c.testpaper_id = t.testpaper_id
+          AND tso.organization_id = #{organizationId}
+          and t.testpaper_id = tso.test_paper_id
     </select>
     <update id="updateStudentAnswerSocre">
         UPDATE student_answer
