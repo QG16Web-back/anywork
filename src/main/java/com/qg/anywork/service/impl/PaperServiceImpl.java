@@ -72,6 +72,16 @@ public class PaperServiceImpl implements PaperService {
         testpaper.setCreateTime(DateUtil.parse(createTime));
         testpaper.setEndingTime(DateUtil.parse(endingTime));
         testpaper.setTestpaperType(testPaperType);
+        testpaper.setHaveSubject(0);
+        List<Question> questionList = ExcelUtil.getQuestionList(inputStream);
+        if (questionList != null && questionList.size() > 0) {
+            for (Question question : questionList) {
+                if (question.getType() == 4) {
+                    testpaper.setHaveSubject(1);
+                    break;
+                }
+            }
+        }
         // 将试卷插入数据库
         paperDao.insertTestPaper(testpaper);
         // 获得试卷ID
@@ -79,7 +89,6 @@ public class PaperServiceImpl implements PaperService {
         // 插入试卷与组织的关系
         paperDao.insertTestPaperOrganization(testPaperId, organizationIds);
 
-        List<Question> questionList = ExcelUtil.getQuestionList(inputStream);
         int score = 0;
         if (questionList != null && questionList.size() > 0) {
             for (Question question : questionList) {

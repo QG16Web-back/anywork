@@ -18,6 +18,11 @@ public class CheckResult implements Serializable {
     int studentId;
 
     /**
+     * 學號
+     */
+    String studentNum;
+
+    /**
      * 学生姓名
      */
     String studentName;

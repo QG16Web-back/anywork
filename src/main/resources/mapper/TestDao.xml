@@ -33,6 +33,7 @@
         <result property="ifCheck" column="if_check"/>
         <result property="object" column="object"/>
         <result property="subject" column="subject"/>
+        <result property="studentNum" column="student_num"/>
 
         <association property="testpaper" javaType="com.qg.anywork.model.po.TestPaper">
             <id property="testpaperId" column="testpaper_id"/>
@@ -137,6 +138,7 @@
     <select id="getCheckResultByTestpaperId" resultMap="checkResult">
         SELECT c.student_id,
                u.user_name,
+               u.student_id as student_num,
                c.if_check,
                c.object,
                c.subject,

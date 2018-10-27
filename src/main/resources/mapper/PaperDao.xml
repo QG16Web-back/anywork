@@ -6,13 +6,20 @@
 
     <insert id="insertTestPaper" parameterType="com.qg.anywork.model.po.TestPaper" useGeneratedKeys="true"
             keyProperty="testPaper.testpaperId">
-        INSERT INTO test_paper (testpaper_title, author_id, create_time, ending_time, testpaper_type, chapter_id)
+        INSERT INTO test_paper (testpaper_title,
+                                author_id,
+                                create_time,
+                                ending_time,
+                                testpaper_type,
+                                chapter_id,
+                                have_subject)
         VALUES (#{testPaper.testpaperTitle},
                 #{testPaper.authorId},
                 #{testPaper.createTime},
                 #{testPaper.endingTime},
                 #{testPaper.testpaperType},
-                #{testPaper.chapterId})
+                #{testPaper.chapterId},
+                #{testPaper.haveSubject})
     </insert>
 
     <insert id="insertTestPaperOrganization">

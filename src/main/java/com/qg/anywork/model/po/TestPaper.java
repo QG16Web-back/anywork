@@ -74,6 +74,11 @@ public class TestPaper implements Serializable {
     private double averageScore;
 
     /**
+     * 是否有主觀題，１爲有，０沒有
+     */
+    private int haveSubject;
+
+    /**
      * 试卷下的所有题目
      */
     private List<Question> questions;
