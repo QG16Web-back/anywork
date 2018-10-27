@@ -214,10 +214,10 @@ public class PaperController {
      */
     @PostMapping("/student/subject")
     public RequestResult getStudentSubjectAnswer(HttpServletRequest request, @RequestBody Map<String, Integer> map) {
-//        User user = (User) request.getSession().getAttribute("user");
-//        if (user.getMark() != 1) {
-//            throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
-//        }
+        User user = (User) request.getSession().getAttribute("user");
+        if (user.getMark() != 1) {
+            throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
+        }
         return paperService.getStudentSubjectAnswer(map.get("testpaperId"), map.get("studentId"));
     }
 
