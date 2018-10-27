@@ -208,7 +208,7 @@
             #{testPaperId}
         </foreach>
     </select>
-    <select id="getStudentSubjectAnswer" resultType="com.qg.anywork.model.po.StudentAnswerAnalysis">
+    <select id="getStudentSubjectAnswer" resultMap="studentAnswerAnalysis">
         SELECT s.student_id, s.student_answer, s.is_true, s.socre as getsocre, q.*
         FROM student_answer s
                  right join question q on s.question_id = q.question_id
