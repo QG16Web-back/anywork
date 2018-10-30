@@ -145,7 +145,7 @@ public class UserServiceImpl implements UserService {
         if (!password.equals(repeatPassword)) {
             throw new PasswordException(StatEnum.INCONSISTENT_PASSWORD);
         }
-        if (!password.matches("[a-z0-9A-Z\\u4e00-\\u9fa5]{1,15}")) {
+        if (!password.matches("[a-z0-9A-Z\\u4e00-\\u9fa5]{6,15}")) {
             throw new PasswordException(StatEnum.NEW_PASSWORD_FORMAT_ERROR);
         }
         int flag = userRepository.updatePasswordByEmail(email, Encryption.getMD5(password));

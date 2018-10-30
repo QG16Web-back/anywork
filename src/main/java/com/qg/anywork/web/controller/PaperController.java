@@ -83,6 +83,9 @@ public class PaperController {
         if (user.getMark() == 0) {
             throw new NotPowerException(StatEnum.NOT_HAVE_POWER);
         }
+//        User user = new User();
+//        user.setUserId(1996);
+//        user.setUserName("name");
         return paperService.addTestPaper(file.getInputStream(), testpaperTitle, chapterId, createTime, endingTime, testpaperType, user);
     }
 

@@ -52,7 +52,7 @@
         from message m
                  left join user u on m.user_id = u.user_id
         where m.user_id = #{userId}
-        order by create_time
+        order by create_time desc
     </select>
 
     <select id="findByUserIdAndMessageId" resultType="com.qg.anywork.model.po.Message">
