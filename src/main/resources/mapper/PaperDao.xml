@@ -124,9 +124,10 @@
     </select>
 
     <select id="findTestPaperByOrganizationIdAndTime" resultType="com.qg.anywork.model.po.TestPaper">
-        select *
-        from test_paper
-        where organization_id = #{organizationId}
+        select t.*
+        from test_paper t
+                 left join test_paper_organization tpo on tpo.test_paper_id = t.testpaper_id
+        where tpo.organization_id = #{organizationId}
           and create_time &lt; #{createTime}
     </select>
     <select id="getAverageScore" resultType="java.lang.Double">
