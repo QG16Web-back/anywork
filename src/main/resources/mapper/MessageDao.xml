@@ -61,6 +61,7 @@
                  left join user u on m.user_id = u.user_id
         where m.user_id = #{userId}
           and message_id = #{messageId}
+        order by create_time desc
     </select>
 
     <select id="findHaveReadMessageExceptMessageIds" resultType="com.qg.anywork.model.po.Message">
@@ -70,6 +71,7 @@
                  left join organization_message om on om.message_id = m.message_id
         where organization_id = #{organizationId}
           and m.message_id not in (SELECT message_id from user_message where user_id = #{userId})
+        order by create_time desc
     </select>
 
     <select id="findUnreadMessage" resultType="com.qg.anywork.model.po.Message">
@@ -77,6 +79,7 @@
         from message m
                  left join user u on m.user_id = u.user_id
         where m.message_id in (SELECT message_id from user_message where user_id = #{userId})
+        order by create_time desc
     </select>
 
     <select id="findByMessageId" resultType="com.qg.anywork.model.po.Message">
@@ -84,6 +87,7 @@
         from message m
                  left join user u on m.user_id = u.user_id
         where message_id = #{messageId}
+        order by create_time desc
     </select>
 
     <select id="findAllMessagesByOrganizationId" resultType="com.qg.anywork.model.po.Message">
@@ -92,6 +96,7 @@
                  left join organization_message om on om.message_id = m.message_id
                  left join user u on m.user_id = u.user_id
         where organization_id = #{organizationId}
+        order by create_time desc
     </select>
 
     <select id="findMessageIdsByStudentId" resultType="java.lang.Integer">
