@@ -27,6 +27,9 @@ public class Suggestion implements Serializable {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "image_path")
+    private String imagePath;
+
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH}, optional = false)
     @JoinColumn(name = "user_id")
     private User user;

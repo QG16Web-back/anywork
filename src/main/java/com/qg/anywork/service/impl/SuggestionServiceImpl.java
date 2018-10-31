@@ -42,9 +42,10 @@ public class SuggestionServiceImpl implements SuggestionService {
         List<Suggestion> suggestions = suggestionRepository.findAll();
         List<Object> list = new ArrayList<>();
         for (Suggestion suggestion : suggestions) {
-            Map<String, String> map = new HashMap<>(2);
+            Map<String, String> map = new HashMap<>(3);
             map.put("userName", suggestion.getUser().getUserName());
             map.put("description", suggestion.getDescription());
+            map.put("imagePath", suggestion.getImagePath());
             list.add(map);
         }
         return new RequestResult<>(StatEnum.GET_TEST_SUCCESS, list);

@@ -206,7 +206,9 @@ public class UserController {
         if (null != file && !file.isEmpty()) {
             String filename = file.getOriginalFilename();
             assert filename != null;
-            if (filename.endsWith(".jpg") || filename.endsWith(".JPG") || filename.endsWith(".png") || filename.endsWith(".PNG")) {
+            if (filename.endsWith(".jpg") || filename.endsWith(".JPG")
+                    || filename.endsWith(".png") || filename.endsWith(".PNG")
+                    || filename.endsWith(".jpeg") || filename.endsWith(".JPEG")) {
                 //文件上传
                 File picture = new File(request.getServletContext().getRealPath("/picture/user/"), user.getUserId() + ".jpg");
                 if (!picture.exists()) {

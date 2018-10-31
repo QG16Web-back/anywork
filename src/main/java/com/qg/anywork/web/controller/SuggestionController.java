@@ -5,11 +5,16 @@ import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.model.po.Suggestion;
 import com.qg.anywork.model.po.User;
 import com.qg.anywork.service.SuggestionService;
+import net.coobird.thumbnailator.Thumbnails;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 
 /**
  * @author logan
@@ -22,12 +27,32 @@ public class SuggestionController {
     private SuggestionService suggestionService;
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public RequestResult addSuggestion(@RequestBody Map map, HttpServletRequest request) {
+    public RequestResult addSuggestion(@RequestParam("description") String description, HttpServletRequest request, @RequestParam("file") MultipartFile file) throws IOException {
         User user = (User) request.getSession().getAttribute("user");
-        String description = (String) map.get("description");
+        //上传图片
+        String path = UUID.randomUUID().toString();
+        if (null != file && !file.isEmpty()) {
+            String filename = file.getOriginalFilename();
+            assert filename != null;
+            if (filename.endsWith(".jpg") || filename.endsWith(".JPG")
+                    || filename.endsWith(".png") || filename.endsWith(".PNG")
+                    || filename.endsWith(".jpeg") || filename.endsWith(".JPEG")) {
+                //文件上传
+                FileUtils.copyInputStreamToFile(file.getInputStream(),
+                        new File(request.getServletContext().getRealPath("/picture/suggestion/"), path + ".jpg"));
+
+                Thumbnails.of(request.getServletContext().getRealPath("/picture/suggestion" + "/" + path + ".jpg"))
+                        .scale(0.4f).toFile(request.getServletContext().getRealPath("/picture/suggestion" + "/" + path + ".jpg"));
+            } else {
+                return new RequestResult<>(StatEnum.FILE_FORMAT_ERROR, null);
+            }
+        } else {
+            return new RequestResult<>(StatEnum.FILE_UPLOAD_FAIL, null);
+        }
         Suggestion suggestion = new Suggestion();
         suggestion.setUser(user);
         suggestion.setDescription(description);
+        suggestion.setImagePath(request.getServletContext().getRealPath("/picture/suggestion" + "/" + path + ".jpg"));
         return suggestionService.addSuggestion(suggestion);
     }
 
