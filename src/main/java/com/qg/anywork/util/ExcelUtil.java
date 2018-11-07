@@ -426,6 +426,7 @@ public class ExcelUtil {
                     question.setType(3);
                     //替換答案中非法字符
                     question.setKey(question.getKey().replaceAll("#", "∏"));
+                    question.setOther(question.getKey().split("∏").length);
                 } else if (status.startsWith("D")) {
                     question.setType(4);
                 }

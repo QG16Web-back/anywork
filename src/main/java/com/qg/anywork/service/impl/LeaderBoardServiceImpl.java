@@ -3,6 +3,7 @@ package com.qg.anywork.service.impl;
 import com.qg.anywork.dao.*;
 import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.common.ParamException;
+import com.qg.anywork.exception.leaderboard.LeaderBoardException;
 import com.qg.anywork.model.dto.LeaderBoard;
 import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.model.po.Organization;
@@ -181,6 +182,9 @@ public class LeaderBoardServiceImpl implements LeaderBoardService {
 
         for (TestPaper testPaper : testPapers) {
             testPaperIds.add(testPaper.getTestpaperId());
+        }
+        if (testPaperIds.size() == 0) {
+            throw new LeaderBoardException(StatEnum.NOT_HAVE_LEADER_BOARD);
         }
         String organizationName = organizationDao.getById(organizationId).getOrganizationName();
         List<LeaderBoard> leaderBoards = new ArrayList<>();

@@ -88,6 +88,7 @@ public enum StatEnum {
     GET_SUCCESS(1, "获取成功"),
     WRONG_QUESTION_LIST_IS_NULL(0, "错题列表为空"),
     TEST_PAPER_TIME_ERROR(0, "试卷时间有错误"),
+    NOT_HAVE_LEADER_BOARD(0, "暂时没有排行榜"),
 
     /**
      * 组织板块

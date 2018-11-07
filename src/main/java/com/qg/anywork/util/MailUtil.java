@@ -26,22 +26,22 @@ public class MailUtil {
     /**
      * 服务器地址
      */
-    private final static String HOST = "10.21.56.107";
+    private final static String HOST = "qgstudio.org";
 
     /**
      * 登录URL
      */
-    private final static String LOGIN_URL = "http://" + HOST + ":8080/html/login.html";
+    private final static String LOGIN_URL = "https://" + HOST + ":80/anywork/html/login.html";
 
     /**
      * 校验邮箱URL
      */
-    private final static String CHECK_EMAIL_URL = "http://" + HOST + ":8080/utils/check";
+    private final static String CHECK_EMAIL_URL = "https://" + HOST + ":80/anywork/utils/check";
 
     /**
      * 忘记密码URL
      */
-    private final static String PASSWORD_URL = "http://" + HOST + ":8080/utils/reset";
+    private final static String PASSWORD_URL = "https://" + HOST + ":80/utils/reset";
 
     @Autowired
     private JavaMailSender javaMailSender;

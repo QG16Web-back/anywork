@@ -24,6 +24,14 @@ public interface ChapterDao {
      */
     List<Chapter> getByOrganizationId(@Param("organizationId") int organizationId);
 
+    /**
+     * 根据userId获取章节
+     *
+     * @param userId userId
+     * @return 章节列表
+     */
+    List<Chapter> getByUserId(@Param("userId") Integer userId);
+
     /***
      * 增加章节
      * @param chapter 章节

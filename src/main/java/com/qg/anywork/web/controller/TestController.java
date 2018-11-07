@@ -27,6 +27,7 @@ import java.util.concurrent.Future;
  */
 @RestController
 @RequestMapping("/test")
+@CrossOrigin
 @Slf4j
 public class TestController {
 
@@ -121,7 +122,6 @@ public class TestController {
         if (studentPaper == null) {
             return new RequestResult<>(StatEnum.REQUEST_ERROR);
         }
-        // TODO 2018/09/12 增加考试的结束时间
         Future<RequestResult<StudentTestResult>> future = executor.submit(() -> testService.submitTestPaper(studentPaper));
         return future.get();
     }
@@ -155,7 +155,7 @@ public class TestController {
         if (user.getMark() == 0) {
             return new RequestResult<>(0, "无此权限");
         }
-        return chapterService.addChapter(chapter);
+        return chapterService.addChapter(user.getUserId(), chapter);
     }
 
     /***

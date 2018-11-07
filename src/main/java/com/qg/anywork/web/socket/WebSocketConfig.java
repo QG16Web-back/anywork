@@ -1,8 +1,8 @@
 package com.qg.anywork.web.socket;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.socket.server.standard.ServerEndpointExporter;
+import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
 /**
  * Create by ming on 18-9-13 下午5:19
@@ -11,10 +11,11 @@ import org.springframework.web.socket.server.standard.ServerEndpointExporter;
  * I'm the one to ignite the darkened skies.
  */
 @Configuration
-public class WebSocketConfig {
+public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
-    @Bean
-    public ServerEndpointExporter serverEndpointExporter() {
-        return new ServerEndpointExporter();
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("//websocket/{userId}")
+                .setAllowedOrigins("*");
     }
 }

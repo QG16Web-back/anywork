@@ -22,15 +22,18 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping("/suggest")
+@CrossOrigin
 public class SuggestionController {
     @Autowired
     private SuggestionService suggestionService;
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public RequestResult addSuggestion(@RequestParam("description") String description, HttpServletRequest request, @RequestParam("file") MultipartFile file) throws IOException {
+    public RequestResult addSuggestion(@RequestParam("description") String description, HttpServletRequest request,
+                                       @RequestParam(required = false, value = "file") MultipartFile file) throws IOException {
         User user = (User) request.getSession().getAttribute("user");
         //上传图片
         String path = UUID.randomUUID().toString();
+        Suggestion suggestion = new Suggestion();
         if (null != file && !file.isEmpty()) {
             String filename = file.getOriginalFilename();
             assert filename != null;
@@ -43,16 +46,15 @@ public class SuggestionController {
 
                 Thumbnails.of(request.getServletContext().getRealPath("/picture/suggestion" + "/" + path + ".jpg"))
                         .scale(0.4f).toFile(request.getServletContext().getRealPath("/picture/suggestion" + "/" + path + ".jpg"));
+                suggestion.setImagePath("/picture/suggestion" + "/" + path + ".jpg");
             } else {
                 return new RequestResult<>(StatEnum.FILE_FORMAT_ERROR, null);
             }
         } else {
-            return new RequestResult<>(StatEnum.FILE_UPLOAD_FAIL, null);
+            suggestion.setImagePath("");
         }
-        Suggestion suggestion = new Suggestion();
         suggestion.setUser(user);
         suggestion.setDescription(description);
-        suggestion.setImagePath(request.getServletContext().getRealPath("/picture/suggestion" + "/" + path + ".jpg"));
         return suggestionService.addSuggestion(suggestion);
     }
 

@@ -38,6 +38,7 @@ import java.util.concurrent.Future;
  */
 @RestController
 @RequestMapping("/user")
+@CrossOrigin
 @Slf4j
 public class UserController {
 

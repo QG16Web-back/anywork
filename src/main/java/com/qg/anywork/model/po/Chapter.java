@@ -40,4 +40,7 @@ public class Chapter  implements Serializable {
      */
     @Column(name = "chapter_name")
     private String chapterName;
+
+    @Column(name = "user_id")
+    private Integer userId;
 }

@@ -21,10 +21,11 @@ public interface ChapterService {
 
     /***
      * 添加章节
+     * @param userId userId
      * @param chapter 章节
      * @return 章节信息
      */
-    RequestResult addChapter(Chapter chapter);
+    RequestResult addChapter(int userId, Chapter chapter);
 
     /***
      * 删除章节

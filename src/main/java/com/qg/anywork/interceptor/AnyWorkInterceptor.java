@@ -17,10 +17,13 @@ public class AnyWorkInterceptor extends WebMvcConfigurerAdapter {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new AnyWorkLoginHandlerInterceptor())
                 .addPathPatterns("/**")
-                .excludePathPatterns("/utils/valcode", "/user/forget/new", "/utils/reset", "/user/forget", "/user/login",
-                        "/user/register", "/html/login.html", "/html/newPassword.html", "/html/failure.html",
-                        "/html/success.html", "/static/**", "/picture/**", "favicon.ico",
-                        "/message/publish"
+                .excludePathPatterns(
+                        "/anywork/utils/valcode", "/anywork/user/forget/new",
+                        "/anywork/utils/reset", "/anywork/user/forget",
+                        "/anywork/user/login", "/anywork/user/register",
+                        "/anywork/html/**",
+                        "/anywork/static/**", "/anywork/picture/**", "/anywork/excel/**",
+                        "/anywork/favicon.ico"
                 );
         super.addInterceptors(registry);
     }

@@ -15,11 +15,16 @@
         from chapter
         where chapter_id = #{chapterId}
     </select>
+    <select id="getByUserId" resultType="com.qg.anywork.model.po.Chapter">
+        SELECT *
+        FROM chapter
+        WHERE user_id = #{userId}
+    </select>
 
     <insert id="addChapter" parameterType="com.qg.anywork.model.po.Chapter" useGeneratedKeys="true"
             keyProperty="chapter.chapterId">
-        INSERT ignore INTO chapter (organization_id, chapter_name)
-        VALUE (#{chapter.organizationId}, #{chapter.chapterName})
+        INSERT ignore INTO chapter (user_id, chapter_name)
+        VALUE (#{chapter.userId}, #{chapter.chapterName})
     </insert>
 
     <delete id="deleteChapter" parameterType="int">

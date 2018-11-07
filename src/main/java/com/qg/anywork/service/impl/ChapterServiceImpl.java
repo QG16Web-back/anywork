@@ -6,6 +6,7 @@ import com.qg.anywork.enums.StatEnum;
 import com.qg.anywork.exception.organization.OrganizationException;
 import com.qg.anywork.model.dto.RequestResult;
 import com.qg.anywork.model.po.Chapter;
+import com.qg.anywork.model.po.Organization;
 import com.qg.anywork.service.ChapterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,14 +32,17 @@ public class ChapterServiceImpl implements ChapterService {
         if (organizationDao.getById(organizationId) == null) {
             throw new OrganizationException(StatEnum.ORGANIZATION_NOT_EXIST);
         }
-        return new RequestResult<>(1, "获取成功", chapterDao.getByOrganizationId(organizationId));
+        Organization organization = organizationDao.getById(organizationId);
+        List<Chapter> chapters = chapterDao.getByUserId(organization.getTeacherId());
+        for (Chapter chapter : chapters) {
+            chapter.setOrganizationId(organizationId);
+        }
+        return new RequestResult<>(1, "获取成功", chapters);
     }
 
     @Override
-    public RequestResult addChapter(Chapter chapter) {
-        if (organizationDao.getById(chapter.getOrganizationId()) == null) {
-            throw new OrganizationException(StatEnum.ORGANIZATION_NOT_EXIST);
-        }
+    public RequestResult addChapter(int userId, Chapter chapter) {
+        chapter.setUserId(userId);
         if (chapter.getChapterName().length() > 32) {
             throw new OrganizationException(StatEnum.CHAPTER_TOO_LONG);
         }
@@ -61,7 +65,6 @@ public class ChapterServiceImpl implements ChapterService {
         chapter.setChapterId(chapterId);
         chapter.setChapterName(chapterName);
         chapterDao.updateChapter(chapter);
-        chapter.setOrganizationId(chapterDao.getOrganizationIdByChapterId(chapterId));
         return new RequestResult<>(1, "修改成功", chapter);
     }
 }

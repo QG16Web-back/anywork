@@ -27,6 +27,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/organization")
+@CrossOrigin
 @Slf4j
 public class OrganizationController {
 

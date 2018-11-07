@@ -229,7 +229,7 @@ public class PaperServiceImpl implements PaperService {
         StudentTestResult studentTestResult = testDao.getTestResult(teacherSubmit.getTestpaperId(), teacherSubmit.getStudentId());
         studentTestResult.setSocre(studentTestResult.getSocre() + subject);
         testDao.updateTestResult(studentTestResult);
-        return new RequestResult<>(0, "评卷成功");
+        return new RequestResult<>(1, "评卷成功");
     }
 
     private List<CheckResult> listAllOrganizationStudentDoneDetail(List<Integer> organizationIds, Integer testPaperId) {
